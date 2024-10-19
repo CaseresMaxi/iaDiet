@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f4f4",
     padding: 20,
     marginTop: -50,
-    borderTopLeftRadius: "50px",
+    // borderTopLeftRadius: "50px",
     height: "40%",
     justifyContent: "space-between",
   },

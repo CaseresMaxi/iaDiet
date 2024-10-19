@@ -7,7 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Modal,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 const Traker = () => {
   const [data, setData] = useState([
@@ -18,29 +21,36 @@ const Traker = () => {
   const [inputValues, setInputValues] = useState({});
   const [expandedDates, setExpandedDates] = useState({});
   const [newDate, setNewDate] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentDate, setCurrentDate] = useState("");
+  const [newItemText, setNewItemText] = useState("");
+  const [newItemImage, setNewItemImage] = useState(null);
 
-  // Función para agregar un nuevo elemento a una fecha específica
-  const addItem = (date) => {
-    const newText = inputValues[date];
-    if (newText && newText.trim()) {
+  const addItem = () => {
+    if (newItemText.trim() || newItemImage) {
       setData((prevData) =>
         prevData.map((day) =>
-          day.date === date
+          day.date === currentDate
             ? {
                 ...day,
                 items: [
                   ...day.items,
-                  { id: Date.now().toString(), text: newText },
+                  {
+                    id: Date.now().toString(),
+                    text: newItemText,
+                    image: newItemImage,
+                  },
                 ],
               }
             : day,
         ),
       );
-      setInputValues((prevValues) => ({ ...prevValues, [date]: "" }));
+      setNewItemText("");
+      setNewItemImage(null);
+      setModalVisible(false);
     }
   };
 
-  // Función para eliminar un elemento de una fecha específica
   const deleteItem = (date, id) => {
     setData((prevData) =>
       prevData.map((day) =>
@@ -51,7 +61,6 @@ const Traker = () => {
     );
   };
 
-  // Función para alternar el estado expandido de una fecha específica
   const toggleExpand = (date) => {
     setExpandedDates((prev) => ({
       ...prev,
@@ -59,7 +68,11 @@ const Traker = () => {
     }));
   };
 
-  // Función para agregar un nuevo día
+  const openModal = (date) => {
+    setCurrentDate(date);
+    setModalVisible(true);
+  };
+
   const addDate = () => {
     if (newDate.trim() && !data.some((day) => day.date === newDate)) {
       setData((prevData) => [...prevData, { date: newDate, items: [] }]);
@@ -67,14 +80,26 @@ const Traker = () => {
     }
   };
 
-  // Función para eliminar una fecha completa
   const deleteDate = (date) => {
     setData((prevData) => prevData.filter((day) => day.date !== date));
   };
 
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync();
+    if (!result.cancelled) {
+      console.log(result?.assets[0]?.uri, "result.uri"); // Confirmar que el resultado no está cancelado
+      setNewItemImage(result?.assets[0]?.uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Campo para agregar nuevas fechas */}
       <View style={styles.newDateContainer}>
         <TextInput
           style={{ ...styles.input, ...styles.newDateInput }}
@@ -87,13 +112,11 @@ const Traker = () => {
         </Pressable>
       </View>
 
-      {/* Lista de fechas con elementos */}
       <FlatList
         data={data}
         keyExtractor={(item) => item.date}
         renderItem={({ item }) => (
           <View style={styles.dateContainer}>
-            {/* Cabecera de la fecha */}
             <View style={styles.dateHeader}>
               <TouchableOpacity
                 onPress={() => toggleExpand(item.date)}
@@ -112,20 +135,11 @@ const Traker = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Contenido desplegable */}
             {expandedDates[item.date] && (
               <View style={styles.content}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Add new item"
-                  value={inputValues[item.date] || ""}
-                  onChangeText={(text) =>
-                    setInputValues({ ...inputValues, [item.date]: text })
-                  }
-                />
                 <TouchableOpacity
                   style={styles.addButton}
-                  onPress={() => addItem(item.date)}
+                  onPress={() => openModal(item.date)}
                 >
                   <Text style={styles.buttonText}>Add Item</Text>
                 </TouchableOpacity>
@@ -134,7 +148,18 @@ const Traker = () => {
                   data={item.items}
                   keyExtractor={(subItem) => subItem.id}
                   renderItem={({ item: subItem }) => (
-                    <View style={styles.listItem}>
+                    <View
+                      style={styles.listItem}
+                      onClick={() => console.log(item, subItem)}
+                    >
+                      {/* Muestra la imagen si existe */}
+                      {console.log(subItem)}
+                      {subItem.image && (
+                        <Image
+                          source={{ uri: subItem.image }}
+                          style={styles.itemImage}
+                        />
+                      )}
                       <Text style={styles.itemText}>{subItem.text}</Text>
                       <TouchableOpacity
                         onPress={() => deleteItem(item.date, subItem.id)}
@@ -149,6 +174,45 @@ const Traker = () => {
           </View>
         )}
       />
+
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Enter item for {currentDate}</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Item text"
+              value={newItemText}
+              onChangeText={setNewItemText}
+            />
+            <TouchableOpacity style={styles.addButton} onPress={pickImage}>
+              <Text style={styles.buttonText}>Take Photo</Text>
+            </TouchableOpacity>
+            {newItemImage && (
+              <Image
+                source={{ uri: newItemImage }}
+                style={styles.previewImage}
+              />
+            )}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.addButton} onPress={addItem}>
+                <Text style={styles.buttonText}>Add Item</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -165,11 +229,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   newDateContainer: {
-    gap: 10,
-    marginBottom: 20,
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
   dateContainer: {
     marginBottom: 20,
@@ -196,18 +259,16 @@ const styles = StyleSheet.create({
   },
   toggleIcon: {
     fontSize: 20,
-    fontWeight: "bold",
     marginLeft: 10,
   },
   deleteDateButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
     backgroundColor: "#f44",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 5,
   },
   deleteDateText: {
     color: "#fff",
-    fontWeight: "bold",
   },
   content: {
     padding: 15,
@@ -232,11 +293,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "bold",
   },
   listItem: {
     flexDirection: "row",
+    alignItems: "center", // Asegura que el texto y la imagen estén alineados verticalmente
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "#f9f9f9",
@@ -247,9 +308,52 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 18,
+    flex: 1,
   },
   deleteText: {
     color: "red",
     fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 15,
+  },
+  cancelButton: {
+    backgroundColor: "#999",
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    width: "40%",
+  },
+  itemImage: {
+    width: 50, // Ancho de la imagen
+    height: 50, // Alto de la imagen
+    borderRadius: 5, // Redondea las esquinas de la imagen
+    marginRight: 10, // Margen derecho entre la imagen y el texto
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginVertical: 10,
   },
 });
