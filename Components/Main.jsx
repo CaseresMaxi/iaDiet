@@ -1,10 +1,11 @@
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useRouter } from "expo-router";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -17,7 +18,7 @@ export default function Main() {
   });
   const onSubmit = (data) => {
     console.log(data);
-    window.location.href = "/tracker";
+    router.push("/tracker");
   };
 
   return (
@@ -99,8 +100,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#000",
-    // borderBottomLeftRadius: 50,
-    // borderBottomRightRadius: 50,
     height: "30%",
     zIndex: -1,
   },
@@ -120,7 +119,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f4f4",
     padding: 20,
     marginTop: -50,
-    // borderTopLeftRadius: "50px",
     height: "40%",
     justifyContent: "space-between",
   },

@@ -2,6 +2,7 @@ import Main from "../Components/Main";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
+import { Text } from "react-native-web";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
@@ -15,12 +16,12 @@ export default function Index() {
       }}
     >
       <Stack.Screen
-        options={{
-          headerTitle: "",
-          headerLeft: () => null,
-          headerShadowVisible: false,
-          headerTransparent: true,
-        }}
+      // options={{
+      //   headerTitle: () => <Text>""</Text>,
+      //   headerLeft: () => null,
+      //   headerShadowVisible: false,
+      //   headerTransparent: true,
+      // }}
       />
       <Main />
     </View>

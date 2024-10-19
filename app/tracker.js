@@ -1,16 +1,39 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  View,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable,
-  Modal,
-  Image,
+  View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import * as yup from "yup";
+
+// Esquema de validación con Yup
+const schema = yup.object().shape({
+  foodName: yup.string().required("El nombre de la comida es obligatorio"),
+  calories: yup
+    .number()
+    .typeError("Las calorías deben ser un número")
+    .required("Las calorías son obligatorias"),
+  proteins: yup
+    .number()
+    .typeError("Las proteínas deben ser un número")
+    .required("Las proteínas son obligatorias"),
+  carbs: yup
+    .number()
+    .typeError("Los carbohidratos deben ser un número")
+    .required("Los carbohidratos son obligatorios"),
+  fats: yup
+    .number()
+    .typeError("Las grasas deben ser un número")
+    .required("Las grasas son obligatorias"),
+});
 
 const Traker = () => {
   const [data, setData] = useState([
@@ -18,37 +41,43 @@ const Traker = () => {
     { date: "2024-10-12", items: [] },
     { date: "2024-10-13", items: [] },
   ]);
-  const [inputValues, setInputValues] = useState({});
   const [expandedDates, setExpandedDates] = useState({});
   const [newDate, setNewDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  const [newItemText, setNewItemText] = useState("");
   const [newItemImage, setNewItemImage] = useState(null);
 
-  const addItem = () => {
-    if (newItemText.trim() || newItemImage) {
-      setData((prevData) =>
-        prevData.map((day) =>
-          day.date === currentDate
-            ? {
-                ...day,
-                items: [
-                  ...day.items,
-                  {
-                    id: Date.now().toString(),
-                    text: newItemText,
-                    image: newItemImage,
-                  },
-                ],
-              }
-            : day,
-        ),
-      );
-      setNewItemText("");
-      setNewItemImage(null);
-      setModalVisible(false);
-    }
+  // React Hook Form setup
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const addItem = (formData) => {
+    setData((prevData) =>
+      prevData.map((day) =>
+        day.date === currentDate
+          ? {
+              ...day,
+              items: [
+                ...day.items,
+                {
+                  id: Date.now().toString(),
+                  ...formData, // Aquí se añaden los datos del formulario
+                  image: newItemImage,
+                },
+              ],
+            }
+          : day,
+      ),
+    );
+    reset(); // Limpiar el formulario después de añadir el item
+    setNewItemImage(null);
+    setModalVisible(false);
   };
 
   const deleteItem = (date, id) => {
@@ -93,7 +122,6 @@ const Traker = () => {
 
     const result = await ImagePicker.launchCameraAsync();
     if (!result.cancelled) {
-      console.log(result?.assets[0]?.uri, "result.uri"); // Confirmar que el resultado no está cancelado
       setNewItemImage(result?.assets[0]?.uri);
     }
   };
@@ -118,7 +146,7 @@ const Traker = () => {
         renderItem={({ item }) => (
           <View style={styles.dateContainer}>
             <View style={styles.dateHeader}>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => toggleExpand(item.date)}
                 style={styles.dateHeaderButton}
               >
@@ -126,46 +154,41 @@ const Traker = () => {
                 <Text style={styles.toggleIcon}>
                   {expandedDates[item.date] ? "-" : "+"}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 onPress={() => deleteDate(item.date)}
                 style={styles.deleteDateButton}
               >
                 <Text style={styles.deleteDateText}>Delete</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             {expandedDates[item.date] && (
               <View style={styles.content}>
-                <TouchableOpacity
+                <Pressable
                   style={styles.addButton}
                   onPress={() => openModal(item.date)}
                 >
                   <Text style={styles.buttonText}>Add Item</Text>
-                </TouchableOpacity>
+                </Pressable>
 
                 <FlatList
                   data={item.items}
                   keyExtractor={(subItem) => subItem.id}
                   renderItem={({ item: subItem }) => (
-                    <View
-                      style={styles.listItem}
-                      onClick={() => console.log(item, subItem)}
-                    >
-                      {/* Muestra la imagen si existe */}
-                      {console.log(subItem)}
+                    <View style={styles.listItem}>
                       {subItem.image && (
                         <Image
                           source={{ uri: subItem.image }}
                           style={styles.itemImage}
                         />
                       )}
-                      <Text style={styles.itemText}>{subItem.text}</Text>
-                      <TouchableOpacity
+                      <Text style={styles.itemText}>{subItem.foodName}</Text>
+                      <Pressable
                         onPress={() => deleteItem(item.date, subItem.id)}
                       >
                         <Text style={styles.deleteText}>Delete</Text>
-                      </TouchableOpacity>
+                      </Pressable>
                     </View>
                   )}
                 />
@@ -183,32 +206,121 @@ const Traker = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Enter item for {currentDate}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Item text"
-              value={newItemText}
-              onChangeText={setNewItemText}
+            {/* <Text style={styles.modalTitle}>
+              Añadir comida para {currentDate}
+            </Text> */}
+
+            <Controller
+              control={control}
+              name="foodName"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nombre de la comida"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
             />
-            <TouchableOpacity style={styles.addButton} onPress={pickImage}>
-              <Text style={styles.buttonText}>Take Photo</Text>
-            </TouchableOpacity>
-            {newItemImage && (
-              <Image
-                source={{ uri: newItemImage }}
-                style={styles.previewImage}
-              />
+            {errors.foodName && (
+              <Text style={styles.errorText}>{errors.foodName.message}</Text>
             )}
+
+            <Controller
+              control={control}
+              name="calories"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Calorías"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            {errors.calories && (
+              <Text style={styles.errorText}>{errors.calories.message}</Text>
+            )}
+
+            <Controller
+              control={control}
+              name="proteins"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Proteínas (g)"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            {errors.proteins && (
+              <Text style={styles.errorText}>{errors.proteins.message}</Text>
+            )}
+
+            <Controller
+              control={control}
+              name="carbs"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Carbohidratos (g)"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            {errors.carbs && (
+              <Text style={styles.errorText}>{errors.carbs.message}</Text>
+            )}
+
+            <Controller
+              control={control}
+              name="fats"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Grasas (g)"
+                  value={value}
+                  onChangeText={onChange}
+                  keyboardType="numeric"
+                />
+              )}
+            />
+            {errors.fats && (
+              <Text style={styles.errorText}>{errors.fats.message}</Text>
+            )}
+
+            <View style={styles.imagePickerContainer}>
+              <Pressable style={styles.addButton} onPress={pickImage}>
+                <Text style={styles.buttonText}>Tomar Foto</Text>
+              </Pressable>
+
+              {/* Vista previa de la imagen junto al botón */}
+              {newItemImage && (
+                <Image
+                  source={{ uri: newItemImage }}
+                  style={styles.previewImageSmall}
+                />
+              )}
+            </View>
+
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.addButton} onPress={addItem}>
-                <Text style={styles.buttonText}>Add Item</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              <Pressable
+                style={styles.addButton}
+                onPress={handleSubmit(addItem)}
+              >
+                <Text style={styles.buttonText}>Añadir Item</Text>
+              </Pressable>
+              <Pressable
                 style={styles.cancelButton}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -289,7 +401,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     marginBottom: 15,
-    width: "33%",
+    width: "40%",
   },
   buttonText: {
     color: "#fff",
@@ -297,7 +409,7 @@ const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: "row",
-    alignItems: "center", // Asegura que el texto y la imagen estén alineados verticalmente
+    alignItems: "center",
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "#f9f9f9",
@@ -332,6 +444,33 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
   },
+  itemImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 5,
+  },
+  imagePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center", // Alinea la imagen y el botón verticalmente
+    marginBottom: 20,
+  },
+  previewImageSmall: {
+    width: 50, // Ancho de la imagen
+    height: 50, // Alto de la imagen
+    borderRadius: 5, // Borde redondeado
+    marginLeft: 10, // Espacio entre la imagen y el botón
+  },
   modalButtons: {
     flexDirection: "row",
     gap: 10,
@@ -343,17 +482,5 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     width: "40%",
-  },
-  itemImage: {
-    width: 50, // Ancho de la imagen
-    height: 50, // Alto de la imagen
-    borderRadius: 5, // Redondea las esquinas de la imagen
-    marginRight: 10, // Margen derecho entre la imagen y el texto
-  },
-  previewImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginVertical: 10,
   },
 });

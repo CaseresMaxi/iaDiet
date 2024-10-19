@@ -7,19 +7,19 @@ const Layout = () => {
   return (
     <>
       <Stack
-        screenOptions={{
-          headerTitle: "",
-          headerShadowVisible: false,
-          //   headerTransparent: true,
-          headerLeft: () => (
-            <View style={{ marginLeft: 20 }}>
-              <Text style={{ color: "#fff", fontSize: 24 }}>◉ Traker</Text>
-            </View>
-          ),
-          headerStyle: {
-            backgroundColor: "#000",
-          },
-        }}
+      // screenOptions={{
+      //   // headerTitle: "",
+      //   // headerShadowVisible: false,
+      //   //   headerTransparent: true,
+      //   headerLeft: () => (
+      //     <View style={{ marginLeft: 20 }}>
+      //       <Text style={{ color: "#fff", fontSize: 24 }}>◉ Traker</Text>
+      //     </View>
+      //   ),
+      //   headerStyle: {
+      //     backgroundColor: "#000",
+      //   },
+      // }}
       />
     </>
   );
