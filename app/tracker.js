@@ -106,25 +106,42 @@ const Traker = () => {
     setCurrentDate(date);
     setModalVisible(true);
   };
+
   const openChatModal = (date) => {
     setCurrentDate(date);
     setChatModalVisible(true);
   };
+
+  // Función para enviar un mensaje del usuario
   const sendMessage = () => {
     if (newMessage.trim() || selectedImage) {
-      console.log(newMessage, selectedImage);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: Date.now().toString(),
           text: newMessage,
           image: selectedImage,
+          isBot: false, // Identificar mensaje como usuario
         },
       ]);
       setNewMessage("");
       setSelectedImage(null); // Limpiar la imagen seleccionada después de enviar
+      sendBotReply(); // Llamar a la función para responder con un mensaje genérico
     }
   };
+
+  // Función para simular una respuesta genérica del "bot"
+  const sendBotReply = () => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: `${Date.now().toString()}-res`,
+        text: "Este es un mensaje automático del sistema.",
+        isBot: true, // Identificar mensaje como bot
+      },
+    ]);
+  };
+
   const addDate = () => {
     if (newDate.trim() && !data.some((day) => day.date === newDate)) {
       setData((prevData) => [...prevData, { date: newDate, items: [] }]);
@@ -148,6 +165,7 @@ const Traker = () => {
       setNewItemImage(result?.assets[0]?.uri);
     }
   };
+
   const pickImageForChat = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -170,6 +188,7 @@ const Traker = () => {
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.newDateContainer}>
@@ -250,10 +269,6 @@ const Traker = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {/* <Text style={styles.modalTitle}>
-              Añadir comida para {currentDate}
-            </Text> */}
-
             <Controller
               control={control}
               name="foodName"
@@ -343,7 +358,6 @@ const Traker = () => {
                 <Text style={styles.buttonText}>Tomar Foto</Text>
               </Pressable>
 
-              {/* Vista previa de la imagen junto al botón */}
               {newItemImage && (
                 <Image
                   source={{ uri: newItemImage }}
@@ -369,21 +383,25 @@ const Traker = () => {
           </View>
         </View>
       </Modal>
+
       <Modal
         transparent={true}
         animationType="slide"
         visible={chatModalVisible}
         onRequestClose={() => setChatModalVisible(false)}
       >
-        {console.log(messages)}
-
         <View style={styles.modalCenteredContainer}>
           <View style={styles.chatModalFixedContent}>
             <FlatList
               data={messages}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.chatMessageContainer}>
+                <View
+                  style={[
+                    styles.chatMessageContainer,
+                    item.isBot ? styles.botMessage : styles.userMessage,
+                  ]}
+                >
                   {item.image && (
                     <Image
                       source={{ uri: item.image }}
@@ -395,7 +413,6 @@ const Traker = () => {
               )}
             />
 
-            {/* Mostrar la imagen seleccionada antes de enviar */}
             {selectedImage && (
               <View style={styles.selectedImageContainer}>
                 <Image
@@ -545,37 +562,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
   itemImage: {
     width: 50,
     height: 50,
     borderRadius: 5,
     marginRight: 10,
   },
-  previewImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginVertical: 10,
+  previewImageSmall: {
+    width: 50,
+    height: 50,
+    borderRadius: 5,
+    marginLeft: 10,
   },
   errorText: {
     color: "red",
     marginBottom: 5,
-  },
-  imagePickerContainer: {
-    flexDirection: "row",
-    alignItems: "center", // Alinea la imagen y el botón verticalmente
-    marginBottom: 20,
-  },
-  previewImageSmall: {
-    width: 50, // Ancho de la imagen
-    height: 50, // Alto de la imagen
-    borderRadius: 5, // Borde redondeado
-    marginLeft: 10, // Espacio entre la imagen y el botón
   },
   modalButtons: {
     flexDirection: "row",
@@ -618,6 +619,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#f1f1f1",
     alignSelf: "flex-start",
     maxWidth: "80%",
+  },
+  botMessage: {
+    backgroundColor: "#DCF8C6", // Color para mensajes del "bot"
+    alignSelf: "flex-end", // Alineación a la derecha
+  },
+  userMessage: {
+    backgroundColor: "#E5E5E5", // Color para mensajes del usuario
+    alignSelf: "flex-start", // Alineación a la izquierda
   },
   messageImage: {
     width: 200,
