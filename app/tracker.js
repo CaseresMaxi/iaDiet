@@ -46,6 +46,11 @@ const Traker = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [newItemImage, setNewItemImage] = useState(null);
+  const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
+
+  const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
+  const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
+  const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
 
   // React Hook Form setup
   const {
@@ -101,7 +106,25 @@ const Traker = () => {
     setCurrentDate(date);
     setModalVisible(true);
   };
-
+  const openChatModal = (date) => {
+    setCurrentDate(date);
+    setChatModalVisible(true);
+  };
+  const sendMessage = () => {
+    if (newMessage.trim() || selectedImage) {
+      console.log(newMessage, selectedImage);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: Date.now().toString(),
+          text: newMessage,
+          image: selectedImage,
+        },
+      ]);
+      setNewMessage("");
+      setSelectedImage(null); // Limpiar la imagen seleccionada después de enviar
+    }
+  };
   const addDate = () => {
     if (newDate.trim() && !data.some((day) => day.date === newDate)) {
       setData((prevData) => [...prevData, { date: newDate, items: [] }]);
@@ -125,7 +148,28 @@ const Traker = () => {
       setNewItemImage(result?.assets[0]?.uri);
     }
   };
+  const pickImageForChat = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
 
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setSelectedImage(result?.assets[0]?.uri); // Guardar la imagen seleccionada
+    }
+  };
+
+  // Función para eliminar la imagen seleccionada
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.newDateContainer}>
@@ -167,7 +211,7 @@ const Traker = () => {
               <View style={styles.content}>
                 <Pressable
                   style={styles.addButton}
-                  onPress={() => openModal(item.date)}
+                  onPress={() => openChatModal(item.date)}
                 >
                   <Text style={styles.buttonText}>Add Item</Text>
                 </Pressable>
@@ -320,6 +364,68 @@ const Traker = () => {
                 onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={chatModalVisible}
+        onRequestClose={() => setChatModalVisible(false)}
+      >
+        {console.log(messages)}
+
+        <View style={styles.modalCenteredContainer}>
+          <View style={styles.chatModalFixedContent}>
+            <FlatList
+              data={messages}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.chatMessageContainer}>
+                  {item.image && (
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.messageImage}
+                    />
+                  )}
+                  <Text style={styles.messageText}>{item.text}</Text>
+                </View>
+              )}
+            />
+
+            {/* Mostrar la imagen seleccionada antes de enviar */}
+            {selectedImage && (
+              <View style={styles.selectedImageContainer}>
+                <Image
+                  source={{ uri: selectedImage }}
+                  style={styles.selectedImage}
+                />
+                <Pressable
+                  style={styles.removeImageButton}
+                  onPress={removeSelectedImage}
+                >
+                  <Text style={styles.removeImageButtonText}>✖</Text>
+                </Pressable>
+              </View>
+            )}
+
+            <View style={styles.chatInputContainer}>
+              <Pressable
+                style={styles.imagePickerButton}
+                onPress={pickImageForChat}
+              >
+                <Text style={styles.imagePickerButtonText}>📷</Text>
+              </Pressable>
+              <TextInput
+                style={styles.chatInput}
+                placeholder="Escribe tu mensaje..."
+                value={newMessage}
+                onChangeText={setNewMessage}
+              />
+              <Pressable style={styles.chatSendButton} onPress={sendMessage}>
+                <Text style={styles.sendButtonText}>Enviar</Text>
               </Pressable>
             </View>
           </View>
@@ -482,5 +588,110 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     width: "40%",
+  },
+  modalCenteredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  chatModalFixedContent: {
+    width: "90%",
+    height: "80%",
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 15,
+    justifyContent: "space-between",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  chatMessageContainer: {
+    marginVertical: 8,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#f1f1f1",
+    alignSelf: "flex-start",
+    maxWidth: "80%",
+  },
+  messageImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  messageText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  chatInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+  },
+  chatInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    fontSize: 16,
+    backgroundColor: "#f8f8f8",
+  },
+  chatSendButton: {
+    marginLeft: 10,
+    backgroundColor: "#007AFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+  },
+  sendButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  imagePickerButton: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  imagePickerButtonText: {
+    fontSize: 24,
+  },
+  selectedImageContainer: {
+    position: "relative",
+    marginBottom: 10,
+    borderRadius: 10,
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    alignItems: "center",
+  },
+  selectedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  removeImageButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 15,
+    width: 25,
+    height: 25,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  removeImageButtonText: {
+    color: "#fff",
+    fontSize: 16,
   },
 });
