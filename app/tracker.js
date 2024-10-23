@@ -51,6 +51,7 @@ const Traker = () => {
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
   const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
+  const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
 
   // React Hook Form setup
   const {
@@ -73,7 +74,7 @@ const Traker = () => {
                 {
                   id: Date.now().toString(),
                   ...formData, // Aquí se añaden los datos del formulario
-                  image: newItemImage,
+                  image: lastSelectedImg,
                 },
               ],
             }
@@ -109,6 +110,8 @@ const Traker = () => {
 
   const openChatModal = (date) => {
     setCurrentDate(date);
+    setMessages([]);
+    setLastSelectedImg(null);
     setChatModalVisible(true);
   };
 
@@ -125,6 +128,9 @@ const Traker = () => {
         },
       ]);
       setNewMessage("");
+      if (selectedImage) {
+        setLastSelectedImg(selectedImage);
+      }
       setSelectedImage(null); // Limpiar la imagen seleccionada después de enviar
       sendBotReply(); // Llamar a la función para responder con un mensaje genérico
     }
@@ -354,13 +360,13 @@ const Traker = () => {
             )}
 
             <View style={styles.imagePickerContainer}>
-              <Pressable style={styles.addButton} onPress={pickImage}>
+              {/* <Pressable style={styles.addButton} onPress={pickImage}>
                 <Text style={styles.buttonText}>Tomar Foto</Text>
-              </Pressable>
+              </Pressable> */}
 
-              {newItemImage && (
+              {lastSelectedImg && (
                 <Image
-                  source={{ uri: newItemImage }}
+                  source={{ uri: lastSelectedImg }}
                   style={styles.previewImageSmall}
                 />
               )}
@@ -409,6 +415,19 @@ const Traker = () => {
                     />
                   )}
                   <Text style={styles.messageText}>{item.text}</Text>
+                  {item.isBot && (
+                    <Pressable
+                      style={styles.openModalButton}
+                      onPress={() => {
+                        setChatModalVisible(false);
+                        setModalVisible(true);
+                      }}
+                    >
+                      <Text style={styles.openModalButtonText}>
+                        Abrir Modal
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
               )}
             />
@@ -637,6 +656,17 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: "#000",
+  },
+  openModalButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  openModalButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   chatInputContainer: {
     flexDirection: "row",
