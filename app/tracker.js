@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   FlatList,
@@ -13,25 +13,28 @@ import {
   View,
 } from "react-native";
 import * as yup from "yup";
+import DotTypingAnimation from "../Components/DotTyping";
+import DateTimePicker from "react-native-ui-datepicker";
+import moment from "moment/moment";
 
 // Esquema de validación con Yup
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
   calories: yup
     .number()
-    .typeError("Las calorías deben ser un número")
+    // .typeError("Las calorías deben ser un número")
     .required("Las calorías son obligatorias"),
   proteins: yup
     .number()
-    .typeError("Las proteínas deben ser un número")
+    // .typeError("Las proteínas deben ser un número")
     .required("Las proteínas son obligatorias"),
   carbs: yup
     .number()
-    .typeError("Los carbohidratos deben ser un número")
+    // .typeError("Los carbohidratos deben ser un número")
     .required("Los carbohidratos son obligatorios"),
   fats: yup
     .number()
-    .typeError("Las grasas deben ser un número")
+    // .typeError("Las grasas deben ser un número")
     .required("Las grasas son obligatorias"),
 });
 
@@ -47,6 +50,8 @@ const Traker = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [newItemImage, setNewItemImage] = useState(null);
   const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
+  const [isLoading, setisLoading] = useState(false);
+  const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
 
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
@@ -54,15 +59,38 @@ const Traker = () => {
   const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
 
   // React Hook Form setup
+
+  useEffect(() => {
+    console.log("nutritionData", nutritionData);
+  }, [nutritionData]);
+
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      foodName: "",
+      calories: 0,
+      proteins: 0,
+      carbs: 0,
+      fats: 0,
+    },
   });
 
+  // Prellenar el formulario cuando nutritionData y modalVisible cambian
+  useEffect(() => {
+    if (nutritionData && modalVisible) {
+      setValue("foodName", nutritionData.nombre || "");
+      setValue("calories", Number(nutritionData.calorias) || 0);
+      setValue("proteins", Number(nutritionData.proteinas) || 0);
+      setValue("carbs", Number(nutritionData.carbohidratos) || 0);
+      setValue("fats", Number(nutritionData.grasas) || 0);
+    }
+  }, [nutritionData, modalVisible, setValue]);
   const addItem = (formData) => {
     setData((prevData) =>
       prevData.map((day) =>
@@ -103,11 +131,6 @@ const Traker = () => {
     }));
   };
 
-  const openModal = (date) => {
-    setCurrentDate(date);
-    setModalVisible(true);
-  };
-
   const openChatModal = (date) => {
     setCurrentDate(date);
     setMessages([]);
@@ -115,25 +138,93 @@ const Traker = () => {
     setChatModalVisible(true);
   };
 
-  // Función para enviar un mensaje del usuario
-  const sendMessage = () => {
+  const sendMessage = async () => {
+    setNutritionData(null);
     if (newMessage.trim() || selectedImage) {
+      const contextMessage =
+        "Lo que se está enviando aquí es en el contexto de una aplicación para el conteo de calorías. Necesito que seas preciso con la descripción de calorías e ingredientes que tiene las imágenes que te envíe o las descripciones que te dé. Ten en cuenta que necesito que, además de tu respuesta habitual, me envíes antes del mensaje la siguiente información nutricional del alimento encerrada toda esta seccion empara con /* y terminara con */. Necesito nombre del alimento, calorías, proteínas, grasas y carbohidratos, deben ir de la siguiente fomra: '&&&nombre:nombre del alimento&&&calorias: calorias&&&proteinas: proteinas&&&grasas&&&carbohidratos: carbohidratos&&&', recuerda que en las calorais, carbohidratos, rasas y proteinas, solo deben ir numeros, na nada de letras. Es importante que no hagas mención a este texto en tu respuesta, solo envía la información solicitada.";
+      const messageBody = {
+        message: `${contextMessage}\n${newMessage}`,
+        images: selectedImage ? [selectedImage] : [],
+      };
+
+      console.log("messageBody", messageBody);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: Date.now().toString(),
           text: newMessage,
           image: selectedImage,
-          isBot: false, // Identificar mensaje como usuario
+          isBot: false,
         },
       ]);
+
       setNewMessage("");
       if (selectedImage) {
         setLastSelectedImg(selectedImage);
       }
-      setSelectedImage(null); // Limpiar la imagen seleccionada después de enviar
-      sendBotReply(); // Llamar a la función para responder con un mensaje genérico
+      setSelectedImage(null);
+
+      setisLoading(true);
+
+      try {
+        const response = await fetch("http://54.198.190.149:5000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(messageBody),
+        });
+        console.log("response", response);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Response:", data);
+
+          // Extraer información nutricional
+          const nutritionInfo = extractNutritionInfo(data.response);
+
+          // Guardar la información nutricional en el estado y limpiar el mensaje
+          setNutritionData(nutritionInfo);
+          const cleanMessage = data?.response
+            ?.replace(/&&&.*?&&&/g, "")
+            ?.replace(/\/\*[^]*?\*\//g, "")
+            ?.trim();
+          console.log("cleanMessage", cleanMessage);
+
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              id: `${Date.now().toString()}-res`,
+              text: cleanMessage,
+              isBot: true,
+            },
+          ]);
+        } else {
+          console.error("Error al enviar el mensaje:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+      }
+
+      setisLoading(false);
     }
+  };
+
+  // Función para extraer información nutricional del mensaje
+  const extractNutritionInfo = (responseText) => {
+    const nutritionPattern =
+      /&&&nombre:(.*?)&&&calorias:(.*?)&&&proteinas:(.*?)&&&grasas:(.*?)&&&carbohidratos:(.*?)&&&/;
+    const match = responseText?.match(nutritionPattern);
+    if (match) {
+      return {
+        nombre: match[1].trim(),
+        calorias: match[2].trim(),
+        proteinas: match[3].trim(),
+        grasas: match[4].trim(),
+        carbohidratos: match[5].trim(),
+      };
+    }
+    return null;
   };
 
   // Función para simular una respuesta genérica del "bot"
@@ -148,10 +239,20 @@ const Traker = () => {
     ]);
   };
 
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+
   const addDate = () => {
     if (newDate.trim() && !data.some((day) => day.date === newDate)) {
       setData((prevData) => [...prevData, { date: newDate, items: [] }]);
       setNewDate("");
+    }
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setDatePickerVisible(false);
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split("T")[0];
+      setNewDate(formattedDate);
     }
   };
 
@@ -183,10 +284,13 @@ const Traker = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
+      base64: true,
     });
 
+    console.log("result img", result);
+
     if (!result.cancelled) {
-      setSelectedImage(result?.assets[0]?.uri); // Guardar la imagen seleccionada
+      setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
     }
   };
 
@@ -198,17 +302,19 @@ const Traker = () => {
   return (
     <View style={styles.container}>
       <View style={styles.newDateContainer}>
-        <TextInput
-          style={{ ...styles.input, ...styles.newDateInput }}
-          placeholder="Add new date (YYYY-MM-DD)"
-          value={newDate}
-          onChangeText={setNewDate}
-        />
+        <Pressable onPress={() => setDatePickerVisible(true)}>
+          <TextInput
+            style={{ ...styles.input, ...styles.newDateInput }}
+            placeholder="Add new date (YYYY-MM-DD)"
+            value={newDate}
+            editable={false} // Prevent direct editing
+            pointerEvents="none" // Ensure pressable works
+          />
+        </Pressable>
         <Pressable style={styles.addButton} onPress={addDate}>
           <Text style={styles.buttonText}>Add Date</Text>
         </Pressable>
       </View>
-
       <FlatList
         data={data}
         keyExtractor={(item) => item.date}
@@ -399,37 +505,47 @@ const Traker = () => {
         <View style={styles.modalCenteredContainer}>
           <View style={styles.chatModalFixedContent}>
             <FlatList
-              data={messages}
+              data={
+                isLoading
+                  ? [...messages, { id: "loading", isBot: true }]
+                  : messages
+              }
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View
-                  style={[
-                    styles.chatMessageContainer,
-                    item.isBot ? styles.botMessage : styles.userMessage,
-                  ]}
-                >
-                  {item.image && (
-                    <Image
-                      source={{ uri: item.image }}
-                      style={styles.messageImage}
-                    />
-                  )}
-                  <Text style={styles.messageText}>{item.text}</Text>
-                  {item.isBot && (
-                    <Pressable
-                      style={styles.openModalButton}
-                      onPress={() => {
-                        setChatModalVisible(false);
-                        setModalVisible(true);
-                      }}
-                    >
-                      <Text style={styles.openModalButtonText}>
-                        Abrir Modal
-                      </Text>
-                    </Pressable>
-                  )}
-                </View>
-              )}
+              renderItem={({ item }) =>
+                item.id === "loading" ? (
+                  <View style={styles.chatMessageContainer}>
+                    <DotTypingAnimation />
+                  </View>
+                ) : (
+                  <View
+                    style={[
+                      styles.chatMessageContainer,
+                      item.isBot ? styles.botMessage : styles.userMessage,
+                    ]}
+                  >
+                    {item.image && (
+                      <Image
+                        source={{ uri: item.image }}
+                        style={styles.messageImage}
+                      />
+                    )}
+                    <Text style={styles.messageText}>{item.text}</Text>
+                    {nutritionData && (
+                      <Pressable
+                        style={styles.openModalButton}
+                        onPress={() => {
+                          setChatModalVisible(false);
+                          setModalVisible(true);
+                        }}
+                      >
+                        <Text style={styles.openModalButtonText}>
+                          Abrir Modal
+                        </Text>
+                      </Pressable>
+                    )}
+                  </View>
+                )
+              }
             />
 
             {selectedImage && (
@@ -473,16 +589,26 @@ const Traker = () => {
 
 export default Traker;
 
+/* */
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: "#181A20", // Fondo oscuro
   },
   newDateInput: {
     width: "100%",
+    borderColor: "#4E4C67", // Borde gris oscuro
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    height: 50,
+    backgroundColor: "#1E2028", // Fondo oscuro para inputs
+    color: "#FFFFFF", // Texto en blanco
   },
   newDateContainer: {
+    gap: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -491,7 +617,7 @@ const styles = StyleSheet.create({
   dateContainer: {
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#4E4C67", // Borde gris oscuro
     borderRadius: 15,
     overflow: "hidden",
   },
@@ -499,7 +625,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#eee",
+    backgroundColor: "#1E2028", // Fondo oscuro
     padding: 20,
   },
   dateHeaderButton: {
@@ -510,35 +636,38 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#FFFFFF", // Texto blanco
   },
   toggleIcon: {
     fontSize: 20,
     marginLeft: 10,
+    color: "#FFFFFF", // Icono en blanco
   },
   deleteDateButton: {
-    backgroundColor: "#f44",
+    backgroundColor: "#FF4D4F", // Color rojo para eliminar
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
   },
   deleteDateText: {
-    color: "#fff",
+    color: "#FFFFFF", // Texto blanco en el botón de eliminar
   },
   content: {
     padding: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#1E2028", // Fondo oscuro para el contenido
   },
   input: {
-    borderColor: "#ddd",
+    borderColor: "#4E4C67", // Borde gris oscuro
     borderWidth: 1,
     borderRadius: 25,
     paddingHorizontal: 15,
     height: 50,
-    backgroundColor: "#fff",
+    backgroundColor: "#1E2028", // Fondo oscuro
+    color: "#FFFFFF", // Texto blanco
     marginBottom: 15,
   },
   addButton: {
-    backgroundColor: "#000",
+    backgroundColor: "#7F56DA", // Botón morado
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: "center",
@@ -546,7 +675,7 @@ const styles = StyleSheet.create({
     width: "40%",
   },
   buttonText: {
-    color: "#fff",
+    color: "#FFFFFF", // Texto en blanco
     fontWeight: "bold",
   },
   listItem: {
@@ -554,30 +683,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#1E2028", // Fondo oscuro para los items
     borderRadius: 10,
     marginBottom: 10,
-    borderColor: "#ddd",
+    borderColor: "#4E4C67", // Borde gris oscuro
     borderWidth: 1,
   },
   itemText: {
     fontSize: 18,
     flex: 1,
+    color: "#FFFFFF", // Texto blanco
   },
   deleteText: {
-    color: "red",
+    color: "#FF4D4F", // Texto rojo para eliminar
     fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo transparente oscuro
   },
   modalContent: {
     width: 300,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#1E2028", // Fondo oscuro para el modal
     borderRadius: 10,
     alignItems: "center",
   },
@@ -594,20 +724,23 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   errorText: {
-    color: "red",
+    color: "#FF4D4F", // Texto de error en rojo
     marginBottom: 5,
   },
   modalButtons: {
+    width: "100%",
     flexDirection: "row",
+    justifyContent: "center",
     gap: 10,
     marginTop: 15,
   },
   cancelButton: {
-    backgroundColor: "#999",
+    backgroundColor: "#4E4C67", // Botón gris oscuro
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: "center",
     width: "40%",
+    height: 50,
   },
   modalCenteredContainer: {
     flex: 1,
@@ -618,34 +751,26 @@ const styles = StyleSheet.create({
   chatModalFixedContent: {
     width: "90%",
     height: "80%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#1E2028", // Fondo oscuro para el chat modal
     borderRadius: 20,
     padding: 15,
     justifyContent: "space-between",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   chatMessageContainer: {
     marginVertical: 8,
     padding: 10,
     borderRadius: 10,
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#282C34",
     alignSelf: "flex-start",
     maxWidth: "80%",
   },
   botMessage: {
-    backgroundColor: "#DCF8C6", // Color para mensajes del "bot"
-    alignSelf: "flex-end", // Alineación a la derecha
+    backgroundColor: "#7F56DA", // Fondo morado para los mensajes del bot
+    alignSelf: "flex-start", // Alinear los mensajes del bot a la izquierda
   },
   userMessage: {
-    backgroundColor: "#E5E5E5", // Color para mensajes del usuario
-    alignSelf: "flex-start", // Alineación a la izquierda
+    backgroundColor: "#4E4C67", // Fondo gris oscuro para los mensajes del usuario
+    alignSelf: "flex-end", // Alinear los mensajes del usuario a la derecha
   },
   messageImage: {
     width: 200,
@@ -655,17 +780,17 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
-    color: "#000",
+    color: "#FFFFFF", // Texto blanco para los mensajes
   },
   openModalButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7F56DA", // Botón morado para abrir modal
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
     marginTop: 5,
   },
   openModalButtonText: {
-    color: "#fff",
+    color: "#FFFFFF", // Texto en blanco
     fontWeight: "bold",
   },
   chatInputContainer: {
@@ -673,43 +798,45 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 10,
     borderTopWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#4E4C67", // Borde gris oscuro
   },
   chatInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#4E4C67", // Borde gris oscuro
     borderRadius: 25,
     paddingHorizontal: 15,
     paddingVertical: 10,
     fontSize: 16,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#282C34", // Fondo gris oscuro
+    color: "#FFFFFF", // Texto blanco
   },
   chatSendButton: {
     marginLeft: 10,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7F56DA", // Botón morado para enviar mensajes
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
   },
   sendButtonText: {
-    color: "#fff",
+    color: "#FFFFFF", // Texto en blanco
     fontWeight: "bold",
   },
   imagePickerButton: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#4E4C67", // Botón gris oscuro para elegir imagen
     padding: 10,
     borderRadius: 25,
     marginRight: 10,
   },
   imagePickerButtonText: {
     fontSize: 24,
+    color: "#FFFFFF", // Icono blanco para el botón de imagen
   },
   selectedImageContainer: {
     position: "relative",
     marginBottom: 10,
     borderRadius: 10,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#282C34", // Fondo gris oscuro para la imagen seleccionada
     padding: 10,
     alignItems: "center",
   },
@@ -722,7 +849,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 5,
     right: 5,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro translúcido
     borderRadius: 15,
     width: 25,
     height: 25,
@@ -730,7 +857,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   removeImageButtonText: {
-    color: "#fff",
+    color: "#FFFFFF", // Texto blanco para eliminar imagen
     fontSize: 16,
   },
 });
