@@ -9,9 +9,6 @@ const Layout = () => {
     <>
       <Stack
         screenOptions={{
-          headerTitle: "",
-          headerShadowVisible: false,
-
           headerShown: false,
           // headerLeft: () => (
           //   <View style={{ marginLeft: 20 }}>

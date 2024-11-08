@@ -2,6 +2,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Link, Stack, useRouter } from "expo-router";
+import { useState } from "react";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -17,7 +18,6 @@ export default function Main() {
     },
   });
   const onSubmit = (data) => {
-    console.log(data);
     router.push("/tracker");
   };
 
@@ -46,7 +46,7 @@ export default function Main() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={styles.customInput}
               placeholder="Email"
               placeholderTextColor="#888"
               onBlur={onBlur}
@@ -65,7 +65,7 @@ export default function Main() {
           rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              style={styles.input}
+              style={styles.customInput}
               placeholder="Password"
               placeholderTextColor="#888"
               secureTextEntry
@@ -84,9 +84,11 @@ export default function Main() {
           <Text style={styles.buttonText}>Login</Text>
         </Pressable>
 
-        <Text style={styles.footerText}>
-          Don't have any account? <Text style={styles.linkText}>Sign Up</Text>
-        </Text>
+        <Pressable onPress={() => router.push("/signup")}>
+          <Text style={styles.footerText}>
+            Don't have any account? <Text style={styles.linkText}>Sign Up</Text>
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#FFFFFF", // Título en blanco
   },
-  input: {
+  customInput: {
     height: 50,
     borderColor: "#4E4C67", // Borde gris oscuro
     borderWidth: 1,

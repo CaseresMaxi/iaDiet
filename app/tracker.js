@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import dayjs from "dayjs";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,8 +15,6 @@ import {
 } from "react-native";
 import * as yup from "yup";
 import DotTypingAnimation from "../Components/DotTyping";
-import DateTimePicker from "react-native-ui-datepicker";
-import moment from "moment/moment";
 
 // Esquema de validación con Yup
 const schema = yup.object().shape({
@@ -40,15 +39,14 @@ const schema = yup.object().shape({
 
 const Traker = () => {
   const [data, setData] = useState([
-    { date: "2024-10-11", items: [] },
-    { date: "2024-10-12", items: [] },
-    { date: "2024-10-13", items: [] },
+    { date: dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD"), items: [] },
   ]);
   const [expandedDates, setExpandedDates] = useState({});
-  const [newDate, setNewDate] = useState("");
+  const [newDate, setNewDate] = useState(
+    dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD"),
+  ); // Estado para la nueva fecha (hoy o mannew Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  const [newItemImage, setNewItemImage] = useState(null);
   const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
   const [isLoading, setisLoading] = useState(false);
   const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
@@ -110,7 +108,7 @@ const Traker = () => {
       ),
     );
     reset(); // Limpiar el formulario después de añadir el item
-    setNewItemImage(null);
+    // setNewItemImage(null);
     setModalVisible(false);
   };
 
@@ -227,50 +225,15 @@ const Traker = () => {
     return null;
   };
 
-  // Función para simular una respuesta genérica del "bot"
-  const sendBotReply = () => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        id: `${Date.now().toString()}-res`,
-        text: "Este es un mensaje automático del sistema.",
-        isBot: true, // Identificar mensaje como bot
-      },
-    ]);
-  };
-
-  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-
   const addDate = () => {
-    if (newDate.trim() && !data.some((day) => day.date === newDate)) {
+    if (newDate.trim() && !data.some((day) => day === newDate)) {
       setData((prevData) => [...prevData, { date: newDate, items: [] }]);
       setNewDate("");
     }
   };
 
-  const onDateChange = (event, selectedDate) => {
-    setDatePickerVisible(false);
-    if (selectedDate) {
-      const formattedDate = selectedDate.toISOString().split("T")[0];
-      setNewDate(formattedDate);
-    }
-  };
-
   const deleteDate = (date) => {
     setData((prevData) => prevData.filter((day) => day.date !== date));
-  };
-
-  const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync();
-    if (!result.cancelled) {
-      setNewItemImage(result?.assets[0]?.uri);
-    }
   };
 
   const pickImageForChat = async () => {
@@ -302,19 +265,18 @@ const Traker = () => {
   return (
     <View style={styles.container}>
       <View style={styles.newDateContainer}>
-        <Pressable onPress={() => setDatePickerVisible(true)}>
-          <TextInput
-            style={{ ...styles.input, ...styles.newDateInput }}
-            placeholder="Add new date (YYYY-MM-DD)"
-            value={newDate}
-            editable={false} // Prevent direct editing
-            pointerEvents="none" // Ensure pressable works
-          />
-        </Pressable>
+        <TextInput
+          style={{ ...styles.input, ...styles.newDateInput }}
+          placeholder="Add new date (YYYY-MM-DD)"
+          value={newDate}
+          editable={false} // Prevent direct editing
+          pointerEvents="none" // Ensure pressable works
+        />
         <Pressable style={styles.addButton} onPress={addDate}>
           <Text style={styles.buttonText}>Add Date</Text>
         </Pressable>
       </View>
+
       <FlatList
         data={data}
         keyExtractor={(item) => item.date}
@@ -511,7 +473,7 @@ const Traker = () => {
                   : messages
               }
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) =>
+              renderItem={({ item, index }) =>
                 item.id === "loading" ? (
                   <View style={styles.chatMessageContainer}>
                     <DotTypingAnimation />
@@ -530,7 +492,7 @@ const Traker = () => {
                       />
                     )}
                     <Text style={styles.messageText}>{item.text}</Text>
-                    {nutritionData && (
+                    {nutritionData && index === messages.length - 1 && (
                       <Pressable
                         style={styles.openModalButton}
                         onPress={() => {
@@ -598,7 +560,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#181A20", // Fondo oscuro
   },
   newDateInput: {
-    width: "100%",
+    width: "50%",
     borderColor: "#4E4C67", // Borde gris oscuro
     borderWidth: 1,
     borderRadius: 25,
@@ -612,6 +574,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    width: "100%",
     marginBottom: 20,
   },
   dateContainer: {
@@ -742,12 +705,7 @@ const styles = StyleSheet.create({
     width: "40%",
     height: 50,
   },
-  modalCenteredContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+
   chatModalFixedContent: {
     width: "90%",
     height: "80%",
@@ -859,5 +817,28 @@ const styles = StyleSheet.create({
   removeImageButtonText: {
     color: "#FFFFFF", // Texto blanco para eliminar imagen
     fontSize: 16,
+  },
+  datePickerContainer: {
+    width: "80%",
+    backgroundColor: "#FFFFFF", // Fondo claro para el DatePicker
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  datePicker: {
+    width: "100%",
+    height: "100%",
+  },
+  modalCenteredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro translúcido
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro translúcido para el modal
   },
 });
