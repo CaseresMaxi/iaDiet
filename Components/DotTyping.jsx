@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { View, Animated, StyleSheet } from "react-native";
+import { Animated, View } from "react-native";
+import { styles } from "../styles/DotTypingStyles";
 const DotTypingAnimation = () => {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
@@ -44,18 +45,3 @@ const DotTypingAnimation = () => {
   );
 };
 export default DotTypingAnimation;
-const styles = StyleSheet.create({
-  dotContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#9880ff",
-    marginHorizontal: 2,
-  },
-});
