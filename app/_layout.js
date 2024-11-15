@@ -1,8 +1,7 @@
+import { Dropdown } from "antd";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native-web";
-import { Dropdown } from "antd";
-import { styles } from "../styles/TrakerStyles";
 
 const Layout = () => {
   const items = [

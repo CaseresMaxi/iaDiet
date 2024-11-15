@@ -92,14 +92,15 @@ export const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: "row",
-    alignItems: "center",
-    // justifyContent: "space-between",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
     padding: 20,
     backgroundColor: "#1E2028", // Fondo oscuro para los items
     borderRadius: 10,
     marginBottom: 10,
     borderColor: "#4E4C67", // Borde gris oscuro
     borderWidth: 1,
+    gap: 20,
   },
   itemText: {
     fontSize: 18,

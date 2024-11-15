@@ -1,3 +1,4 @@
+import { notification } from "antd";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -18,9 +19,26 @@ export default function Main() {
       password: "",
     },
   });
-  const onSubmit = (data) => {
-    login(data, () => router.push("/tracker"));
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (placement) => {
+    api.error({
+      message: `Credenciales incorrectas`,
+
+      placement,
+    });
   };
+
+  const onSubmit = (data) => {
+    login(
+      data,
+      () => router.push("/tracker"),
+      () => {
+        console.log("error");
+        openNotification("topRight");
+      },
+    );
+  };
+
   return (
     <View
       style={{
@@ -29,6 +47,7 @@ export default function Main() {
         paddingBottom: insets.bottom,
       }}
     >
+      {contextHolder}
       <View style={styles.header}></View>
 
       <View style={styles.formContainer}>

@@ -15,7 +15,7 @@ export const createUser = (data, callback = () => {}) => {
     .catch((error) => console.error(error));
 };
 
-export const login = (data, callback = () => {}) => {
+export const login = (data, callback = () => {}, callbackError = () => {}) => {
   fetch("http://54.198.190.149:5000/users/login", {
     method: "POST",
     headers: {
@@ -23,11 +23,18 @@ export const login = (data, callback = () => {}) => {
     },
     body: JSON.stringify(data),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      window.sessionStorage.setItem("user_id", data.user_id);
-      callback();
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error("invalid credentials.");
     })
-    .catch((error) => console.error(error));
+    .then((data) => {
+      callback();
+      window.sessionStorage.setItem("user_id", data.user_id);
+    })
+    .catch((error) => {
+      callbackError();
+      console.error(error);
+    });
 };

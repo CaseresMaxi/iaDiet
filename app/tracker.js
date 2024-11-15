@@ -8,9 +8,6 @@ import * as yup from "yup";
 import Chat from "../Components/Chat";
 import { ModalAdd } from "../Components/ModalAdd";
 import { styles } from "../styles/TrakerStyles";
-import UserIcon from "../assets/user.svg";
-import { Dropdown, Space } from "antd";
-import { router } from "expo-router";
 
 // Esquema de validación con Yup
 const schema = yup.object().shape({
@@ -291,19 +288,85 @@ const Traker = () => {
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
+  const [expandedItems, setExpandedItems] = useState({});
+
+  // Toggle function to expand/collapse an item
+  const toggleExpandItem = (index) => {
+    setExpandedItems((prevExpandedItems) => ({
+      ...prevExpandedItems,
+      [index]: !prevExpandedItems[index],
+    }));
+  };
 
   return (
     <View style={{ ...styles.container, justifyContent: "center" }}>
       <View style={{ height: "90%" }}>
-        <View style={styles.listItem}>
-          {/* {subItem.image && (
-          <Image source={{ uri: subItem.image }} style={styles.itemImage} />
-        )} */}
-          <Text style={styles.itemText}>{"asd"}</Text>
-          <Pressable onPress={() => {}}>
-            <Text style={styles.deleteText}>Delete</Text>
+        {ingestData.map((subItem, index) => (
+          <Pressable
+            key={index}
+            onPress={() => toggleExpandItem(index)}
+            style={{ ...styles.listItem, flexDirection: "column" }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                flex: 1,
+                justifyContent: "space-between",
+                width: "100%",
+                gap: 20,
+              }}
+            >
+              <View style={{ flexDirection: "column", flex: 1 }}>
+                <Text style={styles.itemText}>{subItem.ingest}</Text>
+                <Text
+                  style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
+                >
+                  {subItem.description}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <Text style={styles.itemText}>{subItem.calories} calorias</Text>
+              </View>
+              <Pressable
+                onPress={() => {
+                  /* Delete function here */
+                }}
+              >
+                <Text style={styles.deleteText}>Delete</Text>
+              </Pressable>
+            </View>
+            {expandedItems[index] && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "90%",
+                }}
+              >
+                <View>
+                  <Image
+                    style={{ width: 100, height: 100 }}
+                    source={{
+                      uri: "https://argentinaburger.com/wp-content/uploads/2022/10/front-view-burger-on-stand-compressed-768x512.jpg",
+                    }}
+                  />
+                </View>
+                <View style={{ marginTop: 10 }}>
+                  <Text style={styles.itemText}>
+                    Proteins: {subItem.proteins}g
+                  </Text>
+                  <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
+                  <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
+                </View>
+              </View>
+            )}
           </Pressable>
-        </View>
+        ))}
 
         <View style={{ display: "fixed", right: 0 }}>
           <Pressable

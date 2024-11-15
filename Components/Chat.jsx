@@ -49,9 +49,9 @@ const Chat = ({
                     item.isBot ? styles.botMessage : styles.userMessage,
                   ]}
                 >
-                  {item.image && (
+                  {item?.image && (
                     <Image
-                      source={{ uri: item.image }}
+                      source={{ uri: item?.image }}
                       style={styles.messageImage}
                     />
                   )}
