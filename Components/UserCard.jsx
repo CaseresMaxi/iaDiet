@@ -9,8 +9,8 @@ export default function UserCard() {
   useEffect(() => {
     // fetch(`http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`)
     fetch(
-      `http://54.198.190.149:5000/users/5a1f8f88-e9f2-4ec2-9ea1-7046125951bd`,
-      { method: "GET" },
+      `http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`, {
+        headers: { Authorization: `${window.sessionStorage.getItem("token")}` },}
     )
       .then((response) => response.json())
       .then((data) => {

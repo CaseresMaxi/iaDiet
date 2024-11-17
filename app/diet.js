@@ -6,6 +6,7 @@ import Food from "../Components/Food";
 import { styles } from "../styles/DietStyles";
 
 import Chat from "../Components/Chat";
+import { fetchDiet } from "../services/Diet";
 
 export default function Diet() {
   const insets = useSafeAreaInsets();
@@ -15,80 +16,53 @@ export default function Diet() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `${window.sessionStorage.getItem("token")}`,
       },
       body: JSON.stringify({
-        user_id: "d499c5fe-2b11-426e-8f48-757a72210d43",
-        foods: {
-          breakfast: {
-            name: "Oatmeal with fruits and nuts",
-            calories: 350,
-            description: "Oatmeal with fruits and nuts",
-          },
-          lunch: {
-            name: "Oatmeal with fruits and nuts",
-            calories: 350,
-            description: "Oatmeal with fruits and nuts",
-          },
-          dinner: {
-            name: "Oatmeal with fruits and nuts",
-            calories: 350,
-            description: "Oatmeal with fruits and nuts",
-          },
-          snack: {
-            name: "Oatmeal with fruits and nuts",
-            calories: 350,
-            description: "Oatmeal with fruits and nuts",
-          },
-        },
+        user_id: window.sessionStorage.getItem("user_id"),
+        foods: newDiet,
       }),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => {
+        console.log(data, "dietData");
+        fetchDiet(setdietData);
+      })
       .catch((error) => console.error("Error:", error));
   };
 
   useEffect(() => {
-    fetch(
-      "http://54.198.190.149:5000/diets/last/d499c5fe-2b11-426e-8f48-757a72210d43",
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setdietData(data);
-      })
-      .catch((error) => console.error(error));
+    fetchDiet(setdietData);
   }, []);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatLoading, setIsChatLoading] = useState(false);
-  const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
-  const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
+  const [messages, setMessages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
-  // const pickImageForChat = async () => {
-  //   const permissionResult =
-  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (permissionResult.granted === false) {
-  //     alert("Permission to access camera roll is required!");
-  //     return;
-  //   }
 
-  //   const result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     quality: 1,
-  //     base64: true,
-  //   });
+  const [newMessage, setNewMessage] = useState("");
+  const extractDietData = (inputText) => {
+    const regex = /&&&(.*?)&&&/s;
+    const match = inputText.match(regex);
 
-  //   console.log("result img", result);
+    if (match && match[1]) {
+      try {
+        const extractedObject = JSON.parse(match[1]);
+        return extractedObject;
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    } else {
+      console.error("No valid JSON found between &&&");
+    }
+  };
 
-  //   if (!result.cancelled) {
-  //     setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
-  //   }
-  // };
-  const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
-
+  const [newDiet, setnewDiet] = useState({});
   const sendMessage = async () => {
-    setdietData(null);
+    setnewDiet(null);
     if (newMessage.trim()) {
       const contextMessage =
         "Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description y calories, la otra parte debe ser una descripcion en lenguaje antural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio.";
@@ -96,12 +70,11 @@ export default function Diet() {
         message: `${contextMessage}\n${newMessage}`,
         images: [],
       };
-
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: Date.now().toString(),
-          text: messageBody,
+          text: newMessage,
           image: null,
           isBot: false,
         },
@@ -116,18 +89,20 @@ export default function Diet() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `${window.sessionStorage.getItem("token")}`,
           },
           body: JSON.stringify(messageBody),
         });
         console.log("response", response);
         if (response.ok) {
           const data = await response.json();
+          setnewDiet(extractDietData(data.response));
 
           setMessages((prevMessages) => [
             ...prevMessages,
             {
               id: `${Date.now().toString()}-res`,
-              text: data,
+              text: data.response?.replace(/&&&[\s\S]*?&&&/g, "")?.trim(),
               isBot: true,
             },
           ]);
@@ -152,7 +127,7 @@ export default function Diet() {
       }}
     >
       <Text style={styles.header}>User's Diet</Text>
-      {/* {dietData.foods &&
+      {dietData?.foods &&
         Object.keys(dietData.foods).map((meal) => {
           return (
             <Food
@@ -162,7 +137,7 @@ export default function Diet() {
               calories={dietData.foods[meal]?.calories}
             />
           );
-        })} */}
+        })}
 
       <Pressable
         onPress={() => {
@@ -185,8 +160,10 @@ export default function Diet() {
         setChatModalVisible={setChatOpen}
         isLoading={isChatLoading}
         messages={messages}
-        nutritionData={dietData}
-        setModalVisible={() => {}}
+        nutritionData={newDiet}
+        setModalVisible={() => {
+          addDiet();
+        }}
         selectedImage={selectedImage}
         removeSelectedImage={removeSelectedImage}
         pickImageForChat={() => {}}

@@ -5,6 +5,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { login } from "../services/Users";
 import { styles } from "../styles/MainStyles";
+import { useEffect } from "react";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -19,14 +20,14 @@ export default function Main() {
       password: "",
     },
   });
-  const [api, contextHolder] = notification.useNotification();
-  const openNotification = (placement) => {
-    api.error({
-      message: `Credenciales incorrectas`,
+  // const [api, contextHolder] = notification.useNotification();
+  // const openNotification = (placement) => {
+  //   api.error({
+  //     message: `Credenciales incorrectas`,
 
-      placement,
-    });
-  };
+  //     placement,
+  //   });
+  // };
 
   const onSubmit = (data) => {
     login(
@@ -34,10 +35,16 @@ export default function Main() {
       () => router.push("/tracker"),
       () => {
         console.log("error");
-        openNotification("topRight");
+        // openNotification("topRight");
       },
     );
   };
+
+  useEffect(() => {
+    if (window.sessionStorage.getItem("token")) {
+      router.push("/tracker");
+    }
+  }, []);
 
   return (
     <View
@@ -47,7 +54,7 @@ export default function Main() {
         paddingBottom: insets.bottom,
       }}
     >
-      {contextHolder}
+      {/* {contextHolder} */}
       <View style={styles.header}></View>
 
       <View style={styles.formContainer}>

@@ -31,7 +31,8 @@ export const login = (data, callback = () => {}, callbackError = () => {}) => {
     })
     .then((data) => {
       callback();
-      window.sessionStorage.setItem("user_id", data.user_id);
+      window.sessionStorage.setItem("user_id", data.user.user_id);
+      window.sessionStorage.setItem("token", data.token);
     })
     .catch((error) => {
       callbackError();

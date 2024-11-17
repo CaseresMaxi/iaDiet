@@ -38,6 +38,7 @@ const Layout = () => {
       extra: "🔒",
       onClick: () => {
         window.sessionStorage.removeItem("user_id");
+        window.sessionStorage.removeItem("token");
         router.push("/");
       },
     },

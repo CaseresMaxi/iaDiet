@@ -2,14 +2,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { Image, Pressable, Text, View } from "react-native";
 import * as yup from "yup";
 import Chat from "../Components/Chat";
 import { ModalAdd } from "../Components/ModalAdd";
 import { styles } from "../styles/TrakerStyles";
+import { getIngest, getIngests, postIngest } from "../services/Ingests";
 
-// Esquema de validación con Yup
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
   calories: yup
@@ -36,7 +36,7 @@ const Traker = () => {
   ]);
   const [expandedDates, setExpandedDates] = useState({});
   const [newDate, setNewDate] = useState(
-    dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD"),
+    dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD")
   ); // Estado para la nueva fecha (hoy o mannew Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
@@ -82,41 +82,11 @@ const Traker = () => {
   const [ingestData, setingestData] = useState([]);
 
   useEffect(() => {
-    fetch("http://54.198.190.149:5000/ingests")
-      .then((response) => response.json())
-      .then((data) => {
-        setingestData(data);
-      })
-      .catch((error) => console.error(error));
+    getIngests(setingestData);
   }, []);
 
-  console.log("ingestData", ingestData);
   const addItem = (formData) => {
-    console.log("formData", formData);
-    fetch("http://54.198.190.149:5000/ingests", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: "5a1f8f88-e9f2-4ec2-9ea1-7046125951bd",
-        // window.sessionStorage.getItem("user_id") ||
-        // "5a1f8f88-e9f2-4ec2-9ea1-7046125951bd",
-        ingest: formData.foodName,
-        calories: formData.calories,
-        description: formData.foodName,
-        proteins: formData.proteins,
-        images: [lastSelectedImg],
-        carbs: formData.carbs,
-        fats: formData.fats,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => console.error(error));
-
+    postIngest(setingestData, formData);
     setData((prevData) =>
       prevData.map((day) =>
         day.date === currentDate
@@ -131,8 +101,8 @@ const Traker = () => {
                 },
               ],
             }
-          : day,
-      ),
+          : day
+      )
     );
     reset(); // Limpiar el formulario después de añadir el item
     // setNewItemImage(null);
@@ -144,8 +114,8 @@ const Traker = () => {
       prevData.map((day) =>
         day.date === date
           ? { ...day, items: day.items.filter((item) => item.id !== id) }
-          : day,
-      ),
+          : day
+      )
     );
   };
 
@@ -197,6 +167,7 @@ const Traker = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `${window.sessionStorage.getItem("token")}`,
           },
           body: JSON.stringify(messageBody),
         });
@@ -277,8 +248,6 @@ const Traker = () => {
       base64: true,
     });
 
-    console.log("result img", result);
-
     if (!result.cancelled) {
       setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
     }
@@ -290,13 +259,35 @@ const Traker = () => {
   };
   const [expandedItems, setExpandedItems] = useState({});
 
-  // Toggle function to expand/collapse an item
+  const [s3Img, sets3Img] = useState("");
+  const [s3ImgB64, sets3ImgB64] = useState("");
+
   const toggleExpandItem = (index) => {
+    console.log("index", ingestData[index]);
+    getIngest(ingestData[index].ingest_id, sets3Img);
     setExpandedItems((prevExpandedItems) => ({
-      ...prevExpandedItems,
+      // ...prevExpandedItems,
       [index]: !prevExpandedItems[index],
     }));
   };
+
+  useEffect(() => {
+    fetch(s3Img)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Parse the response as plain text
+      })
+      .then((data) => {
+        console.log(data); // Log the base64 image data
+        sets3ImgB64(data);
+        // Optionally, do something with the base64 string
+      })
+      .catch((error) => {
+        console.error("Error fetching the data:", error);
+      });
+  }, [s3Img]);
 
   return (
     <View style={{ ...styles.container, justifyContent: "center" }}>
@@ -352,7 +343,7 @@ const Traker = () => {
                   <Image
                     style={{ width: 100, height: 100 }}
                     source={{
-                      uri: "https://argentinaburger.com/wp-content/uploads/2022/10/front-view-burger-on-stand-compressed-768x512.jpg",
+                      uri: s3ImgB64,
                     }}
                   />
                 </View>
@@ -379,7 +370,9 @@ const Traker = () => {
             }}
             onPress={() => openChatModal(null)}
           >
-            +
+            <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
+              +
+            </Text>
           </Pressable>
         </View>
       </View>
