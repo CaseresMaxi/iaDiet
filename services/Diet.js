@@ -4,7 +4,9 @@ export const fetchDiet = (setdietData) =>
       "user_id"
     )}`,
     {
-      headers: { Authorization: `${window.sessionStorage.getItem("token")}` },
+      headers: {
+        Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+      },
     }
   )
     .then((response) => response.json())

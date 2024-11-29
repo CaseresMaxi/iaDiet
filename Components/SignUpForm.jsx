@@ -51,6 +51,20 @@ export default function Main() {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               style={styles.customInput}
+              placeholder="Username"
+              placeholderTextColor="#888"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+            />
+          )}
+          name="username"
+        />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.customInput}
               placeholder="email"
               placeholderTextColor="#888"
               onBlur={onBlur}

@@ -10,7 +10,7 @@ export default function UserCard() {
     // fetch(`http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`)
     fetch(
       `http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`, {
-        headers: { Authorization: `${window.sessionStorage.getItem("token")}` },}
+        headers: { Authorization: `Bearer ${window.sessionStorage.getItem("token")}` },}
     )
       .then((response) => response.json())
       .then((data) => {
@@ -22,7 +22,7 @@ export default function UserCard() {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.username}>{userData?.name || "John Doe"}</Text>
+        <Text style={styles.username}>{userData?.name || "John Doe 🧑‍🦰"}</Text>
         <Text style={styles.deleteButton}>Delete</Text>
       </View>
       {userData && (

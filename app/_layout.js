@@ -47,9 +47,11 @@ const Layout = () => {
   return (
     <>
       <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
+        screenOptions={
+          {
+            // headerShown: false,
+          }
+        }
       />
       <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.headerTitle}>App Name 🍌</Text>

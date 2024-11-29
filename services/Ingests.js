@@ -1,7 +1,11 @@
 export const getIngests = (setingestData) => {
   fetch(
     `http://54.198.190.149:5000/ingests/user/${window.sessionStorage.getItem("user_id")}`,
-    { headers: { Authorization: `${window.sessionStorage.getItem("token")}` } }
+    {
+      headers: {
+        Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+      },
+    }
   )
     .then((response) => {
       if (!response.ok) throw new Error("Network response was not ok.");
@@ -13,12 +17,12 @@ export const getIngests = (setingestData) => {
     .catch((error) => console.error(error));
 };
 
-export const postIngest = (setingestData) => {
+export const postIngest = (setingestData, formData, lastSelectedImg) => {
   fetch("http://54.198.190.149:5000/ingests", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `${window.sessionStorage.getItem("token")}`,
+      Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
     },
     body: JSON.stringify({
       user_id: window.sessionStorage.getItem("user_id"),
@@ -26,7 +30,7 @@ export const postIngest = (setingestData) => {
       calories: formData.calories,
       description: formData.foodName,
       proteins: formData.proteins,
-      images: [lastSelectedImg],
+      images: lastSelectedImg ? [lastSelectedImg] : null,
       carbs: formData.carbs,
       fats: formData.fats,
     }),
@@ -42,7 +46,7 @@ export const getIngest = (ingestId, sets3Img) => {
   fetch(`http://54.198.190.149:5000/ingests/${ingestId}`, {
     method: "GET",
     headers: {
-      Authorization: `${window.sessionStorage.getItem("token")}`,
+      Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
     },
   })
     .then((response) => response.json())

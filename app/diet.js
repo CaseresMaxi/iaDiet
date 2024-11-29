@@ -7,6 +7,7 @@ import { styles } from "../styles/DietStyles";
 
 import Chat from "../Components/Chat";
 import { fetchDiet } from "../services/Diet";
+import { deleteContextChat } from "../services/Utils";
 
 export default function Diet() {
   const insets = useSafeAreaInsets();
@@ -16,7 +17,7 @@ export default function Diet() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `${window.sessionStorage.getItem("token")}`,
+        Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         user_id: window.sessionStorage.getItem("user_id"),
@@ -64,9 +65,9 @@ export default function Diet() {
   const sendMessage = async () => {
     setnewDiet(null);
     if (newMessage.trim()) {
-      const contextMessage =
-        "Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description y calories, la otra parte debe ser una descripcion en lenguaje antural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio.";
+      const contextMessage = "";
       const messageBody = {
+        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description y calories, la otra parte debe ser una descripcion en lenguaje antural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio. yout response must be ins ${"Spanish"}`,
         message: `${contextMessage}\n${newMessage}`,
         images: [],
       };
@@ -89,7 +90,7 @@ export default function Diet() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `${window.sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
           },
           body: JSON.stringify(messageBody),
         });
@@ -141,7 +142,9 @@ export default function Diet() {
 
       <Pressable
         onPress={() => {
+          setMessages([]);
           setChatOpen(true);
+          deleteContextChat();
         }}
         style={{
           // with: "100%",

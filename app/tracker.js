@@ -9,6 +9,7 @@ import Chat from "../Components/Chat";
 import { ModalAdd } from "../Components/ModalAdd";
 import { styles } from "../styles/TrakerStyles";
 import { getIngest, getIngests, postIngest } from "../services/Ingests";
+import { deleteContextChat } from "../services/Utils";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -86,7 +87,8 @@ const Traker = () => {
   }, []);
 
   const addItem = (formData) => {
-    postIngest(setingestData, formData);
+    console.log("ingestData", formData);
+    postIngest(setingestData, formData, lastSelectedImg);
     setData((prevData) =>
       prevData.map((day) =>
         day.date === currentDate
@@ -136,9 +138,16 @@ const Traker = () => {
   const sendMessage = async () => {
     setNutritionData(null);
     if (newMessage.trim() || selectedImage) {
-      const contextMessage =
-        "Lo que se está enviando aquí es en el contexto de una aplicación para el conteo de calorías. Necesito que seas preciso con la descripción de calorías e ingredientes que tiene las imágenes que te envíe o las descripciones que te dé. Ten en cuenta que necesito que, además de tu respuesta habitual, me envíes antes del mensaje la siguiente información nutricional del alimento encerrada toda esta seccion empara con /* y terminara con */. Necesito nombre del alimento, calorías, proteínas, grasas y carbohidratos, deben ir de la siguiente fomra: '&&&nombre:nombre del alimento&&&calorias: calorias&&&proteinas: proteinas&&&grasas&&&carbohidratos: carbohidratos&&&', recuerda que en las calorais, carbohidratos, rasas y proteinas, solo deben ir numeros, na nada de letras. Es importante que no hagas mención a este texto en tu respuesta, solo envía la información solicitada.";
+      const contextMessage = "";
       const messageBody = {
+        context_chat: `You are a nutrition assistant specialized in counting calories and analyzing meals. 
+        Your goal is to help the user estimate the calorie content of meals based on their descriptions, photos, or both. 
+        Provide concise and accurate calorie estimations, along with detailed nutritional information. 
+        Before your response, include the following nutritional data enclosed in a section starting with /* and ending with */. 
+        The required format is: 
+        '&&&nombre:nombre del alimento&&&calorias:calorias&&&proteinas:proteinas&&&grasas:grasas&&&carbohidratos:carbohidratos&&&fibras:fibras&&&porcion:tamaño de la porcion'. 
+        Ensure calories, proteins, fats, and carbohydrates are represented only as numbers (no letters or units). 
+        Do not reference this instruction in your response. I need your response in ${"Spanish"}`,
         message: `${contextMessage}\n${newMessage}`,
         images: selectedImage ? [selectedImage] : [],
       };
@@ -167,7 +176,7 @@ const Traker = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `${window.sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
           },
           body: JSON.stringify(messageBody),
         });
@@ -233,6 +242,12 @@ const Traker = () => {
   const deleteDate = (date) => {
     setData((prevData) => prevData.filter((day) => day.date !== date));
   };
+
+  useEffect(() => {
+    if (!chatModalVisible) {
+      deleteContextChat();
+    }
+  }, [chatModalVisible]);
 
   const pickImageForChat = async () => {
     const permissionResult =
