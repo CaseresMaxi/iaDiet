@@ -4,6 +4,12 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { createUser } from "../services/Users";
 import { styles } from "../styles/SingUpStyles";
+import FormInput from "./Input/Input";
+import { useEffect } from "react";
+import { useStore } from "../utils/zustan";
+import Button from "./Button/Button";
+import { Col } from "antd";
+import Colors from "../styles/Colors";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -18,16 +24,20 @@ export default function Main() {
       age: 1,
       height: 1,
       weight: 1,
-      daily_activity: "",
-      sports: "",
+      daily_activity: "1",
+      sports: "1",
       target_weight: 1,
-      time_to_target_weight: "",
+      time_to_target_weight: "1",
     },
   });
   const onSubmit = (data) => {
     createUser(data, router.push("/tracker"));
   };
 
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  useEffect(() => {
+    setHeaderTitle("Sign Up");
+  }, []);
   return (
     <View
       style={{
@@ -36,26 +46,37 @@ export default function Main() {
         paddingBottom: insets.bottom,
       }}
     >
-      <View style={styles.header}>
-        {/* <View style={styles.logoContainer}> */}
-        {/* <Text style={styles.logo}>◉</Text> */}
-        {/* </View> */}
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          // backgroundColor: "red",
+        }}
+      >
+        <Text style={{ ...styles.title, textAlign: "center" }}>
+          Start Your New Fitness Journey
+        </Text>
       </View>
-
       <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign Up</Text>
-
         {/* Existing email and password fields */}
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="Username"
+            //   placeholderTextColor="#888"
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            // />
+            <FormInput
               placeholder="Username"
-              placeholderTextColor="#888"
+              valor={value}
+              label={"Username"}
+              setValor={onChange}
               onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
             />
           )}
           name="username"
@@ -63,13 +84,20 @@ export default function Main() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="email"
-              placeholderTextColor="#888"
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="email"
+            //   placeholderTextColor="#888"
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            // />
+            <FormInput
+              placeholder="Email" // Cambia el placeholder a "Email"
+              valor={value}
+              label={"Email"}
+              setValor={onChange}
               onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
             />
           )}
           name="email"
@@ -78,14 +106,21 @@ export default function Main() {
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Password"
-              placeholderTextColor="#888"
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="Password"
+            //   placeholderTextColor="#888"
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            //   secureTextEntry={true} // Agrega esto para ocultar la contraseña
+            // />
+            <FormInput
+              placeholder="Password" // Cambia el placeholder a "Password"
+              valor={value}
+              label={"Password"}
+              setValor={onChange}
               onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry={true} // Agrega esto para ocultar la contraseña
             />
           )}
           name="password"
@@ -93,22 +128,28 @@ export default function Main() {
 
         <Controller
           control={control}
-          rules={{ required: true, min: 1 }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Age"
-              placeholderTextColor="#888"
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="Password"
+            //   placeholderTextColor="#888"
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            //   secureTextEntry={true} // Agrega esto para ocultar la contraseña
+            // />
+            <FormInput
+              placeholder="Confirm Password" // Cambia el placeholder a "Password"
+              valor={value}
+              label={"Confirm Password"}
+              setValor={onChange}
               onBlur={onBlur}
-              onChangeText={onChange}
-              value={value.toString()}
-              keyboardType="numeric"
             />
           )}
-          name="age"
+          name="confirmPassword"
         />
 
-        <Controller
+        {/* <Controller
           control={control}
           rules={{ required: true, min: 0.1 }}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -155,9 +196,9 @@ export default function Main() {
             />
           )}
           name="daily_activity"
-        />
+        /> */}
 
-        <Controller
+        {/* <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -187,9 +228,9 @@ export default function Main() {
             />
           )}
           name="target_weight"
-        />
+        /> */}
 
-        <Controller
+        {/* <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
@@ -202,17 +243,55 @@ export default function Main() {
             />
           )}
           name="time_to_target_weight"
-        />
+        /> */}
 
-        <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
+        {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
           <Text style={styles.buttonText}>Create account</Text>
-        </Pressable>
-
-        <Pressable onPress={() => router.push("/")}>
-          <Text style={styles.footerText}>
-            back to <Text style={styles.linkText}>login</Text>
+        </Pressable> */}
+        <View style={{ alignItems: "center", marginTop: 24, gap: 20 }}>
+          <Text
+            style={{
+              width: 180,
+              textAlign: "center",
+              height: "fit-content",
+              color: Colors.Font2,
+              fontWeight: "500",
+            }}
+          >
+            By continuing, you agree to{" "}
+            <Text style={{ color: Colors.Color1, fontWeight: "500" }}>
+              Terms of Use
+            </Text>{" "}
+            and{" "}
+            <Text style={{ color: Colors.Color1, fontWeight: "500" }}>
+              Privacy Policy.
+            </Text>
           </Text>
-        </Pressable>
+          <Button
+            text="Create account"
+            width={180}
+            onClick={handleSubmit(onSubmit)}
+          />
+        </View>
+
+        <View style={{ alignItems: "center", marginTop: 24, gap: 20 }}>
+          <Pressable onPress={() => router.push("/")}>
+            <Text
+              style={{
+                width: 180,
+                textAlign: "center",
+                height: "fit-content",
+                color: Colors.Font2,
+                fontWeight: "500",
+              }}
+            >
+              Already have an account?{" "}
+              <Text style={{ color: Colors.Color1, fontWeight: "500" }}>
+                Log in
+              </Text>
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );

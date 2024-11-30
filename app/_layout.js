@@ -1,7 +1,9 @@
-import { Dropdown } from "antd";
+// import { Dropdown } from "antd";
 import { router, Stack } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native-web";
+import { Text, View, TouchableOpacity } from "react-native-web";
+import headerStyles from "../styles/HeaderStyles";
+import { useStore } from "../utils/zustan";
 
 const Layout = () => {
   const items = [
@@ -43,52 +45,32 @@ const Layout = () => {
       },
     },
   ];
-
+  const headerTitle = useStore((state) => state.headerTitle);
   return (
     <>
       <Stack
-        screenOptions={
-          {
-            // headerShown: false,
-          }
-        }
+        screenOptions={{
+          headerTitle: () => (
+            <View style={headerStyles.headerContainer}>
+              <Text style={headerStyles.headerTitle}>{headerTitle}</Text>
+              {/* <Dropdown menu={{ items }}>
+                <Text style={headerStyles.settingsIcon}>⚙️</Text>
+              </Dropdown> */}
+            </View>
+          ),
+          headerLeft: () => null,
+          headerShadowVisible: false,
+          headerTransparent: true,
+        }}
       />
-      <View style={headerStyles.headerContainer}>
+      {/* <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.headerTitle}>App Name 🍌</Text>
         <Dropdown menu={{ items }}>
           <Text style={headerStyles.settingsIcon}>⚙️</Text>
         </Dropdown>
-      </View>
+      </View> */}
     </>
   );
-};
-
-const headerStyles = {
-  headerContainer: {
-    height: 48,
-    width: "100%",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    backgroundColor: "#7F56DA",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    zIndex: 1000,
-  },
-  headerTitle: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  settingsIcon: {
-    color: "#FFFFFF",
-    fontSize: 24,
-    cursor: "pointer",
-  },
 };
 
 export default Layout;

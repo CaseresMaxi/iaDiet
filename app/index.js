@@ -3,9 +3,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { Text } from "react-native-web";
+import { useEffect } from "react";
+import { useStore } from "../utils/zustan";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  useEffect(() => {
+    setHeaderTitle("Login");
+  }, []);
 
   return (
     <View
@@ -16,12 +22,14 @@ export default function Index() {
       }}
     >
       <Stack.Screen
-      // options={{
-      //   headerTitle: () => <Text>""</Text>,
-      //   headerLeft: () => null,
-      //   headerShadowVisible: false,
-      //   headerTransparent: true,
-      // }}
+        options={
+          {
+            // headerTitle: () => <Text>login</Text>,
+            //   // headerLeft: () => null,
+            //   headerShadowVisible: false,
+            //   headerTransparent: true,
+          }
+        }
       />
       <Main />
     </View>

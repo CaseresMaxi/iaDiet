@@ -1,17 +1,14 @@
 import { StyleSheet } from "react-native";
+import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
-  dotContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  boton: {
+    borderWidth: 1,
+    borderColor: Colors.Font2,
+    backgroundColor: Colors.Color5,
+    color: Colors.Font2,
     justifyContent: "center",
-    paddingVertical: 10,
+    alignItems: "center",
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#9880ff",
-    marginHorizontal: 2,
-  },
+  textoBoton: {},
 });
