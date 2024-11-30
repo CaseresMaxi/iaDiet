@@ -4,24 +4,25 @@ import { styles } from "../../styles/InputStyles";
 
 const FormInput = ({
   placeholder = "",
-  valor,
-  setValor = () => {},
+  value,
+  onChangeText = () => {},
   onBlur,
   style,
   label = null,
   width = "100%",
+  paddingHorizontal = 24,
   type = "default",
 }) => {
   return (
-    <View style={{ paddingHorizontal: 24 }}>
+    <View style={{ paddingHorizontal }}>
       <Text style={styles.label}>{label}</Text>
 
       <TextInput
         type={type}
         // label={label}
         placeholder={placeholder}
-        value={valor}
-        onChangeText={(texto) => setValor(texto)}
+        value={value}
+        onChangeText={(texto) => onChangeText(texto)}
         style={{
           ...styles.customInput,
           ...style,

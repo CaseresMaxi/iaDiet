@@ -45,9 +45,11 @@ export default function Main() {
 
   useEffect(() => {
     if (window.sessionStorage.getItem("token")) {
-      router.push("/tracker");
+      // router.push("/tracker");
+      window.sessionStorage.removeItem("token");
+      window.sessionStorage.removeItem("user_id");
     }
-  }, []);
+  }, [router.isReady]);
 
   return (
     <View
@@ -79,6 +81,7 @@ export default function Main() {
             placeholderTextColor="#888"
             onBlur={onBlur}
             onChangeText={onChange}
+            paddingHorizontal={24}
             value={value}
             label="Username or email"
           />

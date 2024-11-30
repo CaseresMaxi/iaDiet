@@ -26,6 +26,22 @@ export const buttonStyles = StyleSheet.create({
     // backgroundColor: "#9880ff",
     // marginHorizontal: 2,
   },
+  secondaryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "fit-content",
+    height: 45,
+    backgroundColor: Colors.Color1,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: "100px",
+  },
+  secondaryButtonText: {
+    color: Colors.Color4,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default buttonStyles;

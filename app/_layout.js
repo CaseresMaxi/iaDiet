@@ -1,9 +1,16 @@
 // import { Dropdown } from "antd";
 import { router, Stack } from "expo-router";
 import React from "react";
-import { Text, View, TouchableOpacity } from "react-native-web";
+import { Text, View, TouchableOpacity, Image } from "react-native-web";
 import headerStyles from "../styles/HeaderStyles";
 import { useStore } from "../utils/zustan";
+import ChevronBack from "../assets/icons/ChevronBack.svg";
+import Colors from "../styles/Colors";
+import Home from "../assets/icons/Home.svg";
+import Ingest from "../assets/icons/Ingest.svg";
+import Diets from "../assets/icons/Diets.svg";
+import Scan from "../assets/icons/Scan.svg";
+import NavBar from "../Components/NavBar/NavBar";
 
 const Layout = () => {
   const items = [
@@ -46,23 +53,46 @@ const Layout = () => {
     },
   ];
   const headerTitle = useStore((state) => state.headerTitle);
+  const headerColor = useStore((state) => state.headerColor);
+  const navigationVisible = useStore((state) => state.navigationVisible);
   return (
     <>
       <Stack
         screenOptions={{
           headerTitle: () => (
             <View style={headerStyles.headerContainer}>
-              <Text style={headerStyles.headerTitle}>{headerTitle}</Text>
-              {/* <Dropdown menu={{ items }}>
-                <Text style={headerStyles.settingsIcon}>⚙️</Text>
-              </Dropdown> */}
+              {/* Botón "asdasd" al inicio */}
+              <TouchableOpacity
+                style={headerStyles.backButtonContainer}
+                onPress={() => router.back()}
+              >
+                <Text style={headerStyles.backButton}>
+                  <Image source={ChevronBack} />
+                </Text>
+              </TouchableOpacity>
+
+              {/* Título centrado */}
+              <Text style={{ ...headerStyles.headerTitle, color: headerColor }}>
+                {headerTitle}
+              </Text>
+              <View style={headerStyles.settingsIconContainer}></View>
             </View>
           ),
-          headerLeft: () => null,
+          headerLeft: () => {},
           headerShadowVisible: false,
           headerTransparent: true,
         }}
       />
+      {navigationVisible && (
+        <NavBar
+          butons={[
+            { icon: Diets, onClick: () => router.push("/diet") },
+            { icon: Ingest, onClick: () => router.push("/ingest") },
+            { icon: Home, onClick: () => router.push("/tracker") },
+            { icon: Scan, onClick: () => router.push("/scan") },
+          ]}
+        />
+      )}
       {/* <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.headerTitle}>App Name 🍌</Text>
         <Dropdown menu={{ items }}>

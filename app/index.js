@@ -9,8 +9,13 @@ import { useStore } from "../utils/zustan";
 export default function Index() {
   const insets = useSafeAreaInsets();
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
   useEffect(() => {
     setHeaderTitle("Login");
+    setNavigationVisible(false);
+    return () => {
+      setNavigationVisible(true);
+    };
   }, []);
 
   return (

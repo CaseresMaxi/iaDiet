@@ -3,6 +3,7 @@ const Colors = {
   Color4: "#232323",
   Color5: "#373737",
   Color1: "#E2F163",
+  Color2: "#896CFE",
 };
 
 export default Colors;

@@ -31,6 +31,9 @@ export default function Main() {
     },
   });
   const onSubmit = (data) => {
+    console.log(data);
+    delete data.confirmPassword;
+    // delete data.username;
     createUser(data, router.push("/tracker"));
   };
 
