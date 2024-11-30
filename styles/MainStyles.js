@@ -1,14 +1,16 @@
 import { StyleSheet } from "react-native";
+import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#7F56DA", // Fondo oscuro
+    backgroundColor: "#232323", // Fondo oscuro
+    gap: 24,
   },
   header: {
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#7F56DA", // Color morado para el encabezado
+    backgroundColor: "#232323", // Color morado para el encabezado
     height: "30%",
     zIndex: -1,
   },
@@ -40,16 +42,16 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#FFFFFF", // Título en blanco
   },
-  customInput: {
-    height: 50,
-    borderColor: "#4E4C67", // Borde gris oscuro
-    borderWidth: 1,
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    backgroundColor: "#282C34", // Fondo oscuro para los inputs
-    color: "#FFFFFF", // Texto en blanco
-  },
+  // customInput: {
+  //   height: 50,
+  //   borderColor: "#4E4C67", // Borde gris oscuro
+  //   borderWidth: 1,
+  //   borderRadius: 25,
+  //   paddingHorizontal: 15,
+  //   marginBottom: 10,
+  //   backgroundColor: "#282C34", // Fondo oscuro para los inputs
+  //   color: "#FFFFFF", // Texto en blanco
+  // },
   button: {
     backgroundColor: "#7F56DA", // Botón morado
     paddingVertical: 15,
@@ -64,8 +66,9 @@ export const styles = StyleSheet.create({
   },
   footerText: {
     textAlign: "center",
-    marginTop: 20,
-    color: "#B0B3C7", // Texto gris claro
+    marginTop: 12,
+    fontWeight: "medium",
+    color: Colors.Font2, // Texto gris claro
   },
   linkText: {
     color: "#7F56DA", // Texto morado para los enlaces

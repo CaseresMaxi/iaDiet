@@ -1,16 +1,21 @@
 import { StyleSheet } from "react-native";
+import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#7F56DA", // Fondo oscuro
+    backgroundColor: Colors.Color4, // Fondo oscuro
+    justifyContent: "center",
+    // alignItems: "center",
   },
   header: {
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#7F56DA", // Color morado para el encabezado
+    backgroundColor: Colors.Color4, // Color morado para el encabezado
     height: "10%",
     zIndex: -1,
+    fontWeight: "bold",
+    fontSize: 24,
   },
   logoContainer: {
     backgroundColor: "#1E2028", // Fondo oscuro para el contenedor del logo
@@ -25,17 +30,16 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF", // Logo en color blanco
   },
   formContainer: {
-    backgroundColor: "#1E2028", // Fondo oscuro para el formulario
-    padding: 20,
-    marginTop: -50,
-    height: "90%",
+    // backgroundColor: "#1E2028", // Fondo oscuro para el formulario
+    // padding: 20,
+    height: "fit-content",
     justifyContent: "space-between",
-    borderRadius: 30,
+    // borderRadius: 30,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
+    width: 270,
     marginBottom: 20,
     color: "#FFFFFF", // Título en blanco
   },
