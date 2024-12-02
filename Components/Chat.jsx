@@ -15,6 +15,7 @@ const Chat = ({
   removeSelectedImage,
   pickImageForChat,
   sendMessage,
+  disabledImgPicker = false,
   newMessage,
   setNewMessage,
   ...props
@@ -90,12 +91,14 @@ const Chat = ({
           )}
 
           <View style={styles.chatInputContainer}>
-            <Pressable
-              style={styles.imagePickerButton}
-              onPress={pickImageForChat}
-            >
-              <Text style={styles.imagePickerButtonText}>📷</Text>
-            </Pressable>
+            {!disabledImgPicker && (
+              <Pressable
+                style={styles.imagePickerButton}
+                onPress={pickImageForChat}
+              >
+                <Text style={styles.imagePickerButtonText}>📷</Text>
+              </Pressable>
+            )}
             <TextInput
               style={styles.chatInput}
               placeholder="Escribe tu mensaje..."

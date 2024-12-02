@@ -10,6 +10,7 @@ import { ModalAdd } from "../Components/ModalAdd";
 import { styles } from "../styles/TrakerStyles";
 import { getIngest, getIngests, postIngest } from "../services/Ingests";
 import { deleteContextChat } from "../services/Utils";
+import { Stack } from "expo-router";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -306,6 +307,7 @@ const Traker = () => {
 
   return (
     <View style={{ ...styles.container, justifyContent: "center" }}>
+      <Stack.Screen />
       <View style={{ height: "90%" }}>
         {ingestData.map((subItem, index) => (
           <Pressable

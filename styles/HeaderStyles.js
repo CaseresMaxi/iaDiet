@@ -21,7 +21,7 @@ const headerStyles = {
     alignItems: "flex-start",
   },
   backButton: {
-    color: "#FFFFFF",
+    color: Colors.Color2,
     fontSize: 16,
     fontWeight: "bold",
     padding: 8,

@@ -8,6 +8,8 @@ const useStoreSessionData = create((set) => ({
 export const useStore = create((set) => ({
   headerTitle: "Login",
   headerColor: Colors.Color1,
+  leftTitle: null,
+  setLeftTitle: (leftTitle) => set({ leftTitle }),
   setHeaderColor: (headerColor) => set({ headerColor }),
   setHeaderTitle: (headerTitle) => set({ headerTitle }),
   navigationVisible: true,

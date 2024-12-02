@@ -53,6 +53,7 @@ const Layout = () => {
     },
   ];
   const headerTitle = useStore((state) => state.headerTitle);
+  const leftTitle = useStore((state) => state.leftTitle);
   const headerColor = useStore((state) => state.headerColor);
   const navigationVisible = useStore((state) => state.navigationVisible);
   return (
@@ -67,7 +68,8 @@ const Layout = () => {
                 onPress={() => router.back()}
               >
                 <Text style={headerStyles.backButton}>
-                  <Image source={ChevronBack} />
+                  <Image source={ChevronBack} style={{ marginRight: 8 }} />
+                  {leftTitle}
                 </Text>
               </TouchableOpacity>
 

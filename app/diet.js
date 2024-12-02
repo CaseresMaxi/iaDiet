@@ -1,76 +1,85 @@
-import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { ScrollView, View, Text, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fetchDiet } from "../services/Diet";
+import Button from "../Components/Button/Button";
+import Chat from "../Components/Chat";
+import { useStore } from "../utils/zustan";
+import MealPlans from "../assets/icons/MealPlans.svg";
+import Colors from "../styles/Colors";
 import Food from "../Components/Food";
 import { styles } from "../styles/DietStyles";
-
-import Chat from "../Components/Chat";
-import { fetchDiet } from "../services/Diet";
 import { deleteContextChat } from "../services/Utils";
+import DietSkeletonCard from "../Components/DietsSkeletonCard";
 
 export default function Diet() {
   const insets = useSafeAreaInsets();
+
   const [dietData, setdietData] = useState({});
-  const addDiet = () => {
-    fetch("http://54.198.190.149:5000/diets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({
-        user_id: window.sessionStorage.getItem("user_id"),
-        foods: newDiet,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data, "dietData");
-        fetchDiet(setdietData);
-      })
-      .catch((error) => console.error("Error:", error));
-  };
-
-  useEffect(() => {
-    fetchDiet(setdietData);
-  }, []);
-
+  const [isLoading, setIsLoading] = useState(false); // Estado de carga
   const [chatOpen, setChatOpen] = useState(false);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [newDiet, setnewDiet] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+
+  useEffect(() => {
+    setHeaderTitle("Diet");
+    loadDietData(); // Llama a la función para cargar las dietas
+  }, []);
+
+  const loadDietData = async () => {
+    setIsLoading(true); // Inicia el estado de carga
+    try {
+      await fetchDiet(setdietData); // Llama al servicio para obtener los datos
+    } catch (error) {
+      console.error("Error al cargar dietas:", error);
+    } finally {
+      setIsLoading(false); // Finaliza el estado de carga
+    }
+  };
+
+  const addDiet = async () => {
+    setIsLoading(true); // Inicia el estado de carga
+    try {
+      const response = await fetch("http://54.198.190.149:5000/diets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          user_id: window.sessionStorage.getItem("user_id"),
+          foods: newDiet,
+        }),
+      });
+      const data = await response.json();
+      console.log(data, "dietData");
+      await loadDietData(); // Recarga las dietas
+    } catch (error) {
+      console.error("Error al agregar dieta:", error);
+    } finally {
+      setIsLoading(false); // Finaliza el estado de carga
+    }
+  };
+
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
 
-  const [newMessage, setNewMessage] = useState("");
-  const extractDietData = (inputText) => {
-    const regex = /&&&(.*?)&&&/s;
-    const match = inputText.match(regex);
-
-    if (match && match[1]) {
-      try {
-        const extractedObject = JSON.parse(match[1]);
-        return extractedObject;
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-      }
-    } else {
-      console.error("No valid JSON found between &&&");
-    }
-  };
-
-  const [newDiet, setnewDiet] = useState({});
   const sendMessage = async () => {
     setnewDiet(null);
     if (newMessage.trim()) {
       const contextMessage = "";
       const messageBody = {
-        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description y calories, la otra parte debe ser una descripcion en lenguaje antural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio. yout response must be ins ${"Spanish"}`,
+        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas...`,
         message: `${contextMessage}\n${newMessage}`,
         images: [],
       };
+
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -80,8 +89,6 @@ export default function Diet() {
           isBot: false,
         },
       ]);
-
-      // setSelectedImage(null);
 
       setIsChatLoading(true);
 
@@ -94,7 +101,6 @@ export default function Diet() {
           },
           body: JSON.stringify(messageBody),
         });
-        console.log("response", response);
         if (response.ok) {
           const data = await response.json();
           setnewDiet(extractDietData(data.response));
@@ -119,45 +125,102 @@ export default function Diet() {
   };
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
+        justifyContent: "flex-start",
         ...styles.container,
-        paddingTop: insets.top,
+        paddingTop: 60,
         paddingBottom: insets.bottom,
-        justifyContent: "center",
       }}
     >
-      <Text style={styles.header}>User's Diet</Text>
-      {dietData?.foods &&
-        Object.keys(dietData.foods).map((meal) => {
-          return (
-            <Food
-              key={meal}
-              title={meal}
-              description={dietData.foods[meal]?.description}
-              calories={dietData.foods[meal]?.calories}
-            />
-          );
-        })}
+      {isLoading ? (
+        <View
+          style={{
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 20,
+          }}
+        >
+          {/* <Text style={{ fontSize: 18, color: Colors.Font2 }}> */}
+          <DietSkeletonCard />
+          <DietSkeletonCard />
+          <DietSkeletonCard />
+          <DietSkeletonCard />
 
-      <Pressable
-        onPress={() => {
-          setMessages([]);
-          setChatOpen(true);
-          deleteContextChat();
-        }}
-        style={{
-          // with: "100%",
-          height: 50,
-          backgroundColor: "#7F56DA",
-          borderRadius: 10,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text style={styles.mealTitle}>Crear una nueva dieta</Text>
-      </Pressable>
-
+          {/* </Text> */}
+        </View>
+      ) : (
+        <>
+          {!dietData?.foods && (
+            <View style={{ height: "100%", justifyContent: "center" }}>
+              <View style={styles.headerContainer}>
+                <Image source={MealPlans} />
+                <Text style={styles.header}>Meal Plans</Text>
+              </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 65,
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    color: Colors.Font2,
+                    fontSize: 20,
+                  }}
+                >
+                  Access your personalized meal plans and get healthy
+                  recommendations...
+                </Text>
+              </View>
+              <View style={{ alignItems: "center", marginBottom: 20 }}>
+                <Button
+                  text="Open Chat"
+                  width={250}
+                  type={"secondary"}
+                  onClick={() => {
+                    setMessages([]);
+                    setChatOpen(true);
+                    deleteContextChat();
+                  }}
+                />
+              </View>
+            </View>
+          )}
+          {dietData?.foods && (
+            <View style={{ height: "fit-content" }}>
+              {Object.keys(dietData.foods).map((meal) => (
+                <Food
+                  dietId={dietData?.diet_id}
+                  meal={meal}
+                  key={meal}
+                  stimatedTime={dietData.foods[meal]?.tiempo_estimado}
+                  title={dietData.foods[meal]?.title}
+                  ingredients={dietData.foods[meal]?.ingredientes}
+                  description={dietData.foods[meal]?.description}
+                  calories={dietData.foods[meal]?.calorias}
+                  instructions={dietData.foods[meal]?.instrucciones}
+                />
+              ))}
+              <View style={{ alignItems: "center", marginBottom: 20 }}>
+                <Button
+                  text="Open Chat"
+                  width={250}
+                  type={"secondary"}
+                  onClick={() => {
+                    setMessages([]);
+                    setChatOpen(true);
+                    deleteContextChat();
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        </>
+      )}
       <Chat
         chatModalVisible={chatOpen}
         setChatModalVisible={setChatOpen}
@@ -167,13 +230,13 @@ export default function Diet() {
         setModalVisible={() => {
           addDiet();
         }}
+        disabledImgPicker
         selectedImage={selectedImage}
         removeSelectedImage={removeSelectedImage}
-        pickImageForChat={() => {}}
         sendMessage={sendMessage}
         newMessage={newMessage}
         setNewMessage={setNewMessage}
       />
-    </View>
+    </ScrollView>
   );
 }
