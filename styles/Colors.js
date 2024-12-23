@@ -6,6 +6,7 @@ const Colors = {
   Color5: "#373737",
   Color1: "#E2F163",
   Color2: "#896CFE",
+  Color6: "#7C57FF",
   Color3: "#BFBFBF",
 };
 

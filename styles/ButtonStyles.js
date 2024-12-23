@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { Button } from "react-native-web";
 import Colors from "./Colors";
 
 export const buttonStyles = StyleSheet.create({
@@ -12,7 +11,7 @@ export const buttonStyles = StyleSheet.create({
     backgroundColor: Colors.Color5,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: "100px",
+    borderRadius: 100,
     borderWidth: 1,
     borderColor: Colors.Font2,
   },
@@ -35,7 +34,7 @@ export const buttonStyles = StyleSheet.create({
     backgroundColor: Colors.Color1,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: "100px",
+    borderRadius: 100,
   },
   secondaryButtonText: {
     color: Colors.Color4,

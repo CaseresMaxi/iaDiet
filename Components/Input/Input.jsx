@@ -12,12 +12,14 @@ const FormInput = ({
   width = "100%",
   paddingHorizontal = 24,
   type = "default",
+  password = false,
 }) => {
   return (
     <View style={{ paddingHorizontal }}>
       <Text style={styles.label}>{label}</Text>
 
       <TextInput
+        secureTextEntry={password}
         type={type}
         // label={label}
         placeholder={placeholder}

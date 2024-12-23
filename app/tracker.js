@@ -11,6 +11,7 @@ import { styles } from "../styles/TrakerStyles";
 import { getIngest, getIngests, postIngest } from "../services/Ingests";
 import { deleteContextChat } from "../services/Utils";
 import { Stack } from "expo-router";
+import { useStore } from "../utils/zustan";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -50,6 +51,12 @@ const Traker = () => {
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
   const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
   const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
+
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
+
+  useEffect(() => {
+    setNavigationVisible(true);
+  }, []);
 
   // React Hook Form setup
 
@@ -177,7 +184,7 @@ const Traker = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+            Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
           },
           body: JSON.stringify(messageBody),
         });
@@ -243,12 +250,13 @@ const Traker = () => {
   const deleteDate = (date) => {
     setData((prevData) => prevData.filter((day) => day.date !== date));
   };
+  const [modalOpened, setModalOpened] = useState(false);
 
   useEffect(() => {
-    if (!chatModalVisible) {
+    if (!chatModalVisible && modalOpened) {
       deleteContextChat();
     }
-  }, [chatModalVisible]);
+  }, [chatModalVisible, modalOpened]);
 
   const pickImageForChat = async () => {
     const permissionResult =
@@ -385,7 +393,10 @@ const Traker = () => {
               borderRadius: 100,
               fontWeight: "bold",
             }}
-            onPress={() => openChatModal(null)}
+            onPress={() => {
+              openChatModal(null);
+              if (!modalOpened) setModalOpened(true);
+            }}
           >
             <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
               +

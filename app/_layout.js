@@ -1,9 +1,8 @@
 // import { Dropdown } from "antd";
 import { router, Stack } from "expo-router";
 import React from "react";
-import { Text, View, TouchableOpacity, Image } from "react-native-web";
+import { Text, View, TouchableOpacity, Image } from "react-native";
 import headerStyles from "../styles/HeaderStyles";
-import { useStore } from "../utils/zustan";
 import ChevronBack from "../assets/icons/ChevronBack.svg";
 import Colors from "../styles/Colors";
 import Home from "../assets/icons/Home.svg";
@@ -11,6 +10,7 @@ import Ingest from "../assets/icons/Ingest.svg";
 import Diets from "../assets/icons/Diets.svg";
 import Scan from "../assets/icons/Scan.svg";
 import NavBar from "../Components/NavBar/NavBar";
+import { useStore } from "../utils/zustan";
 
 const Layout = () => {
   const items = [
@@ -46,9 +46,13 @@ const Layout = () => {
       label: "Log Out",
       extra: "🔒",
       onClick: () => {
-        window.sessionStorage.removeItem("user_id");
-        window.sessionStorage.removeItem("token");
-        router.push("/");
+        try {
+          window.sessionStorage?.removeItem("user_id");
+          window.sessionStorage?.removeItem("token");
+          router.push("/");
+        } catch (error) {
+          console.error("Failed to log out:", error);
+        }
       },
     },
   ];
@@ -56,6 +60,7 @@ const Layout = () => {
   const leftTitle = useStore((state) => state.leftTitle);
   const headerColor = useStore((state) => state.headerColor);
   const navigationVisible = useStore((state) => state.navigationVisible);
+  const headerVisible = useStore((state) => state.headerVisible);
   return (
     <>
       <Stack
@@ -81,6 +86,7 @@ const Layout = () => {
             </View>
           ),
           headerLeft: () => {},
+          header: headerVisible ? undefined : () => null,
           headerShadowVisible: false,
           headerTransparent: true,
         }}

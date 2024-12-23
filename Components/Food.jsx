@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { styles } from "../styles/DietStyles";
-import { Image } from "react-native-web";
+import { Image } from "react-native";
 import Calories from "../assets/icons/Calories.svg";
 import Clock from "../assets/icons/Clock.svg";
 import genericFood from "../assets/genericFood.jpg";

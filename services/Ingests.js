@@ -1,9 +1,9 @@
 export const getIngests = (setingestData) => {
   fetch(
-    `http://54.198.190.149:5000/ingests/user/${window.sessionStorage.getItem("user_id")}`,
+    `http://54.198.190.149:5000/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
     {
       headers: {
-        Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+        Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
       },
     }
   )
@@ -22,10 +22,10 @@ export const postIngest = (setingestData, formData, lastSelectedImg) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
     },
     body: JSON.stringify({
-      user_id: window.sessionStorage.getItem("user_id"),
+      user_id: window.sessionStorage?.getItem("user_id"),
       ingest: formData.foodName,
       calories: formData.calories,
       description: formData.foodName,
@@ -46,7 +46,7 @@ export const getIngest = (ingestId, sets3Img) => {
   fetch(`http://54.198.190.149:5000/ingests/${ingestId}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
+      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
     },
   })
     .then((response) => response.json())

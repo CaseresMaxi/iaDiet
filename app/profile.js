@@ -7,9 +7,10 @@ import styles from "../styles/ProfileStyles";
 import { Controller, useForm } from "react-hook-form";
 import Colors from "../styles/Colors";
 import User from "../assets/icons/user.svg";
-import { Image, Text } from "react-native-web";
+import { Image, Text } from "react-native";
 import FormInput from "../Components/Input/Input";
 import Button from "../Components/Button/Button";
+import { fetchUserData } from "../services/UserData";
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -40,34 +41,34 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async (setuserData) => {
-      setLoading(true); // Indica que la carga ha comenzado
-      try {
-        const response = await fetch(
-          `http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${window.sessionStorage.getItem("token")}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setuserData(data);
-        reset({
-          username: data.username || "",
-          email: data.email || "",
-          birdthday: data.birdthday || "",
-          weight: data.weight || "",
-          height: data.height || "",
-        });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false); // Indica que la carga ha terminado
-      }
-    };
+    // const fetchUserData = async (setuserData) => {
+    //   setLoading(true); // Indica que la carga ha comenzado
+    //   try {
+    //     const response = await fetch(
+    //       `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+    //         },
+    //       }
+    //     );
+    //     const data = await response.json();
+    //     setuserData(data);
+    //     reset({
+    //       username: data.username || "",
+    //       email: data.email || "",
+    //       birdthday: data.birdthday || "",
+    //       weight: data.weight || "",
+    //       height: data.height || "",
+    //     });
+    //   } catch (error) {
+    //     console.error(error);
+    //   } finally {
+    //     setLoading(false); // Indica que la carga ha terminado
+    //   }
+    // };
 
-    fetchUserData(setuserData);
+    fetchUserData(setuserData, setLoading);
   }, []);
 
   return (

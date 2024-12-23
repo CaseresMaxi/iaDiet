@@ -8,7 +8,6 @@ import FormInput from "./Input/Input";
 import { useEffect } from "react";
 import { useStore } from "../utils/zustan";
 import Button from "./Button/Button";
-import { Col } from "antd";
 import Colors from "../styles/Colors";
 
 export default function Main() {
@@ -17,30 +16,38 @@ export default function Main() {
   const {
     control,
     handleSubmit,
-    // formState: { errors },
+    watch,
+    setError,
+    clearErrors,
+    formState: { errors },
   } = useForm({
     defaultValues: {
+      email: "",
       password: "",
-      age: 1,
-      height: 1,
-      weight: 1,
-      daily_activity: "1",
-      sports: "1",
-      target_weight: 1,
-      time_to_target_weight: "1",
+      confirmPassword: "",
     },
   });
+
   const onSubmit = (data) => {
     console.log(data);
     delete data.confirmPassword;
-    // delete data.username;
-    createUser(data, router.push("/tracker"));
+    createUser(data, router.push("/completeSignUp"));
   };
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
+
   useEffect(() => {
     setHeaderTitle("Sign Up");
+    setNavigationVisible(false);
+    return () => {
+      setNavigationVisible(true);
+    };
   }, []);
+
+  // Watch para observar los valores de los campos
+  const password = watch("password");
+
   return (
     <View
       style={{
@@ -54,7 +61,6 @@ export default function Main() {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
-          // backgroundColor: "red",
         }}
       >
         <Text style={{ ...styles.title, textAlign: "center" }}>
@@ -62,201 +68,70 @@ export default function Main() {
         </Text>
       </View>
       <View style={styles.formContainer}>
-        {/* Existing email and password fields */}
         <Controller
           control={control}
+          rules={{ required: "Email is required" }}
           render={({ field: { onChange, onBlur, value } }) => (
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="Username"
-            //   placeholderTextColor="#888"
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            // />
             <FormInput
-              placeholder="Username"
-              valor={value}
-              label={"Username"}
-              setValor={onChange}
-              onBlur={onBlur}
-            />
-          )}
-          name="username"
-        />
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="email"
-            //   placeholderTextColor="#888"
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            // />
-            <FormInput
-              placeholder="Email" // Cambia el placeholder a "Email"
+              placeholder="Email"
               valor={value}
               label={"Email"}
-              setValor={onChange}
+              onChangeText={onChange}
               onBlur={onBlur}
             />
           )}
           name="email"
         />
+        {errors.email && (
+          <Text style={styles.errorText}>{errors.email.message}</Text>
+        )}
 
         <Controller
           control={control}
+          rules={{ required: "Password is required" }}
           render={({ field: { onChange, onBlur, value } }) => (
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="Password"
-            //   placeholderTextColor="#888"
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            //   secureTextEntry={true} // Agrega esto para ocultar la contraseña
-            // />
             <FormInput
-              placeholder="Password" // Cambia el placeholder a "Password"
+              placeholder="Password"
               valor={value}
               label={"Password"}
-              setValor={onChange}
+              password
+              onChangeText={onChange}
               onBlur={onBlur}
             />
           )}
           name="password"
         />
+        {errors.password && (
+          <Text style={styles.errorText}>{errors.password.message}</Text>
+        )}
 
         <Controller
           control={control}
+          rules={{
+            required: "Please confirm your password",
+            validate: (value) => value === password || "Passwords do not match",
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="Password"
-            //   placeholderTextColor="#888"
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            //   secureTextEntry={true} // Agrega esto para ocultar la contraseña
-            // />
             <FormInput
-              placeholder="Confirm Password" // Cambia el placeholder a "Password"
+              placeholder="Confirm Password"
               valor={value}
+              password
               label={"Confirm Password"}
-              setValor={onChange}
+              onChangeText={onChange}
               onBlur={onBlur}
             />
           )}
           name="confirmPassword"
         />
+        {errors.confirmPassword && (
+          <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>
+        )}
 
-        {/* <Controller
-          control={control}
-          rules={{ required: true, min: 0.1 }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Height"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value.toString()}
-              keyboardType="numeric"
-            />
-          )}
-          name="height"
-        />
-
-        <Controller
-          control={control}
-          rules={{ required: true, min: 0.1 }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Weight"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value.toString()}
-              keyboardType="numeric"
-            />
-          )}
-          name="weight"
-        />
-
-        <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Daily Activity"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-          name="daily_activity"
-        /> */}
-
-        {/* <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Sports"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-          name="sports"
-        />
-
-        <Controller
-          control={control}
-          rules={{ required: true, min: 0.1 }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Target Weight"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value.toString()}
-              keyboardType="numeric"
-            />
-          )}
-          name="target_weight"
-        /> */}
-
-        {/* <Controller
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={styles.customInput}
-              placeholder="Time to Target Weight"
-              placeholderTextColor="#888"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
-          name="time_to_target_weight"
-        /> */}
-
-        {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
-          <Text style={styles.buttonText}>Create account</Text>
-        </Pressable> */}
         <View style={{ alignItems: "center", marginTop: 24, gap: 20 }}>
           <Text
             style={{
               width: 180,
               textAlign: "center",
-              height: "fit-content",
               color: Colors.Font2,
               fontWeight: "500",
             }}
@@ -283,7 +158,6 @@ export default function Main() {
               style={{
                 width: 180,
                 textAlign: "center",
-                height: "fit-content",
                 color: Colors.Font2,
                 fontWeight: "500",
               }}

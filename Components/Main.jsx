@@ -44,7 +44,7 @@ export default function Main() {
   };
 
   useEffect(() => {
-    if (window.sessionStorage.getItem("token")) {
+    if (window.sessionStorage?.getItem("token")) {
       // router.push("/tracker");
       window.sessionStorage.removeItem("token");
       window.sessionStorage.removeItem("user_id");

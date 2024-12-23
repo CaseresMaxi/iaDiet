@@ -9,6 +9,8 @@ export const useStore = create((set) => ({
   headerTitle: "Login",
   headerColor: Colors.Color1,
   leftTitle: null,
+  headerVisible: true,
+  setHeaderVisible: (headerVisible) => set({ headerVisible }),
   setLeftTitle: (leftTitle) => set({ leftTitle }),
   setHeaderColor: (headerColor) => set({ headerColor }),
   setHeaderTitle: (headerTitle) => set({ headerTitle }),

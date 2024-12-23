@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { useStore } from "../../utils/zustan";
 import { useEffect } from "react";
-import { FlatList, Image, Text } from "react-native-web";
+import { FlatList, Image, Text } from "react-native";
 import Colors from "../../styles/Colors";
 import FoodImg from "../../assets/genericFood.jpg";
 import Calories from "../../assets/icons/CaloriesColor.svg";
@@ -22,6 +22,7 @@ export default function Detail() {
     );
     // setLeftTitle(everything[0]);
     return () => {
+      setHeaderTitle("Diet");
       // setLeftTitle(null);
     };
   }, []);
@@ -36,7 +37,7 @@ export default function Detail() {
         paddingHorizontal: 32,
       }}
     >
-      <View>
+      <View style={{ width: "100%" }}>
         <Text
           style={{ fontSize: 24, color: Colors.Color1, fontWeight: "Bold" }}
         >

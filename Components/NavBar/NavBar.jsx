@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import Colors from "../../styles/Colors";
 import { TouchableOpacity } from "react-native";
-import { Image } from "react-native-web";
+import { Image } from "react-native";
 
 const NavBar = ({ butons = [] }) => {
   return (

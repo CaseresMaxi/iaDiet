@@ -2,7 +2,6 @@ import Main from "../Components/Main";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
-import { Text } from "react-native-web";
 import { useEffect } from "react";
 import { useStore } from "../utils/zustan";
 
