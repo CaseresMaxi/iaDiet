@@ -43,7 +43,7 @@ export const createUser = async (data, callback = () => {}) => {
       throw new Error("invalid credentials.");
     }
     const result = await response.json();
-    console.log(response);
+    //console.log(response);
 
     if (result?.user_id) {
       window.sessionStorage?.setItem("user_id", data.user_id);

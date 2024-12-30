@@ -12,6 +12,7 @@ import { getIngest, getIngests, postIngest } from "../services/Ingests";
 import { deleteContextChat } from "../services/Utils";
 import { Stack } from "expo-router";
 import { useStore } from "../utils/zustan";
+import Food from "../Components/Food";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -53,9 +54,13 @@ const Traker = () => {
   const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
 
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
 
   useEffect(() => {
     setNavigationVisible(true);
+    setHeaderTitle("Tracker");
+    setHeaderVisible(true);
   }, []);
 
   // React Hook Form setup
@@ -95,7 +100,6 @@ const Traker = () => {
   }, []);
 
   const addItem = (formData) => {
-    console.log("ingestData", formData);
     postIngest(setingestData, formData, lastSelectedImg);
     setData((prevData) =>
       prevData.map((day) =>
@@ -160,7 +164,7 @@ const Traker = () => {
         images: selectedImage ? [selectedImage] : [],
       };
 
-      console.log("messageBody", messageBody);
+      //console.log("messageBody", messageBody);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -188,10 +192,10 @@ const Traker = () => {
           },
           body: JSON.stringify(messageBody),
         });
-        console.log("response", response);
+        //console.log("response", response);
         if (response.ok) {
           const data = await response.json();
-          console.log("Response:", data);
+          //console.log("Response:", data);
 
           // Extraer información nutricional
           const nutritionInfo = extractNutritionInfo(data.response);
@@ -202,7 +206,7 @@ const Traker = () => {
             ?.replace(/&&&.*?&&&/g, "")
             ?.replace(/\/\*[^]*?\*\//g, "")
             ?.trim();
-          console.log("cleanMessage", cleanMessage);
+          //console.log("cleanMessage", cleanMessage);
 
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -287,7 +291,7 @@ const Traker = () => {
   const [s3ImgB64, sets3ImgB64] = useState("");
 
   const toggleExpandItem = (index) => {
-    console.log("index", ingestData[index]);
+    //console.log("index", ingestData[index]);
     getIngest(ingestData[index].ingest_id, sets3Img);
     setExpandedItems((prevExpandedItems) => ({
       // ...prevExpandedItems,
@@ -304,7 +308,7 @@ const Traker = () => {
         return response.text(); // Parse the response as plain text
       })
       .then((data) => {
-        console.log(data); // Log the base64 image data
+        //console.log(data); // Log the base64 image data
         sets3ImgB64(data);
         // Optionally, do something with the base64 string
       })
@@ -316,93 +320,98 @@ const Traker = () => {
   return (
     <View style={{ ...styles.container, justifyContent: "center" }}>
       <Stack.Screen />
+      <View style={{ display: "fixed", right: 0 }}>
+        <Pressable
+          style={{
+            ...styles.addButton,
+            color: "white",
+            fontSize: 30,
+            borderRadius: 100,
+            fontWeight: "bold",
+          }}
+          onPress={() => {
+            openChatModal(null);
+            if (!modalOpened) setModalOpened(true);
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
+            +
+          </Text>
+        </Pressable>
+      </View>
       <View style={{ height: "90%" }}>
-        {ingestData.map((subItem, index) => (
-          <Pressable
-            key={index}
-            onPress={() => toggleExpandItem(index)}
-            style={{ ...styles.listItem, flexDirection: "column" }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                flex: 1,
-                justifyContent: "space-between",
-                width: "100%",
-                gap: 20,
-              }}
-            >
-              <View style={{ flexDirection: "column", flex: 1 }}>
-                <Text style={styles.itemText}>{subItem.ingest}</Text>
-                <Text
-                  style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
-                >
-                  {subItem.description}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                }}
-              >
-                <Text style={styles.itemText}>{subItem.calories} calorias</Text>
-              </View>
-              <Pressable
-                onPress={() => {
-                  /* Delete function here */
-                }}
-              >
-                <Text style={styles.deleteText}>Delete</Text>
-              </Pressable>
-            </View>
-            {expandedItems[index] && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  width: "90%",
-                }}
-              >
-                <View>
-                  <Image
-                    style={{ width: 100, height: 100 }}
-                    source={{
-                      uri: s3ImgB64,
-                    }}
-                  />
-                </View>
-                <View style={{ marginTop: 10 }}>
-                  <Text style={styles.itemText}>
-                    Proteins: {subItem.proteins}g
-                  </Text>
-                  <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
-                  <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
-                </View>
-              </View>
-            )}
-          </Pressable>
-        ))}
-
-        <View style={{ display: "fixed", right: 0 }}>
-          <Pressable
-            style={{
-              ...styles.addButton,
-              color: "white",
-              fontSize: 30,
-              borderRadius: 100,
-              fontWeight: "bold",
-            }}
-            onPress={() => {
-              openChatModal(null);
-              if (!modalOpened) setModalOpened(true);
-            }}
-          >
-            <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
-              +
-            </Text>
-          </Pressable>
-        </View>
+        {ingestData.map(
+          (subItem, index) => {
+            console.log(subItem);
+            return (
+              <Food key={index} title={subItem.ingest} {...subItem}></Food>
+            );
+          }
+          // <Pressable
+          //   key={index}
+          //   onPress={() => toggleExpandItem(index)}
+          //   style={{ ...styles.listItem, flexDirection: "column" }}
+          // >
+          //   <View
+          //     style={{
+          //       flexDirection: "row",
+          //       flex: 1,
+          //       justifyContent: "space-between",
+          //       width: "100%",
+          //       gap: 20,
+          //     }}
+          //   >
+          //     <View style={{ flexDirection: "column", flex: 1 }}>
+          //       <Text style={styles.itemText}>{subItem.ingest}</Text>
+          //       <Text
+          //         style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
+          //       >
+          //         {subItem.description}
+          //       </Text>
+          //     </View>
+          //     <View
+          //       style={{
+          //         flexDirection: "column",
+          //         justifyContent: "flex-start",
+          //       }}
+          //     >
+          //       <Text style={styles.itemText}>{subItem.calories} calorias</Text>
+          //     </View>
+          //     <Pressable
+          //       onPress={() => {
+          //         /* Delete function here */
+          //       }}
+          //     >
+          //       <Text style={styles.deleteText}>Delete</Text>
+          //     </Pressable>
+          //   </View>
+          //   {expandedItems[index] && (
+          //     <View
+          //       style={{
+          //         flexDirection: "row",
+          //         justifyContent: "space-between",
+          //         width: "90%",
+          //       }}
+          //     >
+          //       <View>
+          //         <Image
+          //           style={{ width: 100, height: 100 }}
+          //           source={{
+          //             uri: s3ImgB64,
+          //           }}
+          //         />
+          //       </View>
+          //       <View style={{ marginTop: 10 }}>
+          //         <Text style={styles.itemText}>
+          //           Proteins: {subItem.proteins}g
+          //         </Text>
+          //         <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
+          //         <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
+          //       </View>
+          //     </View>
+          //   )}
+          // </Pressable>
+        )}
       </View>
 
       {/* <View style={styles.newDateContainer}> */}

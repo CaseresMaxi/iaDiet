@@ -1,6 +1,6 @@
 export const fetchUserData = async (setuserData, setLoading) => {
   setLoading(true); // Indica que la carga ha comenzado
-  console.log(window.sessionStorage?.user_id, "asdasdasd");
+  //console.log(window.sessionStorage?.user_id, "asdasdasd");
   try {
     const response = await fetch(
       `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,

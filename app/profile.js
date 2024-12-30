@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import styles from "../styles/ProfileStyles";
 import { Controller, useForm } from "react-hook-form";
 import Colors from "../styles/Colors";
+import Female from "../assets/female_user.png";
+import Male from "../assets/male_user.png";
 import User from "../assets/icons/user.svg";
 import { Image, Text } from "react-native";
 import FormInput from "../Components/Input/Input";
@@ -17,10 +19,12 @@ export default function Profile() {
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setHeaderColor = useStore((state) => state.setHeaderColor);
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
 
   useEffect(() => {
     setHeaderTitle("My Profile");
     setHeaderColor(Colors.Font2);
+    setNavigationVisible(true);
   }, []);
   const {
     control,
@@ -31,7 +35,7 @@ export default function Profile() {
     defaultValues: {
       username: "",
       email: "",
-      birdthday: "",
+      age: "",
       weight: "",
       height: "",
     },
@@ -71,6 +75,19 @@ export default function Profile() {
     fetchUserData(setuserData, setLoading);
   }, []);
 
+  useEffect(() => {
+    reset({
+      username: userData?.username || "",
+      email: userData?.email || "",
+      age: userData?.age || "",
+      weight: `${userData?.weight} kg` || "",
+      height:
+        userData?.height !== undefined || userData?.height !== null
+          ? `${userData?.height} cm`
+          : "",
+    });
+  }, [userData]);
+
   return (
     <View
       style={{
@@ -80,7 +97,10 @@ export default function Profile() {
       }}
     >
       <View style={styles.innerFormContainer}>
-        <Image source={User} style={styles.profileImg} />
+        <Image
+          source={!userData ? User : userData?.gender === "m" ? Male : Female}
+          style={styles.profileImg}
+        />
         {loading ? (
           <View
             style={{
@@ -240,14 +260,15 @@ export default function Profile() {
             control={control}
             rules={{
               required: true,
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              // pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
             }}
-            render={({ field: { onChange, onBlur } }) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
                 placeholder="Cool nickname"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
+                value={value}
                 onChangeText={onChange}
                 label="User Name"
               />
@@ -298,23 +319,15 @@ export default function Profile() {
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
-                placeholder="24/1/1999"
+                placeholder="25"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                label="Date of birth"
+                label="Age"
               />
-              // <TextInput
-              //   style={styles.customInput}
-              //   placeholder="Email"
-              //   placeholderTextColor="#888"
-              //   onBlur={onBlur}
-              //   onChangeText={onChange}
-              //   value={value}
-              // />
             )}
-            name="birdthday"
+            name="age"
           />
           <Controller
             control={control}

@@ -1,10 +1,12 @@
 import { StyleSheet } from "react-native";
+import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#181A20", // Fondo oscuro
+    paddingTop: 60,
+    backgroundColor: Colors.Color4, // Fondo oscuro
   },
   newDateInput: {
     width: "50%",

@@ -35,9 +35,9 @@ export default function Main() {
   const onSubmit = (data) => {
     login(
       data,
-      () => router.push("/tracker"),
+      () => router.push("/home"),
       () => {
-        console.log("error");
+        //console.log("error");
         // openNotification("topRight");
       }
     );

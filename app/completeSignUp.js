@@ -64,10 +64,6 @@ export default function CompleteSignUp() {
     phoneNumber: "",
   });
 
-  useEffect(() => {
-    console.log(userValues, "userValues");
-  }, [userValues]);
-
   const titles = [
     "",
     "What’s Your Gender",
@@ -415,7 +411,7 @@ export default function CompleteSignUp() {
             <View>
               <Image
                 style={{ width: 100, height: 100 }}
-                source={userValues.gender === "male" ? maleUser : femaleUser}
+                source={userValues.gender === "m" ? maleUser : femaleUser}
               ></Image>
             </View>
             <View style={{ width: "100%", gap: 16 }}>

@@ -2,13 +2,19 @@ import { StyleSheet } from "react-native";
 import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
-  boton: {
-    borderWidth: 1,
-    borderColor: Colors.Font2,
-    backgroundColor: Colors.Color5,
-    color: Colors.Font2,
-    justifyContent: "center",
+  dotContainer: {
+    width: "fit-content",
+    paddingVertical: 4,
+    flexDirection: "row",
+    height: "100%",
     alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 4,
   },
-  textoBoton: {},
+  dot: {
+    backgroundColor: Colors.Font2,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
 });

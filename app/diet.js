@@ -99,7 +99,6 @@ export default function Diet() {
         });
         if (response.ok) {
           const data = await response.json();
-          setnewDiet(extractDietData(data.response));
 
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -187,7 +186,6 @@ export default function Diet() {
           </View>
         </View>
       )}
-      {console.log("dietData", dietData)}
       {dietData?.foods && (
         <View
           style={{

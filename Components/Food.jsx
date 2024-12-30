@@ -17,6 +17,9 @@ const Food = ({
   meal = "",
   dietId = "",
   instructions = "",
+  proteins,
+  fats,
+  carbs,
 }) => {
   return (
     <Link
@@ -39,14 +42,21 @@ const Food = ({
           <Text style={styles.mealTitle}>{title}</Text>
           <Text style={{ ...styles.mealDetails }}>{description}</Text>
           <View style={styles.mealDetailsContainer}>
-            <Text style={styles.mealDetails}>
-              <Image source={Clock}></Image>
-              {` ${stimatedTime}`}
-            </Text>
+            {stimatedTime && (
+              <Text style={styles.mealDetails}>
+                <Image source={Clock}></Image>
+                {` ${stimatedTime}`}
+              </Text>
+            )}
             <Text style={styles.mealDetails}>
               <Image source={Calories}></Image>
               {` ${calories} kcal`}
             </Text>
+            {proteins && (
+              <Text style={styles.mealDetails}>{` ${proteins} g`}</Text>
+            )}
+            {fats && <Text style={styles.mealDetails}>{` ${fats} g`}</Text>}
+            {carbs && <Text style={styles.mealDetails}>{` ${carbs} g`}</Text>}
           </View>
         </View>
         <View

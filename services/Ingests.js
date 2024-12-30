@@ -51,7 +51,7 @@ export const getIngest = (ingestId, sets3Img) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       sets3Img(data.signed_url);
     })
     .catch((error) => console.error(error));

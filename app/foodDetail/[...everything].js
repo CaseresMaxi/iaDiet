@@ -13,7 +13,7 @@ import Clock from "../../assets/icons/ClockColor.svg";
 export default function Detail() {
   const insets = useSafeAreaInsets();
   const { everything } = useLocalSearchParams(); // Captura id y dietId
-  console.log(everything);
+  //console.log(everything);
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   useEffect(() => {

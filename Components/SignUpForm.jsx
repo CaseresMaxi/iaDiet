@@ -29,7 +29,7 @@ export default function Main() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    //console.log(data);
     delete data.confirmPassword;
     createUser(data, router.push("/completeSignUp"));
   };
