@@ -16,6 +16,7 @@ import Colors from "../styles/Colors";
 export default function Diet() {
   const insets = useSafeAreaInsets();
   const [dietData, setdietData] = useState({});
+  const [dietLoading, setdietLoading] = useState(true);
   const addDiet = () => {
     fetch("https://ainutritioner.click/diets", {
       method: "POST",
@@ -30,13 +31,13 @@ export default function Diet() {
     })
       .then((response) => response.json())
       .then((data) => {
-        fetchDiet(setdietData);
+        setLoading(true);
+        fetchDiet(setdietData, setdietLoading);
       })
       .catch((error) => console.error("Error:", error));
   };
-
   useEffect(() => {
-    fetchDiet(setdietData);
+    fetchDiet(setdietData, setdietLoading);
   }, []);
 
   const [chatOpen, setChatOpen] = useState(false);
@@ -151,7 +152,7 @@ export default function Diet() {
         overflow: "scroll",
       }}
     >
-      {!dietData?.foods && (
+      {!dietData?.foods && !dietLoading && (
         <View style={{ height: "100%", justifyContent: "center" }}>
           <View style={styles.headerContainer}>
             <Image source={MealPlans} />
@@ -191,7 +192,7 @@ export default function Diet() {
           </View>
         </View>
       )}
-      {dietData?.foods && (
+      {dietData?.foods && !dietLoading && (
         <View
           style={{
             height: "fit-content",

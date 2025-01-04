@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import FormInput from "./Input/Input";
 import Button from "./Button/Button";
 import Colors from "../styles/Colors";
+import GlobalStyles from "../styles/Global";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -97,7 +98,9 @@ export default function Main() {
         name="email"
       />
       {errors.email && (
-        <Text style={styles.errorText}>Valid email is required.</Text>
+        <View style={GlobalStyles.errorWrapper}>
+          <Text style={styles.errorText}>Valid email is required.</Text>
+        </View>
       )}
 
       <Controller
@@ -113,6 +116,7 @@ export default function Main() {
             onChangeText={onChange}
             value={value}
             label={"Password"}
+            password
           />
           // <TextInput
           //   style={styles.customInput}
@@ -127,7 +131,9 @@ export default function Main() {
         name="password"
       />
       {errors.password && (
-        <Text style={styles.errorText}>Password is required.</Text>
+        <View style={GlobalStyles.errorWrapper}>
+          <Text style={styles.errorText}>Password is required.</Text>
+        </View>
       )}
 
       {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>

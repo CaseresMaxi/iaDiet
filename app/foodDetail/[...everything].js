@@ -18,7 +18,7 @@ export default function Detail() {
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   const [s3ImgB64, sets3ImgB64] = useState("");
-  const [dietData, setdietData] = useState({});
+  const [dietData, setdietData] = useState();
   const fetchImg = (s3Img) => {
     fetch(s3Img)
       .then((response) => {
@@ -37,8 +37,8 @@ export default function Detail() {
   };
 
   useEffect(() => {
-    console.log(dietData, "dietData");
-    fetchImg(dietData.foods[everything[1]]?.s3_url);
+    console.log(dietData, "everything[1]");
+    fetchImg(dietData?.foods[everything[1]]?.s3_url);
   }, [dietData]);
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export default function Detail() {
           </Text>
           <FlatList
             style={{ marginLeft: 12, marginTop: 8 }}
-            // data={dietData?.foods[everything[1]]?.ingredientes} // Pasa el array como datos
+            data={dietData?.foods[everything[1]]?.ingredientes} // Pasa el array como datos
             keyExtractor={(item, index) => index.toString()} // Genera claves únicas
             renderItem={({ item }) => (
               <Text style={styles.item}>{`• ${item}`}</Text> // Renderiza cada ingrediente
@@ -121,7 +121,7 @@ export default function Detail() {
           <Text
             style={{ fontSize: 18, fontWeight: "medium", color: Colors.Font2 }}
           >
-            {/* {everything[7]} */}
+            {dietData && dietData?.foods[everything[1]]?.instrucciones}
           </Text>
         </View>
       </View>
