@@ -49,7 +49,7 @@ export default function Profile() {
     //   setLoading(true); // Indica que la carga ha comenzado
     //   try {
     //     const response = await fetch(
-    //       `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,
+    //       `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
     //       {
     //         headers: {
     //           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,

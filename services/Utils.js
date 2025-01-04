@@ -1,5 +1,5 @@
 export const deleteContextChat = (setingestData) => {
-  fetch(`http://54.198.190.149:5000/chat/clear`, {
+  fetch(`https://ainutritioner.click/chat/clear`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,

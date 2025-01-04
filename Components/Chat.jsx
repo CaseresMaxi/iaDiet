@@ -57,6 +57,7 @@ const Chat = ({
                     />
                   )}
                   <Text style={styles.messageText}>{item.text}</Text>
+                  {console.log(nutritionData, index, messages.length)}
                   {nutritionData && index === messages.length - 1 && (
                     <Pressable
                       style={styles.openModalButton}

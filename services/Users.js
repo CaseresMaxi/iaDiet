@@ -4,7 +4,7 @@ export const login = async (
   callbackError = () => {}
 ) => {
   try {
-    const response = await fetch("http://54.198.190.149:5000/users/login", {
+    const response = await fetch("https://ainutritioner.click/users/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export const login = async (
 
 export const createUser = async (data, callback = () => {}) => {
   try {
-    const response = await fetch("http://54.198.190.149:5000/users", {
+    const response = await fetch("https://ainutritioner.click/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

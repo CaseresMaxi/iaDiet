@@ -7,9 +7,9 @@ export default function UserCard() {
   const [userData, setuserData] = useState(null);
 
   useEffect(() => {
-    // fetch(`http://54.198.190.149:5000/users/${window.sessionStorage.user_id}`)
+    // fetch(`https://ainutritioner.click/users/${window.sessionStorage.user_id}`)
     fetch(
-      `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,
+      `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
       {
         headers: {
           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,

@@ -1,6 +1,6 @@
 export const getIngests = (setingestData) => {
   fetch(
-    `http://54.198.190.149:5000/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
+    `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
     {
       headers: {
         Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
@@ -18,7 +18,7 @@ export const getIngests = (setingestData) => {
 };
 
 export const postIngest = (setingestData, formData, lastSelectedImg) => {
-  fetch("http://54.198.190.149:5000/ingests", {
+  fetch("https://ainutritioner.click/ingests", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export const postIngest = (setingestData, formData, lastSelectedImg) => {
 };
 
 export const getIngest = (ingestId, sets3Img) => {
-  fetch(`http://54.198.190.149:5000/ingests/${ingestId}`, {
+  fetch(`https://ainutritioner.click/ingests/${ingestId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,

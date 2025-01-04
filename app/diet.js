@@ -17,7 +17,7 @@ export default function Diet() {
   const insets = useSafeAreaInsets();
   const [dietData, setdietData] = useState({});
   const addDiet = () => {
-    fetch("http://54.198.190.149:5000/diets", {
+    fetch("https://ainutritioner.click/diets", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,12 +65,16 @@ export default function Diet() {
   };
 
   const [newDiet, setnewDiet] = useState({});
+  useEffect(() => {
+    console.log(newDiet, "newDiets");
+    console.log(dietData, "dietData");
+  }, [newDiet, dietData]);
   const sendMessage = async () => {
     setnewDiet(null);
     if (newMessage.trim()) {
       const contextMessage = "";
       const messageBody = {
-        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description , calorias, ingredientes, intrucciones para su preparacion y tiempo estiamdo de la preparacion, la otra parte debe ser una descripcion en lenguaje antural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio. yout response must be ins ${"Spanish"}`,
+        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. neceisto que dividas el mensaje en dos partes, una debe ser un json valido que como key en debe tener cada comida que se esta agregando a la dieta y el valor de cada key debe ser otro objeto que contenga, title, description , calorias, ingredientes, intrucciones para su preparacion y tiempo estiamdo de la preparacion, justo con un listado de palabras clave que tenga como nombre keywords y sean palabras que describan el alimento separadas por un gion bajo, la otra parte debe ser una descripcion en lenguaje natural para que el usuario lea de lo que enviaste en el json, demas de preguntar de forma amable y simpatica al usurio si la dieta es correcta o si desea hacer modificaciones, es importante que el json sea valido y este rodeado por &&& al principio y al final y no se haga mencion a la estructura del texto, debe ser transparente para el usurio. yout response must be ins ${"Spanish"}`,
         message: `${contextMessage}\n${newMessage}`,
         images: [],
       };
@@ -89,7 +93,7 @@ export default function Diet() {
       setIsChatLoading(true);
 
       try {
-        const response = await fetch("http://54.198.190.149:5000/chat", {
+        const response = await fetch("https://ainutritioner.click/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -99,7 +103,8 @@ export default function Diet() {
         });
         if (response.ok) {
           const data = await response.json();
-
+          console.log(extractDietData(data.response), "extractDietData");
+          setnewDiet(extractDietData(data.response));
           setMessages((prevMessages) => [
             ...prevMessages,
             {
@@ -204,6 +209,7 @@ export default function Diet() {
                 description={dietData.foods[meal]?.description}
                 calories={dietData.foods[meal]?.calorias}
                 instructions={dietData.foods[meal]?.instrucciones}
+                s3Img={dietData.foods[meal]?.s3_url}
               />
             );
           })}

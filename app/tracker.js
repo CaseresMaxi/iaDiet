@@ -13,6 +13,7 @@ import { deleteContextChat } from "../services/Utils";
 import { Stack } from "expo-router";
 import { useStore } from "../utils/zustan";
 import Food from "../Components/Food";
+import { createImage } from "../services/Chat";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -95,8 +96,15 @@ const Traker = () => {
 
   const [ingestData, setingestData] = useState([]);
 
+  const [generatedImg, setgeneratedImg] = useState();
+
   useEffect(() => {
     getIngests(setingestData);
+    // createImage(
+    //   setgeneratedImg,
+    //   "arroz con atun y vegetales",
+    //   "arroz_con_atun_vegetales"
+    // );
   }, []);
 
   const addItem = (formData) => {
@@ -184,7 +192,7 @@ const Traker = () => {
       setisLoading(true);
 
       try {
-        const response = await fetch("http://54.198.190.149:5000/chat", {
+        const response = await fetch("https://ainutritioner.click/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -192,10 +200,8 @@ const Traker = () => {
           },
           body: JSON.stringify(messageBody),
         });
-        //console.log("response", response);
         if (response.ok) {
           const data = await response.json();
-          //console.log("Response:", data);
 
           // Extraer información nutricional
           const nutritionInfo = extractNutritionInfo(data.response);
@@ -206,7 +212,6 @@ const Traker = () => {
             ?.replace(/&&&.*?&&&/g, "")
             ?.replace(/\/\*[^]*?\*\//g, "")
             ?.trim();
-          //console.log("cleanMessage", cleanMessage);
 
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -288,34 +293,31 @@ const Traker = () => {
   const [expandedItems, setExpandedItems] = useState({});
 
   const [s3Img, sets3Img] = useState("");
-  const [s3ImgB64, sets3ImgB64] = useState("");
 
   const toggleExpandItem = (index) => {
-    //console.log("index", ingestData[index]);
     getIngest(ingestData[index].ingest_id, sets3Img);
-    setExpandedItems((prevExpandedItems) => ({
-      // ...prevExpandedItems,
-      [index]: !prevExpandedItems[index],
-    }));
+    // setExpandedItems((prevExpandedItems) => ({
+    //   // ...prevExpandedItems,
+    //   [index]: !prevExpandedItems[index],
+    // }));
   };
 
-  useEffect(() => {
-    fetch(s3Img)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text(); // Parse the response as plain text
-      })
-      .then((data) => {
-        //console.log(data); // Log the base64 image data
-        sets3ImgB64(data);
-        // Optionally, do something with the base64 string
-      })
-      .catch((error) => {
-        console.error("Error fetching the data:", error);
-      });
-  }, [s3Img]);
+  // useEffect(() => {
+  //   fetch(s3Img)
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP error! status: ${response.status}`);
+  //       }
+  //       return response.text(); // Parse the response as plain text
+  //     })
+  //     .then((data) => {
+  //       sets3ImgB64(data);
+  //       // Optionally, do something with the base64 string
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching the data:", error);
+  //     });
+  // }, [s3Img]);
 
   return (
     <View style={{ ...styles.container, justifyContent: "center" }}>
@@ -339,12 +341,23 @@ const Traker = () => {
           </Text>
         </Pressable>
       </View>
+      {/* <Image
+        source={{ uri: generatedImg }}
+        style={{ width: 200, height: 200 }}
+      /> */}
+
       <View style={{ height: "90%" }}>
         {ingestData.map(
           (subItem, index) => {
-            console.log(subItem);
             return (
-              <Food key={index} title={subItem.ingest} {...subItem}></Food>
+              <Pressable onPress={() => toggleExpandItem(index)} key={index}>
+                <Food
+                  title={subItem.ingest}
+                  linkeable={false}
+                  s3Img={subItem.signed_url}
+                  {...subItem}
+                ></Food>
+              </Pressable>
             );
           }
           // <Pressable
@@ -413,7 +426,6 @@ const Traker = () => {
           // </Pressable>
         )}
       </View>
-
       {/* <View style={styles.newDateContainer}> */}
       {/* <TextInput
           style={{ ...styles.input, ...styles.newDateInput }}

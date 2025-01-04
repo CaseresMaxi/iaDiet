@@ -3,7 +3,7 @@ export const fetchUserData = async (setuserData, setLoading) => {
   //console.log(window.sessionStorage?.user_id, "asdasdasd");
   try {
     const response = await fetch(
-      `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,
+      `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
       {
         headers: {
           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
@@ -33,7 +33,7 @@ export const modifyUserData = async (
 ) => {
   try {
     const response = await fetch(
-      `http://54.198.190.149:5000/users/${window.sessionStorage?.user_id}`,
+      `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
       {
         method: "PUT",
         headers: {

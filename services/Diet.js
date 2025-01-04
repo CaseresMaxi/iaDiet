@@ -1,6 +1,6 @@
 export const fetchDiet = (setdietData) =>
   fetch(
-    `http://54.198.190.149:5000/diets/last/${window.sessionStorage?.getItem(
+    `https://ainutritioner.click/diets/last/${window.sessionStorage?.getItem(
       "user_id"
     )}`,
     {
