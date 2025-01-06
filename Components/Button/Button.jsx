@@ -5,9 +5,11 @@ import buttonStyles from "../../styles/ButtonStyles";
 const Button = ({ text = "", onClick = () => {}, style, type, width }) => {
   const ButtonVariant = {
     secondary: buttonStyles.secondaryButton,
+    error: buttonStyles.errorButton,
   };
   const ButtonTextVariant = {
     secondary: buttonStyles.secondaryButtonText,
+    error: buttonStyles.errorButtonText,
   };
   return (
     <TouchableOpacity

@@ -4,6 +4,7 @@ import Colors from "./Colors";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    with: "100%",
     backgroundColor: Colors.Color4, // Dark background for the entire screen
     paddingHorizontal: 36,
     height: "100%",
@@ -28,6 +29,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 0,
     marginVertical: 10,
+    width: "100%",
     flexDirection: "row",
   },
   mealTitle: {

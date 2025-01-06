@@ -6,6 +6,7 @@ import Clock from "../assets/icons/Clock.svg";
 import genericFood from "../assets/genericFood.jpg";
 import { TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
+import Ai from "../assets/icons/ai.svg";
 
 const Food = ({
   title = "",
@@ -19,15 +20,19 @@ const Food = ({
   instructions = "",
   proteins,
   fats,
+  id = "",
   carbs,
   linkeable = true,
   s3Img,
+  generatedImg,
+  enableGenerateImg = false,
 }) => {
   const [s3ImgB64, sets3ImgB64] = useState("");
   const [imgLoading, setimgLoading] = useState(false);
 
+  console.log("title", title, calories, enableGenerateImg);
   useEffect(() => {
-    if (s3Img) {
+    if (s3Img && !generatedImg) {
       setimgLoading(true);
       fetch(s3Img)
         .then((response) => {
@@ -49,14 +54,15 @@ const Food = ({
   }, [s3Img]);
 
   const body = (
-    <View style={{ flexDirection: "row" }}>
+    <View style={{ flexDirection: "row", width: "100%" }}>
       <View
         style={{
+          width: "65%",
           flex: 1,
+          // minWidth: "65%",
           justifyContent: "space-between",
           padding: 24,
           paddingRight: 16,
-          maxWidth: "65%",
         }}
       >
         <Text style={styles.mealTitle}>{title}</Text>
@@ -92,7 +98,7 @@ const Food = ({
         ) : (
           <Image
             style={styles.mealImage}
-            source={{ uri: s3ImgB64 || genericFood }}
+            source={{ uri: s3ImgB64 || generatedImg }}
           ></Image>
         )}
       </View>
@@ -110,7 +116,12 @@ const Food = ({
         {body}
       </Link>
     );
-  else return <View style={{ ...styles.mealCard }}>{body}</View>;
+  else
+    return (
+      <View style={{ ...styles.mealCard }} key={id}>
+        {body}
+      </View>
+    );
 };
 
 export default Food;

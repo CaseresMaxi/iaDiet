@@ -120,7 +120,7 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo transparente oscuro
   },
   modalContent: {
-    width: 300,
+    width: "90%",
     padding: 20,
     backgroundColor: "#1E2028", // Fondo oscuro para el modal
     borderRadius: 10,

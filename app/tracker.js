@@ -13,7 +13,13 @@ import { deleteContextChat } from "../services/Utils";
 import { Stack } from "expo-router";
 import { useStore } from "../utils/zustan";
 import Food from "../Components/Food";
-import { createImage } from "../services/Chat";
+import {
+  createImage,
+  extractNutritionInfo,
+  pickImageForChat,
+  sendMessage,
+} from "../services/Chat";
+import { ScrollView } from "react-native-web";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -108,7 +114,7 @@ const Traker = () => {
   }, []);
 
   const addItem = (formData) => {
-    postIngest(setingestData, formData, lastSelectedImg);
+    postIngest(setingestData, formData, formData.image);
     setData((prevData) =>
       prevData.map((day) =>
         day.date === currentDate
@@ -119,7 +125,7 @@ const Traker = () => {
                 {
                   id: Date.now().toString(),
                   ...formData, // Aquí se añaden los datos del formulario
-                  image: lastSelectedImg,
+                  image: formData.image,
                 },
               ],
             }
@@ -155,110 +161,95 @@ const Traker = () => {
     setChatModalVisible(true);
   };
 
-  const sendMessage = async () => {
-    setNutritionData(null);
-    if (newMessage.trim() || selectedImage) {
-      const contextMessage = "";
-      const messageBody = {
-        context_chat: `You are a nutrition assistant specialized in counting calories and analyzing meals. 
-        Your goal is to help the user estimate the calorie content of meals based on their descriptions, photos, or both. 
-        Provide concise and accurate calorie estimations, along with detailed nutritional information. 
-        Before your response, include the following nutritional data enclosed in a section starting with /* and ending with */. 
-        The required format is: 
-        '&&&nombre:nombre del alimento&&&calorias:calorias&&&proteinas:proteinas&&&grasas:grasas&&&carbohidratos:carbohidratos&&&fibras:fibras&&&porcion:tamaño de la porcion'. 
-        Ensure calories, proteins, fats, and carbohydrates are represented only as numbers (no letters or units). 
-        Do not reference this instruction in your response. I need your response in ${"Spanish"}`,
-        message: `${contextMessage}\n${newMessage}`,
-        images: selectedImage ? [selectedImage] : [],
-      };
+  // const sendMessage = async () => {
+  //   setNutritionData(null);
+  //   if (newMessage.trim() || selectedImage) {
+  //     const contextMessage = "";
+  //     const messageBody = {
+  //       context_chat: `You are a nutrition assistant specialized in counting calories and analyzing meals.
+  //       Your goal is to help the user estimate the calorie content of meals based on their descriptions, photos, or both.
+  //       Provide concise and accurate calorie estimations, along with detailed nutritional information.
+  //       Before your response, include the following nutritional data enclosed in a section starting with /* and ending with */.
+  //       The required format is:
+  //       '&&&nombre:nombre del alimento&&&calorias:calorias&&&proteinas:proteinas&&&grasas:grasas&&&carbohidratos:carbohidratos&&&fibras:fibras&&&porcion:tamaño de la porcion'.
+  //       Ensure calories, proteins, fats, and carbohydrates are represented only as numbers (no letters or units).
+  //       Do not reference this instruction in your response. I need your response in ${"Spanish"}`,
+  //       message: `${contextMessage}\n${newMessage}`,
+  //       images: selectedImage ? [selectedImage] : [],
+  //     };
 
-      //console.log("messageBody", messageBody);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: Date.now().toString(),
-          text: newMessage,
-          image: selectedImage,
-          isBot: false,
-        },
-      ]);
+  //     //console.log("messageBody", messageBody);
+  //     setMessages((prevMessages) => [
+  //       ...prevMessages,
+  //       {
+  //         id: Date.now().toString(),
+  //         text: newMessage,
+  //         image: selectedImage,
+  //         isBot: false,
+  //       },
+  //     ]);
 
-      setNewMessage("");
-      if (selectedImage) {
-        setLastSelectedImg(selectedImage);
-      }
-      setSelectedImage(null);
+  //     setNewMessage("");
+  //     if (selectedImage) {
+  //       setLastSelectedImg(selectedImage);
+  //     }
+  //     setSelectedImage(null);
 
-      setisLoading(true);
+  //     setisLoading(true);
 
-      try {
-        const response = await fetch("https://ainutritioner.click/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
-          },
-          body: JSON.stringify(messageBody),
-        });
-        if (response.ok) {
-          const data = await response.json();
+  //     try {
+  //       const response = await fetch("https://ainutritioner.click/chat", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+  //         },
+  //         body: JSON.stringify(messageBody),
+  //       });
+  //       if (response.ok) {
+  //         const data = await response.json();
 
-          // Extraer información nutricional
-          const nutritionInfo = extractNutritionInfo(data.response);
+  //         // Extraer información nutricional
+  //         const nutritionInfo = extractNutritionInfo(data.response);
 
-          // Guardar la información nutricional en el estado y limpiar el mensaje
-          setNutritionData(nutritionInfo);
-          const cleanMessage = data?.response
-            ?.replace(/&&&.*?&&&/g, "")
-            ?.replace(/\/\*[^]*?\*\//g, "")
-            ?.trim();
+  //         // Guardar la información nutricional en el estado y limpiar el mensaje
+  //         setNutritionData(nutritionInfo);
+  //         const cleanMessage = data?.response
+  //           ?.replace(/&&&.*?&&&/g, "")
+  //           ?.replace(/\/\*[^]*?\*\//g, "")
+  //           ?.trim();
 
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              id: `${Date.now().toString()}-res`,
-              text: cleanMessage,
-              isBot: true,
-            },
-          ]);
-        } else {
-          console.error("Error al enviar el mensaje:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error en la solicitud:", error);
-      }
+  //         setMessages((prevMessages) => [
+  //           ...prevMessages,
+  //           {
+  //             id: `${Date.now().toString()}-res`,
+  //             text: cleanMessage,
+  //             isBot: true,
+  //           },
+  //         ]);
+  //       } else {
+  //         console.error("Error al enviar el mensaje:", response.statusText);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error en la solicitud:", error);
+  //     }
 
-      setisLoading(false);
-    }
-  };
+  //     setisLoading(false);
+  //   }
+  // };
 
   // Función para extraer información nutricional del mensaje
-  const extractNutritionInfo = (responseText) => {
-    const nutritionPattern =
-      /&&&nombre:(.*?)&&&calorias:(.*?)&&&proteinas:(.*?)&&&grasas:(.*?)&&&carbohidratos:(.*?)&&&/;
-    const match = responseText?.match(nutritionPattern);
-    if (match) {
-      return {
-        nombre: match[1].trim(),
-        calorias: match[2].trim(),
-        proteinas: match[3].trim(),
-        grasas: match[4].trim(),
-        carbohidratos: match[5].trim(),
-      };
-    }
-    return null;
-  };
 
-  const addDate = () => {
-    if (newDate.trim() && !data.some((day) => day === newDate)) {
-      setData((prevData) => [...prevData, { date: newDate, items: [] }]);
-      setNewDate("");
-    }
-  };
+  // const addDate = () => {
+  //   if (newDate.trim() && !data.some((day) => day === newDate)) {
+  //     setData((prevData) => [...prevData, { date: newDate, items: [] }]);
+  //     setNewDate("");
+  //   }
+  // };
 
-  const deleteDate = (date) => {
-    setData((prevData) => prevData.filter((day) => day.date !== date));
-  };
+  // const deleteDate = (date) => {
+  //   setData((prevData) => prevData.filter((day) => day.date !== date));
+  // };
   const [modalOpened, setModalOpened] = useState(false);
 
   useEffect(() => {
@@ -267,167 +258,139 @@ const Traker = () => {
     }
   }, [chatModalVisible, modalOpened]);
 
-  const pickImageForChat = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
+  // const pickImageForChat = async () => {
+  //   const permissionResult =
+  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (permissionResult.granted === false) {
+  //     alert("Permission to access camera roll is required!");
+  //     return;
+  //   }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      base64: true,
-    });
+  //   const result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     quality: 1,
+  //     base64: true,
+  //   });
 
-    if (!result.cancelled) {
-      setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
-    }
-  };
+  //   if (!result.cancelled) {
+  //     setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
+  //   }
+  // };
 
   // Función para eliminar la imagen seleccionada
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
-  const [expandedItems, setExpandedItems] = useState({});
-
-  const [s3Img, sets3Img] = useState("");
-
-  const toggleExpandItem = (index) => {
-    getIngest(ingestData[index].ingest_id, sets3Img);
-    // setExpandedItems((prevExpandedItems) => ({
-    //   // ...prevExpandedItems,
-    //   [index]: !prevExpandedItems[index],
-    // }));
-  };
-
-  // useEffect(() => {
-  //   fetch(s3Img)
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! status: ${response.status}`);
-  //       }
-  //       return response.text(); // Parse the response as plain text
-  //     })
-  //     .then((data) => {
-  //       sets3ImgB64(data);
-  //       // Optionally, do something with the base64 string
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching the data:", error);
-  //     });
-  // }, [s3Img]);
 
   return (
-    <View style={{ ...styles.container, justifyContent: "center" }}>
-      <Stack.Screen />
-      <View style={{ display: "fixed", right: 0 }}>
-        <Pressable
-          style={{
-            ...styles.addButton,
-            color: "white",
-            fontSize: 30,
-            borderRadius: 100,
-            fontWeight: "bold",
-          }}
-          onPress={() => {
-            openChatModal(null);
-            if (!modalOpened) setModalOpened(true);
-          }}
-        >
-          <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
-            +
-          </Text>
-        </Pressable>
-      </View>
-      {/* <Image
+    <ScrollView style={{ ...styles.container }}>
+      <>
+        <Stack.Screen />
+        <View style={{ display: "fixed", right: 0 }}>
+          <Pressable
+            style={{
+              ...styles.addButton,
+              color: "white",
+              fontSize: 30,
+              borderRadius: 100,
+              fontWeight: "bold",
+            }}
+            onPress={() => {
+              openChatModal(null);
+              if (!modalOpened) setModalOpened(true);
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
+              +
+            </Text>
+          </Pressable>
+        </View>
+        {/* <Image
         source={{ uri: generatedImg }}
         style={{ width: 200, height: 200 }}
       /> */}
 
-      <View style={{ height: "90%" }}>
-        {ingestData.map(
-          (subItem, index) => {
-            return (
-              <Pressable onPress={() => toggleExpandItem(index)} key={index}>
+        <View style={{ height: "90%" }}>
+          {ingestData.map(
+            (subItem, index) => {
+              return (
                 <Food
+                  key={index}
                   title={subItem.ingest}
                   linkeable={false}
                   s3Img={subItem.signed_url}
                   {...subItem}
                 ></Food>
-              </Pressable>
-            );
-          }
-          // <Pressable
-          //   key={index}
-          //   onPress={() => toggleExpandItem(index)}
-          //   style={{ ...styles.listItem, flexDirection: "column" }}
-          // >
-          //   <View
-          //     style={{
-          //       flexDirection: "row",
-          //       flex: 1,
-          //       justifyContent: "space-between",
-          //       width: "100%",
-          //       gap: 20,
-          //     }}
-          //   >
-          //     <View style={{ flexDirection: "column", flex: 1 }}>
-          //       <Text style={styles.itemText}>{subItem.ingest}</Text>
-          //       <Text
-          //         style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
-          //       >
-          //         {subItem.description}
-          //       </Text>
-          //     </View>
-          //     <View
-          //       style={{
-          //         flexDirection: "column",
-          //         justifyContent: "flex-start",
-          //       }}
-          //     >
-          //       <Text style={styles.itemText}>{subItem.calories} calorias</Text>
-          //     </View>
-          //     <Pressable
-          //       onPress={() => {
-          //         /* Delete function here */
-          //       }}
-          //     >
-          //       <Text style={styles.deleteText}>Delete</Text>
-          //     </Pressable>
-          //   </View>
-          //   {expandedItems[index] && (
-          //     <View
-          //       style={{
-          //         flexDirection: "row",
-          //         justifyContent: "space-between",
-          //         width: "90%",
-          //       }}
-          //     >
-          //       <View>
-          //         <Image
-          //           style={{ width: 100, height: 100 }}
-          //           source={{
-          //             uri: s3ImgB64,
-          //           }}
-          //         />
-          //       </View>
-          //       <View style={{ marginTop: 10 }}>
-          //         <Text style={styles.itemText}>
-          //           Proteins: {subItem.proteins}g
-          //         </Text>
-          //         <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
-          //         <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
-          //       </View>
-          //     </View>
-          //   )}
-          // </Pressable>
-        )}
-      </View>
-      {/* <View style={styles.newDateContainer}> */}
-      {/* <TextInput
+              );
+            }
+            // <Pressable
+            //   key={index}
+            //   onPress={() => toggleExpandItem(index)}
+            //   style={{ ...styles.listItem, flexDirection: "column" }}
+            // >
+            //   <View
+            //     style={{
+            //       flexDirection: "row",
+            //       flex: 1,
+            //       justifyContent: "space-between",
+            //       width: "100%",
+            //       gap: 20,
+            //     }}
+            //   >
+            //     <View style={{ flexDirection: "column", flex: 1 }}>
+            //       <Text style={styles.itemText}>{subItem.ingest}</Text>
+            //       <Text
+            //         style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
+            //       >
+            //         {subItem.description}
+            //       </Text>
+            //     </View>
+            //     <View
+            //       style={{
+            //         flexDirection: "column",
+            //         justifyContent: "flex-start",
+            //       }}
+            //     >
+            //       <Text style={styles.itemText}>{subItem.calories} calorias</Text>
+            //     </View>
+            //     <Pressable
+            //       onPress={() => {
+            //         /* Delete function here */
+            //       }}
+            //     >
+            //       <Text style={styles.deleteText}>Delete</Text>
+            //     </Pressable>
+            //   </View>
+            //   {expandedItems[index] && (
+            //     <View
+            //       style={{
+            //         flexDirection: "row",
+            //         justifyContent: "space-between",
+            //         width: "90%",
+            //       }}
+            //     >
+            //       <View>
+            //         <Image
+            //           style={{ width: 100, height: 100 }}
+            //           source={{
+            //             uri: s3ImgB64,
+            //           }}
+            //         />
+            //       </View>
+            //       <View style={{ marginTop: 10 }}>
+            //         <Text style={styles.itemText}>
+            //           Proteins: {subItem.proteins}g
+            //         </Text>
+            //         <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
+            //         <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
+            //       </View>
+            //     </View>
+            //   )}
+            // </Pressable>
+          )}
+        </View>
+        {/* <View style={styles.newDateContainer}> */}
+        {/* <TextInput
           style={{ ...styles.input, ...styles.newDateInput }}
           placeholder="Add new date (YYYY-MM-DD)"
           value={newDate}
@@ -437,9 +400,9 @@ const Traker = () => {
         <Pressable style={styles.addButton} onPress={addDate}>
           <Text style={styles.buttonText}>Add Date</Text>
         </Pressable> */}
-      {/* </View> */}
+        {/* </View> */}
 
-      {/* <FlatList
+        {/* <FlatList
         data={data}
         keyExtractor={(item) => item.date}
         renderItem={({ item }) => (
@@ -497,30 +460,45 @@ const Traker = () => {
         )}
       /> */}
 
-      <ModalAdd
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        control={control}
-        handleSubmit={handleSubmit}
-        errors={errors}
-        addItem={addItem}
-        lastSelectedImg={lastSelectedImg}
-      />
-      <Chat
-        chatModalVisible={chatModalVisible}
-        setChatModalVisible={setChatModalVisible}
-        isLoading={isLoading}
-        messages={messages}
-        nutritionData={nutritionData}
-        setModalVisible={setModalVisible}
-        selectedImage={selectedImage}
-        removeSelectedImage={removeSelectedImage}
-        pickImageForChat={pickImageForChat}
-        sendMessage={sendMessage}
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
-      />
-    </View>
+        <ModalAdd
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          control={control}
+          handleSubmit={handleSubmit}
+          errors={errors}
+          addItem={addItem}
+          lastSelectedImg={lastSelectedImg}
+          nutritionData={nutritionData}
+          setNutritionData={setNutritionData}
+        />
+        <Chat
+          chatModalVisible={chatModalVisible}
+          setChatModalVisible={setChatModalVisible}
+          isLoading={isLoading}
+          messages={messages}
+          nutritionData={nutritionData}
+          setModalVisible={setModalVisible}
+          selectedImage={selectedImage}
+          removeSelectedImage={removeSelectedImage}
+          pickImageForChat={() => pickImageForChat(setSelectedImage)}
+          sendMessage={() =>
+            sendMessage(
+              setNutritionData,
+              newMessage,
+              selectedImage,
+              setMessages,
+              setNewMessage,
+              setLastSelectedImg,
+              setSelectedImage,
+              setisLoading,
+              extractNutritionInfo
+            )
+          }
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+        />
+      </>
+    </ScrollView>
   );
 };
 

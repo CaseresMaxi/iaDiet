@@ -18,6 +18,7 @@ export const getIngests = (setingestData) => {
 };
 
 export const postIngest = (setingestData, formData, lastSelectedImg) => {
+  console.log("formData", formData);
   fetch("https://ainutritioner.click/ingests", {
     method: "POST",
     headers: {
@@ -26,13 +27,13 @@ export const postIngest = (setingestData, formData, lastSelectedImg) => {
     },
     body: JSON.stringify({
       user_id: window.sessionStorage?.getItem("user_id"),
-      ingest: formData.foodName,
-      calories: formData.calories,
-      description: formData.foodName,
-      proteins: formData.proteins,
+      ingest: formData.nombre,
+      calories: formData.calorias,
+      description: formData.nombre,
+      proteins: formData.proteinas,
       images: lastSelectedImg ? [lastSelectedImg] : null,
-      carbs: formData.carbs,
-      fats: formData.fats,
+      carbs: formData.carbohidratos,
+      fats: formData.grasas,
     }),
   })
     .then((response) => response.json())

@@ -166,7 +166,7 @@ export default function Profile() {
                     fontWeight: "600",
                   }}
                 >
-                  {userData?.weight || 0}
+                  {`${userData?.weight || 0} kg`}
                 </Text>
                 <Text
                   style={{
@@ -342,7 +342,7 @@ export default function Profile() {
                 placeholderTextColor="#888"
                 onBlur={onBlur}
                 onChangeText={onChange}
-                value={value}
+                value={value || ""}
                 label="Weight"
               />
               // <TextInput
@@ -369,7 +369,7 @@ export default function Profile() {
                 placeholderTextColor="#888"
                 onBlur={onBlur}
                 onChangeText={onChange}
-                value={value}
+                value={value || ""}
                 label="Height"
               />
               // <TextInput
@@ -384,14 +384,31 @@ export default function Profile() {
             name="height"
           />
         </View>
-        {/* <UserCard /> */}
-        <Button
-          text="Save"
-          style={{ marginTop: 20 }}
-          type={"secondary"}
-          onClick={handleSubmit}
-          width={142}
-        />
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            flexDirection: "row",
+            gap: 20,
+            alignItems: "center",
+          }}
+        >
+          {/* <UserCard /> */}
+          <Button
+            text="Save"
+            style={{ marginTop: 20 }}
+            type={"secondary"}
+            onClick={handleSubmit}
+            width={142}
+          />
+          <Button
+            text="Log Out"
+            style={{ marginTop: 20 }}
+            type={"error"}
+            onClick={handleSubmit}
+            width={142}
+          />
+        </View>
       </View>
     </View>
   );

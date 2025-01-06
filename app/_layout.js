@@ -95,9 +95,9 @@ const Layout = () => {
         <NavBar
           butons={[
             { icon: Diets, onClick: () => router.push("/diet") },
-            { icon: Ingest, onClick: () => router.push("/tracker") },
             { icon: Home, onClick: () => router.push("/home") },
-            { icon: Scan, onClick: () => router.push("/scan") },
+            { icon: Ingest, onClick: () => router.push("/tracker") },
+            // { icon: Scan, onClick: () => router.push("/scan") },
           ]}
         />
       )}
