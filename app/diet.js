@@ -198,6 +198,7 @@ export default function Diet() {
             height: "fit-content",
           }}
         >
+          {console.log(dietData, "ingestData")}
           {Object.keys(dietData.foods).map((meal) => {
             return (
               <Food

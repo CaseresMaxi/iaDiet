@@ -2,14 +2,18 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import Main from "./Components/Main";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { CopilotProvider } from "react-native-copilot";
+import { RenewTokenProvider } from "./app/Provider/RenewTokenProvider";
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <Main />
-      </View>
+        <CopilotProvider>
+          <View style={styles.container}>
+            <StatusBar style="auto" />
+            <Main />
+          </View>
+        </CopilotProvider>
     </SafeAreaProvider>
   );
 }

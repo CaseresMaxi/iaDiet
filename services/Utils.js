@@ -14,3 +14,21 @@ export const deleteContextChat = (setingestData) => {
     })
     .catch((error) => console.error(error));
 };
+
+export const renewToken = () => {
+  fetch(`https://ainutritioner.click/users/renew-token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log("data", data);
+      window.sessionStorage.setItem("token", data.token);
+    })
+
+    .catch((error) => console.error(error));
+};

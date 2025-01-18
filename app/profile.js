@@ -13,6 +13,7 @@ import { Image, Text } from "react-native";
 import FormInput from "../Components/Input/Input";
 import Button from "../Components/Button/Button";
 import { fetchUserData } from "../services/UserData";
+import { ScrollView } from "react-native-web";
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -89,7 +90,7 @@ export default function Profile() {
   }, [userData]);
 
   return (
-    <View
+    <ScrollView
       style={{
         ...styles.container,
         paddingTop: insets.top,
@@ -410,6 +411,6 @@ export default function Profile() {
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }

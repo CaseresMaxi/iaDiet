@@ -17,7 +17,11 @@ export const getIngests = (setingestData) => {
     .catch((error) => console.error(error));
 };
 
-export const postIngest = (setingestData, formData, lastSelectedImg) => {
+export const postIngest = (
+  setingestData = () => {},
+  formData,
+  lastSelectedImg
+) => {
   console.log("formData", formData);
   fetch("https://ainutritioner.click/ingests", {
     method: "POST",

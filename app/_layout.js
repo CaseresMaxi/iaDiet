@@ -11,6 +11,8 @@ import Diets from "../assets/icons/Diets.svg";
 import Scan from "../assets/icons/Scan.svg";
 import NavBar from "../Components/NavBar/NavBar";
 import { useStore } from "../utils/zustan";
+import { CopilotProvider } from "react-native-copilot";
+import { Button } from "antd";
 
 const Layout = () => {
   const items = [
@@ -62,52 +64,57 @@ const Layout = () => {
   const navigationVisible = useStore((state) => state.navigationVisible);
   const headerVisible = useStore((state) => state.headerVisible);
   return (
-    <>
-      <Stack
-        screenOptions={{
-          headerTitle: () => (
-            <View style={headerStyles.headerContainer}>
-              {/* Botón "asdasd" al inicio */}
-              <TouchableOpacity
-                style={headerStyles.backButtonContainer}
-                onPress={() => router.back()}
-              >
-                <Text style={headerStyles.backButton}>
-                  <Image source={ChevronBack} style={{ marginRight: 8 }} />
-                  {leftTitle}
-                </Text>
-              </TouchableOpacity>
+    <CopilotProvider>
+      <>
+        <Stack
+          screenOptions={{
+            headerTitle: () => (
+              <View style={headerStyles.headerContainer}>
+                {/* Botón "asdasd" al inicio */}
 
-              {/* Título centrado */}
-              <Text style={{ ...headerStyles.headerTitle, color: headerColor }}>
-                {headerTitle}
-              </Text>
-              <View style={headerStyles.settingsIconContainer}></View>
-            </View>
-          ),
-          headerLeft: () => {},
-          header: headerVisible ? undefined : () => null,
-          headerShadowVisible: false,
-          headerTransparent: true,
-        }}
-      />
-      {navigationVisible && (
-        <NavBar
-          butons={[
-            { icon: Diets, onClick: () => router.push("/diet") },
-            { icon: Home, onClick: () => router.push("/home") },
-            { icon: Ingest, onClick: () => router.push("/tracker") },
-            // { icon: Scan, onClick: () => router.push("/scan") },
-          ]}
+                <TouchableOpacity
+                  style={headerStyles.backButtonContainer}
+                  onPress={() => router.back()}
+                >
+                  <Text style={headerStyles.backButton}>
+                    <Image source={ChevronBack} style={{ marginRight: 8 }} />
+                    {leftTitle}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Título centrado */}
+                <Text
+                  style={{ ...headerStyles.headerTitle, color: headerColor }}
+                >
+                  {headerTitle}
+                </Text>
+                <View style={headerStyles.settingsIconContainer}></View>
+              </View>
+            ),
+            headerLeft: () => {},
+            header: headerVisible ? undefined : () => null,
+            headerShadowVisible: false,
+            headerTransparent: true,
+          }}
         />
-      )}
-      {/* <View style={headerStyles.headerContainer}>
+        {navigationVisible && (
+          <NavBar
+            butons={[
+              { icon: Diets, onClick: () => router.push("/diet") },
+              { icon: Home, onClick: () => router.push("/home") },
+              { icon: Ingest, onClick: () => router.push("/tracker") },
+              // { icon: Scan, onClick: () => router.push("/scan") },
+            ]}
+          />
+        )}
+        {/* <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.headerTitle}>App Name 🍌</Text>
         <Dropdown menu={{ items }}>
           <Text style={headerStyles.settingsIcon}>⚙️</Text>
         </Dropdown>
       </View> */}
-    </>
+      </>
+    </CopilotProvider>
   );
 };
 

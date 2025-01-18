@@ -4,15 +4,16 @@ import Colors from "./Colors";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
-    justifyContent: "flex-start",
+    backgroundColor: Colors.Color4,
+    // justifyContent: "flex-start",
     // height: "100%",
-    alignItems: "center",
+    // alignItems: "center",
   },
   innerFormContainer: {
     backgroundColor: Colors.Color4,
     height: "100%",
     width: "100%",
+    marginTop: 20,
     // display: "flex",
     alignItems: "center",
     justifyContent: "center",

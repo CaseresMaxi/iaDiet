@@ -1,9 +1,15 @@
 import Main from "../Components/Main";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useStore } from "../utils/zustan";
+import { renewToken } from "../services/Utils";
+import { RenewTokenProvider } from "./Provider/RenewTokenProvider";
+import { CopilotProvider } from "react-native-copilot";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
@@ -18,25 +24,31 @@ export default function Index() {
   }, []);
 
   return (
-    <View
-      style={{
-        ...styles.container,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-      }}
-    >
-      <Stack.Screen
-        options={
-          {
-            // headerTitle: () => <Text>login</Text>,
-            //   // headerLeft: () => null,
-            //   headerShadowVisible: false,
-            //   headerTransparent: true,
-          }
-        }
-      />
-      <Main />
-    </View>
+    <RenewTokenProvider>
+      <SafeAreaProvider>
+        <CopilotProvider>
+          <View
+            style={{
+              ...styles.container,
+              paddingTop: insets.top,
+              paddingBottom: insets.bottom,
+            }}
+          >
+            <Stack.Screen
+              options={
+                {
+                  // headerTitle: () => <Text>login</Text>,
+                  //   // headerLeft: () => null,
+                  //   headerShadowVisible: false,
+                  //   headerTransparent: true,
+                }
+              }
+            />
+            <Main />
+          </View>
+        </CopilotProvider>
+      </SafeAreaProvider>
+    </RenewTokenProvider>
   );
 }
 
