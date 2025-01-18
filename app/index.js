@@ -5,9 +5,8 @@ import {
 } from "react-native-safe-area-context";
 import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useStore } from "../utils/zustan";
-import { renewToken } from "../services/Utils";
 import { RenewTokenProvider } from "./Provider/RenewTokenProvider";
 import { CopilotProvider } from "react-native-copilot";
 
@@ -26,27 +25,27 @@ export default function Index() {
   return (
     <RenewTokenProvider>
       <SafeAreaProvider>
-        <CopilotProvider>
-          <View
-            style={{
-              ...styles.container,
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom,
-            }}
-          >
-            <Stack.Screen
-              options={
-                {
-                  // headerTitle: () => <Text>login</Text>,
-                  //   // headerLeft: () => null,
-                  //   headerShadowVisible: false,
-                  //   headerTransparent: true,
-                }
+        {/* <CopilotProvider> */}
+        <View
+          style={{
+            ...styles.container,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          }}
+        >
+          <Stack.Screen
+            options={
+              {
+                // headerTitle: () => <Text>login</Text>,
+                //   // headerLeft: () => null,
+                //   headerShadowVisible: false,
+                //   headerTransparent: true,
               }
-            />
-            <Main />
-          </View>
-        </CopilotProvider>
+            }
+          />
+          <Main />
+        </View>
+        {/* </CopilotProvider> */}
       </SafeAreaProvider>
     </RenewTokenProvider>
   );

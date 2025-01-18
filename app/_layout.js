@@ -64,8 +64,8 @@ const Layout = () => {
   const navigationVisible = useStore((state) => state.navigationVisible);
   const headerVisible = useStore((state) => state.headerVisible);
   return (
-    <CopilotProvider>
-      <>
+    <>
+      <CopilotProvider>
         <Stack
           screenOptions={{
             headerTitle: () => (
@@ -97,24 +97,24 @@ const Layout = () => {
             headerTransparent: true,
           }}
         />
-        {navigationVisible && (
-          <NavBar
-            butons={[
-              { icon: Diets, onClick: () => router.push("/diet") },
-              { icon: Home, onClick: () => router.push("/home") },
-              { icon: Ingest, onClick: () => router.push("/tracker") },
-              // { icon: Scan, onClick: () => router.push("/scan") },
-            ]}
-          />
-        )}
-        {/* <View style={headerStyles.headerContainer}>
+      </CopilotProvider>
+      {navigationVisible && (
+        <NavBar
+          butons={[
+            { icon: Diets, onClick: () => router.push("/diet") },
+            { icon: Home, onClick: () => router.push("/home") },
+            { icon: Ingest, onClick: () => router.push("/tracker") },
+            // { icon: Scan, onClick: () => router.push("/scan") },
+          ]}
+        />
+      )}
+      {/* <View style={headerStyles.headerContainer}>
         <Text style={headerStyles.headerTitle}>App Name 🍌</Text>
         <Dropdown menu={{ items }}>
           <Text style={headerStyles.settingsIcon}>⚙️</Text>
         </Dropdown>
       </View> */}
-      </>
-    </CopilotProvider>
+    </>
   );
 };
 

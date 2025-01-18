@@ -122,229 +122,264 @@ export default function Home() {
     setLastSelectedImg(null);
     setChatModalVisible(true);
   };
-  // const { start } = useCopilot();
+  const { start } = useCopilot();
+
+  const CustomComponents = ({ copilot }) => (
+    <View {...copilot}>
+      <Text>test</Text>
+    </View>
+  );
   return (
     <ScrollView style={{ backgroundColor: Colors.Color4 }}>
       {/* <View>
-        <Button title="Start tutorial" onPress={() => start()} />
+        <Button
+          title="Start tutorial"
+          onPress={() => {
+            console.log("start");
+            start();
+          }}
+        />
       </View> */}
-      <CopilotStep text="This is a hello world example!" order={1} name="hello">
+
+      <View
+        style={{
+          ...styles.container,
+          paddingTop: insets.top || 30,
+          backgroundColor: Colors.Color4,
+          paddingHorizontal: 36,
+        }}
+      >
+        <Stack.Screen />
         <View
           style={{
-            ...styles.container,
-            paddingTop: insets.top || 30,
-            backgroundColor: Colors.Color4,
-            paddingHorizontal: 36,
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 32,
           }}
         >
-          <Stack.Screen />
-          <View
+          <Text
+            style={{ fontWeight: "bold", color: Colors.Color2, fontSize: 20 }}
+          >
+            {`Hello, ${userData?.username}!`}
+          </Text>
+          <View style={{ flexDirection: "row", gap: 20 }}>
+            <Image style={{ width: 14, height: 18 }} source={Notification} />
+            <TouchableOpacity onPress={() => router.push("/profile")}>
+              <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View>
+          <Text
             style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 32,
+              fontWeight: "bold",
+              color: Colors.Color1,
+              fontSize: 20,
+              marginBottom: 12,
             }}
           >
-            <Text
-              style={{ fontWeight: "bold", color: Colors.Color2, fontSize: 20 }}
-            >
-              {`Hello, ${userData?.username}!`}
-            </Text>
-            <View style={{ flexDirection: "row", gap: 20 }}>
-              <Image style={{ width: 14, height: 18 }} source={Notification} />
-              <TouchableOpacity onPress={() => router.push("/profile")}>
-                <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: Colors.Color1,
-                fontSize: 20,
-                marginBottom: 12,
-              }}
-            >
-              Today
-            </Text>
-            <View
-              style={{
-                backgroundColor: Colors.Color2,
-                height: "fit-content",
-                paddingHorizontal: 18,
-                paddingVertical: 24,
-                borderRadius: 24,
-                gap: 8,
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  // flex: 1,
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}
-              >
-                {/* <View>
-              <ProgressBar progress={0.5} title="Carbs" />
-            </View> */}
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    300g/600g
-                  </Text>
-                  <View style={{ height: 10, width: "80%" }}>
-                    <ProgressBar
-                      style={{ width: "auto" }}
-                      progress={0.6}
-                      color={Colors.Font2}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                    }}
-                  >
-                    proteins:
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    300g/600g
-                  </Text>
-                  <View style={{ height: 10, width: "80%" }}>
-                    <ProgressBar
-                      style={{ width: "auto" }}
-                      progress={0.6}
-                      color={Colors.Font2}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                    }}
-                  >
-                    fats:
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    300g/600g
-                  </Text>
-                  <View style={{ height: 10, width: "80%" }}>
-                    <ProgressBar
-                      style={{ width: "auto" }}
-                      progress={0.6}
-                      color={Colors.Font2}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Carbs:
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                    marginBottom: 2,
-                  }}
-                >
-                  2000/3000
-                </Text>
-                <View style={{ height: 10, width: "100%" }}>
-                  <ProgressBar
-                    style={{ width: "auto" }}
-                    progress={0.6}
-                    color={Colors.Font2}
-                  />
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                  }}
-                >
-                  Caloeries:
-                </Text>
-              </View>
-            </View>
-          </View>
+            Today
+          </Text>
+          {/* <CopilotStep
+            text="This is a hello world example!"
+            order={1}
+            name="hello"
+          >
+            <CustomComponents />
+          </CopilotStep> */}
           <View
             style={{
-              marginTop: 32,
-              // flexDirection: "row",
-              justifyContent: "space-between",
+              backgroundColor: Colors.Color2,
+              height: "fit-content",
+              paddingHorizontal: 18,
+              paddingVertical: 24,
+              borderRadius: 24,
+              gap: 8,
               alignItems: "center",
             }}
           >
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between",
+                // flex: 1,
                 width: "100%",
+                justifyContent: "space-between",
+              }}
+            >
+              {/* <View>
+              <ProgressBar progress={0.5} title="Carbs" />
+            </View> */}
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  300g/600g
+                </Text>
+                <View style={{ height: 10, width: "80%" }}>
+                  <ProgressBar
+                    style={{ width: "auto" }}
+                    progress={0.6}
+                    color={Colors.Font2}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                  }}
+                >
+                  proteins:
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  300g/600g
+                </Text>
+                <View style={{ height: 10, width: "80%" }}>
+                  <ProgressBar
+                    style={{ width: "auto" }}
+                    progress={0.6}
+                    color={Colors.Font2}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                  }}
+                >
+                  fats:
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                    marginBottom: 6,
+                  }}
+                >
+                  300g/600g
+                </Text>
+                <View style={{ height: 10, width: "80%" }}>
+                  <ProgressBar
+                    style={{ width: "auto" }}
+                    progress={0.6}
+                    color={Colors.Font2}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: Colors.Font2,
+                    fontWeight: 600,
+                  }}
+                >
+                  Carbs:
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: Colors.Font2,
+                  fontWeight: 600,
+                  marginBottom: 2,
+                }}
+              >
+                2000/3000
+              </Text>
+              <View style={{ height: 10, width: "100%" }}>
+                <ProgressBar
+                  style={{ width: "auto" }}
+                  progress={0.6}
+                  color={Colors.Font2}
+                />
+              </View>
+
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: Colors.Font2,
+                  fontWeight: 600,
+                }}
+              >
+                Caloeries:
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          style={{
+            marginTop: 32,
+            // flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.Color1,
+                fontSize: 20,
+                fontWeight: "bold",
+                flex: 1,
+              }}
+            >
+              Your lasts ingests
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                openChatModal(null);
+                if (!modalOpened) setModalOpened(true);
               }}
             >
               <Text
@@ -352,44 +387,27 @@ export default function Home() {
                   color: Colors.Color1,
                   fontSize: 20,
                   fontWeight: "bold",
-                  flex: 1,
                 }}
               >
-                Your lasts ingests
+                +
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  openChatModal(null);
-                  if (!modalOpened) setModalOpened(true);
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.Color1,
-                    fontSize: 20,
-                    fontWeight: "bold",
-                  }}
-                >
-                  +
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              {console.log("ingestData", ingestData)}
-              {ingestData.map((ingest, index) => (
-                <Food
-                  key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                  title={ingest.ingest}
-                  calories={ingest.calories}
-                  s3Img={ingest.signed_url}
-                  stimatedTime={ingest.stimatedTime}
-                  description={ingest.description}
-                />
-              ))}
-            </View>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {console.log("ingestData", ingestData)}
+            {ingestData.map((ingest, index) => (
+              <Food
+                key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
+                title={ingest.ingest}
+                calories={ingest.calories}
+                s3Img={ingest.signed_url}
+                stimatedTime={ingest.stimatedTime}
+                description={ingest.description}
+              />
+            ))}
           </View>
         </View>
-      </CopilotStep>
+      </View>
       {modalVisible && (
         <ModalAdd
           modalVisible={modalVisible}
