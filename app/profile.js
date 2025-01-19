@@ -12,8 +12,9 @@ import User from "../assets/icons/user.svg";
 import { Image, Text } from "react-native";
 import FormInput from "../Components/Input/Input";
 import Button from "../Components/Button/Button";
-import { fetchUserData } from "../services/UserData";
+import { fetchUserData, modifyUserData } from "../services/UserData";
 import { ScrollView } from "react-native-web";
+import { router } from "expo-router";
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -36,9 +37,9 @@ export default function Profile() {
     defaultValues: {
       username: "",
       email: "",
-      age: "",
-      weight: "",
-      height: "",
+      age: 0,
+      weight: 0,
+      height: 0,
     },
   });
 
@@ -80,15 +81,20 @@ export default function Profile() {
     reset({
       username: userData?.username || "",
       email: userData?.email || "",
-      age: userData?.age || "",
-      weight: `${userData?.weight} kg` || "",
-      height:
-        userData?.height !== undefined || userData?.height !== null
-          ? `${userData?.height} cm`
-          : "",
+      age: userData?.age || 0,
+      weight: userData?.weight, //`${userData?.weight} kg` || "",
+      height: userData?.height,
+      // userData?.height !== undefined || userData?.height !== null
+      //   ? `${userData?.height} cm`
+      //   : "",
     });
   }, [userData]);
-
+  // Nueva función onSubmit
+  const onSubmit = (data) => {
+    console.log("Datos enviados:", data);
+    // Aquí puedes enviar los datos al servidor o manejarlos como necesites
+    modifyUserData(data);
+  };
   return (
     <ScrollView
       style={{
@@ -286,10 +292,10 @@ export default function Profile() {
           />
           <Controller
             control={control}
-            rules={{
-              required: true,
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            }}
+            // rules={{
+            //   required: true,
+            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
@@ -313,10 +319,10 @@ export default function Profile() {
           />
           <Controller
             control={control}
-            rules={{
-              required: true,
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            }}
+            // rules={{
+            //   required: true,
+            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
@@ -332,10 +338,10 @@ export default function Profile() {
           />
           <Controller
             control={control}
-            rules={{
-              required: true,
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            }}
+            // rules={{
+            //   required: true,
+            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
@@ -344,7 +350,7 @@ export default function Profile() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value || ""}
-                label="Weight"
+                label="Weight (kg)"
               />
               // <TextInput
               //   style={styles.customInput}
@@ -359,10 +365,10 @@ export default function Profile() {
           />
           <Controller
             control={control}
-            rules={{
-              required: true,
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            }}
+            // rules={{
+            //   required: true,
+            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
                 // style={styles.customInput}
@@ -371,7 +377,8 @@ export default function Profile() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value || ""}
-                label="Height"
+                label="Height (cm)"
+                type="number"
               />
               // <TextInput
               //   style={styles.customInput}
@@ -399,14 +406,17 @@ export default function Profile() {
             text="Save"
             style={{ marginTop: 20 }}
             type={"secondary"}
-            onClick={handleSubmit}
+            onClick={handleSubmit(onSubmit)}
             width={142}
           />
           <Button
             text="Log Out"
             style={{ marginTop: 20 }}
             type={"error"}
-            onClick={handleSubmit}
+            onClick={() => {
+              window.sessionStorage.clear();
+              router.push("/");
+            }}
             width={142}
           />
         </View>

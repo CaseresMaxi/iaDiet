@@ -12,7 +12,8 @@ import Scan from "../assets/icons/Scan.svg";
 import NavBar from "../Components/NavBar/NavBar";
 import { useStore } from "../utils/zustan";
 import { CopilotProvider } from "react-native-copilot";
-import { Button } from "antd";
+import { RenewTokenProvider } from "./Provider/RenewTokenProvider";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Layout = () => {
   const items = [
@@ -65,39 +66,45 @@ const Layout = () => {
   const headerVisible = useStore((state) => state.headerVisible);
   return (
     <>
-      <CopilotProvider>
-        <Stack
-          screenOptions={{
-            headerTitle: () => (
-              <View style={headerStyles.headerContainer}>
-                {/* Botón "asdasd" al inicio */}
+      <RenewTokenProvider>
+        <CopilotProvider>
+          <Stack
+            screenOptions={{
+              headerTitle: () => (
+                <View style={headerStyles.headerContainer}>
+                  {/* Botón "asdasd" al inicio */}
 
-                <TouchableOpacity
-                  style={headerStyles.backButtonContainer}
-                  onPress={() => router.back()}
-                >
-                  <Text style={headerStyles.backButton}>
-                    <Image source={ChevronBack} style={{ marginRight: 8 }} />
-                    {leftTitle}
+                  <TouchableOpacity
+                    style={headerStyles.backButtonContainer}
+                    onPress={() => router.back()}
+                  >
+                    <Text style={headerStyles.backButton}>
+                      <Image source={ChevronBack} style={{ marginRight: 8 }} />
+                      {leftTitle}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* Título centrado */}
+                  <Text
+                    style={{
+                      ...headerStyles.headerTitle,
+                      color: headerColor,
+                    }}
+                  >
+                    {headerTitle}
                   </Text>
-                </TouchableOpacity>
+                  <View style={headerStyles.settingsIconContainer}></View>
+                </View>
+              ),
+              headerLeft: () => {},
+              header: headerVisible ? undefined : () => null,
+              headerShadowVisible: false,
+              headerTransparent: true,
+            }}
+          />
+        </CopilotProvider>
+      </RenewTokenProvider>
 
-                {/* Título centrado */}
-                <Text
-                  style={{ ...headerStyles.headerTitle, color: headerColor }}
-                >
-                  {headerTitle}
-                </Text>
-                <View style={headerStyles.settingsIconContainer}></View>
-              </View>
-            ),
-            headerLeft: () => {},
-            header: headerVisible ? undefined : () => null,
-            headerShadowVisible: false,
-            headerTransparent: true,
-          }}
-        />
-      </CopilotProvider>
       {navigationVisible && (
         <NavBar
           butons={[
