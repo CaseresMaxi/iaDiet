@@ -124,14 +124,12 @@ export default function Home() {
   };
   const { start } = useCopilot();
 
-  const CustomComponents = ({ copilot }) => (
-    <View {...copilot}>
-      <Text>test</Text>
-    </View>
+  const CustomComponents = ({ copilot, children }) => (
+    <View {...copilot}>{children}</View>
   );
   return (
     <ScrollView style={{ backgroundColor: Colors.Color4 }}>
-      {/* <View>
+      <View>
         <Button
           title="Start tutorial"
           onPress={() => {
@@ -139,7 +137,7 @@ export default function Home() {
             start();
           }}
         />
-      </View> */}
+      </View>
 
       <View
         style={{
@@ -181,175 +179,176 @@ export default function Home() {
           >
             Today
           </Text>
-          {/* <CopilotStep
-            text="This is a hello world example!"
+          <CopilotStep
+            text="Aqui puedes ver los macros y las calorias que consumiste hoy"
             order={1}
             name="hello"
           >
-            <CustomComponents />
-          </CopilotStep> */}
-          <View
-            style={{
-              backgroundColor: Colors.Color2,
-              height: "fit-content",
-              paddingHorizontal: 18,
-              paddingVertical: 24,
-              borderRadius: 24,
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                // flex: 1,
-                width: "100%",
-                justifyContent: "space-between",
-              }}
-            >
-              {/* <View>
+            <CustomComponents>
+              <View
+                style={{
+                  backgroundColor: Colors.Color2,
+                  height: "fit-content",
+                  paddingHorizontal: 18,
+                  paddingVertical: 24,
+                  borderRadius: 24,
+                  gap: 8,
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    // flex: 1,
+                    width: "100%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {/* <View>
               <ProgressBar progress={0.5} title="Carbs" />
             </View> */}
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                    marginBottom: 6,
-                  }}
-                >
-                  300g/600g
-                </Text>
-                <View style={{ height: 10, width: "80%" }}>
-                  <ProgressBar
-                    style={{ width: "auto" }}
-                    progress={0.6}
-                    color={Colors.Font2}
-                  />
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                        marginBottom: 6,
+                      }}
+                    >
+                      300g/600g
+                    </Text>
+                    <View style={{ height: 10, width: "80%" }}>
+                      <ProgressBar
+                        style={{ width: "auto" }}
+                        progress={0.6}
+                        color={Colors.Font2}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      proteins:
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                        marginBottom: 6,
+                      }}
+                    >
+                      300g/600g
+                    </Text>
+                    <View style={{ height: 10, width: "80%" }}>
+                      <ProgressBar
+                        style={{ width: "auto" }}
+                        progress={0.6}
+                        color={Colors.Font2}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      fats:
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                        marginBottom: 6,
+                      }}
+                    >
+                      300g/600g
+                    </Text>
+                    <View style={{ height: 10, width: "80%" }}>
+                      <ProgressBar
+                        style={{ width: "auto" }}
+                        progress={0.6}
+                        color={Colors.Font2}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Carbs:
+                    </Text>
+                  </View>
                 </View>
-                <Text
+                <View
                   style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
                   }}
                 >
-                  proteins:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                    marginBottom: 6,
-                  }}
-                >
-                  300g/600g
-                </Text>
-                <View style={{ height: 10, width: "80%" }}>
-                  <ProgressBar
-                    style={{ width: "auto" }}
-                    progress={0.6}
-                    color={Colors.Font2}
-                  />
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                  }}
-                >
-                  fats:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                    marginBottom: 6,
-                  }}
-                >
-                  300g/600g
-                </Text>
-                <View style={{ height: 10, width: "80%" }}>
-                  <ProgressBar
-                    style={{ width: "auto" }}
-                    progress={0.6}
-                    color={Colors.Font2}
-                  />
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: Colors.Font2,
-                    fontWeight: 600,
-                  }}
-                >
-                  Carbs:
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: Colors.Font2,
-                  fontWeight: 600,
-                  marginBottom: 2,
-                }}
-              >
-                2000/3000
-              </Text>
-              <View style={{ height: 10, width: "100%" }}>
-                <ProgressBar
-                  style={{ width: "auto" }}
-                  progress={0.6}
-                  color={Colors.Font2}
-                />
-              </View>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: Colors.Font2,
+                      fontWeight: 600,
+                      marginBottom: 2,
+                    }}
+                  >
+                    2000/3000
+                  </Text>
+                  <View style={{ height: 10, width: "100%" }}>
+                    <ProgressBar
+                      style={{ width: "auto" }}
+                      progress={0.6}
+                      color={Colors.Font2}
+                    />
+                  </View>
 
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: Colors.Font2,
-                  fontWeight: 600,
-                }}
-              >
-                Caloeries:
-              </Text>
-            </View>
-          </View>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: Colors.Font2,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Caloeries:
+                  </Text>
+                </View>
+              </View>
+            </CustomComponents>
+          </CopilotStep>
         </View>
         <View
           style={{
