@@ -131,7 +131,7 @@ export default function Home() {
     <ScrollView style={{ backgroundColor: Colors.Color4 }}>
       <View>
         <Button
-          title="Start tutorial"
+          title="Tutotial"
           onPress={() => {
             start();
           }}
