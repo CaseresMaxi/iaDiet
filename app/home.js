@@ -155,11 +155,23 @@ export default function Home() {
             marginBottom: 32,
           }}
         >
-          <Text
-            style={{ fontWeight: "bold", color: Colors.Color2, fontSize: 20 }}
+          <CopilotStep
+            text="Aquí puedes ver tu nombre de usuario y acceder al perfil."
+            order={1}
+            name="header"
           >
-            {`Hello, ${userData?.username}!`}
-          </Text>
+            <CustomComponents>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: Colors.Color2,
+                  fontSize: 20,
+                }}
+              >
+                {`Hello, ${userData?.username}!`}
+              </Text>
+            </CustomComponents>
+          </CopilotStep>
           <View style={{ flexDirection: "row", gap: 20 }}>
             <Image style={{ width: 14, height: 18 }} source={Notification} />
             <TouchableOpacity onPress={() => router.push("/profile")}>
@@ -180,8 +192,8 @@ export default function Home() {
           </Text>
           <CopilotStep
             text="Aqui puedes ver los macros y las calorias que consumiste hoy"
-            order={1}
-            name="hello"
+            order={2}
+            name="macros"
           >
             <CustomComponents>
               <View
@@ -374,40 +386,56 @@ export default function Home() {
             >
               Your lasts ingests
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                openChatModal(null);
-                if (!modalOpened) setModalOpened(true);
-              }}
+            <CopilotStep
+              text="Aqui podras agregar rapidamente una comida a tu dieta hablando con nuestro chat."
+              order={4}
+              name="add"
             >
-              <Text
-                style={{
-                  color: Colors.Color1,
-                  fontSize: 20,
-                  fontWeight: "bold",
-                }}
-              >
-                +
-              </Text>
-            </TouchableOpacity>
+              <CustomComponents>
+                <TouchableOpacity
+                  onPress={() => {
+                    openChatModal(null);
+                    if (!modalOpened) setModalOpened(true);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.Color1,
+                      fontSize: 20,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    +
+                  </Text>
+                </TouchableOpacity>
+              </CustomComponents>
+            </CopilotStep>
           </View>
-          <View>
-            {ingestData.map((ingest, index) => {
-              return (
-                moment().diff(ingest.date, "days") === 0 && (
-                  <Food
-                    key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                    title={ingest.ingest}
-                    calories={ingest.calories}
-                    s3Img={ingest.signed_url}
-                    stimatedTime={ingest.stimatedTime}
-                    linkeable={false}
-                    description={ingest.description}
-                  />
-                )
-              );
-            })}
-          </View>
+          <CopilotStep
+            text="Aqui podras ver las comidas que has consumido hoy."
+            order={3}
+            name="hoy"
+          >
+            <CustomComponents>
+              <View>
+                {ingestData.map((ingest, index) => {
+                  return (
+                    moment().diff(ingest.date, "days") === 0 && (
+                      <Food
+                        key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
+                        title={ingest.ingest}
+                        calories={ingest.calories}
+                        s3Img={ingest.signed_url}
+                        stimatedTime={ingest.stimatedTime}
+                        linkeable={false}
+                        description={ingest.description}
+                      />
+                    )
+                  );
+                })}
+              </View>
+            </CustomComponents>
+          </CopilotStep>
         </View>
       </View>
       {modalVisible && (
