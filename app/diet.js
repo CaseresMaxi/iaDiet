@@ -148,6 +148,18 @@ export default function Diet() {
         overflow: "scroll",
       }}
     >
+      <View style={{ alignItems: "center", marginBottom: 20 }}>
+        <Button
+          text="Open Chat"
+          width={250}
+          type={"secondary"}
+          onClick={() => {
+            setMessages([]);
+            setChatOpen(true);
+            deleteContextChat();
+          }}
+        />
+      </View>
       {!dietData?.foods && !dietLoading && (
         <View style={{ height: "100%", justifyContent: "center" }}>
           <View style={styles.headerContainer}>
@@ -210,18 +222,6 @@ export default function Diet() {
               />
             );
           })}
-          <View style={{ alignItems: "center", marginBottom: 20 }}>
-            <Button
-              text="Open Chat"
-              width={250}
-              type={"secondary"}
-              onClick={() => {
-                setMessages([]);
-                setChatOpen(true);
-                deleteContextChat();
-              }}
-            />
-          </View>
         </View>
       )}
 
