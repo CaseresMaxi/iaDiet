@@ -19,7 +19,7 @@ import {
   pickImageForChat,
   sendMessage,
 } from "../services/Chat";
-import { ScrollView } from "react-native-web";
+import { FlatList, ScrollView } from "react-native-web";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -54,6 +54,8 @@ const Traker = () => {
   const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
   const [isLoading, setisLoading] = useState(false);
   const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
+  const [groupedData, setGroupedData] = useState({}); // Datos agrupados por fecha
+  const [ingestData, setingestData] = useState([]);
 
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
@@ -68,9 +70,21 @@ const Traker = () => {
     setNavigationVisible(true);
     setHeaderTitle("Tracker");
     setHeaderVisible(true);
+    getIngests((data) => {
+      setingestData(data);
+      const grouped = data.reduce((acc, item) => {
+        const date = dayjs(item.date).format("YYYY-MM-DD");
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(item);
+        return acc;
+      }, {});
+      setGroupedData(grouped);
+    });
   }, []);
 
-  // React Hook Form setup
+  useEffect(() => {
+    console.log("grouped", groupedData);
+  }, [groupedData]);
 
   const {
     control,
@@ -100,18 +114,7 @@ const Traker = () => {
     }
   }, [nutritionData, modalVisible, setValue]);
 
-  const [ingestData, setingestData] = useState([]);
-
-  const [generatedImg, setgeneratedImg] = useState();
-
-  useEffect(() => {
-    getIngests(setingestData);
-    // createImage(
-    //   setgeneratedImg,
-    //   "arroz con atun y vegetales",
-    //   "arroz_con_atun_vegetales"
-    // );
-  }, []);
+  // const [generatedImg, setgeneratedImg] = useState();
 
   const addItem = (formData) => {
     postIngest(setingestData, formData, formData.image);
@@ -145,13 +148,6 @@ const Traker = () => {
           : day
       )
     );
-  };
-
-  const toggleExpand = (date) => {
-    setExpandedDates((prev) => ({
-      ...prev,
-      [date]: !prev[date],
-    }));
   };
 
   const openChatModal = (date) => {
@@ -311,83 +307,41 @@ const Traker = () => {
       /> */}
 
         <View style={{ height: "90%" }}>
-          {ingestData.map(
-            (subItem, index) => {
-              return (
-                <Food
-                  key={index}
-                  title={subItem.ingest}
-                  linkeable={false}
-                  s3Img={subItem.signed_url}
-                  {...subItem}
-                ></Food>
-              );
-            }
-            // <Pressable
-            //   key={index}
-            //   onPress={() => toggleExpandItem(index)}
-            //   style={{ ...styles.listItem, flexDirection: "column" }}
-            // >
-            //   <View
-            //     style={{
-            //       flexDirection: "row",
-            //       flex: 1,
-            //       justifyContent: "space-between",
-            //       width: "100%",
-            //       gap: 20,
-            //     }}
-            //   >
-            //     <View style={{ flexDirection: "column", flex: 1 }}>
-            //       <Text style={styles.itemText}>{subItem.ingest}</Text>
-            //       <Text
-            //         style={{ ...styles.itemText, opacity: 0.5, fontSize: 12 }}
-            //       >
-            //         {subItem.description}
-            //       </Text>
-            //     </View>
-            //     <View
-            //       style={{
-            //         flexDirection: "column",
-            //         justifyContent: "flex-start",
-            //       }}
-            //     >
-            //       <Text style={styles.itemText}>{subItem.calories} calorias</Text>
-            //     </View>
-            //     <Pressable
-            //       onPress={() => {
-            //         /* Delete function here */
-            //       }}
-            //     >
-            //       <Text style={styles.deleteText}>Delete</Text>
-            //     </Pressable>
-            //   </View>
-            //   {expandedItems[index] && (
-            //     <View
-            //       style={{
-            //         flexDirection: "row",
-            //         justifyContent: "space-between",
-            //         width: "90%",
-            //       }}
-            //     >
-            //       <View>
-            //         <Image
-            //           style={{ width: 100, height: 100 }}
-            //           source={{
-            //             uri: s3ImgB64,
-            //           }}
-            //         />
-            //       </View>
-            //       <View style={{ marginTop: 10 }}>
-            //         <Text style={styles.itemText}>
-            //           Proteins: {subItem.proteins}g
-            //         </Text>
-            //         <Text style={styles.itemText}>Carbs: {subItem.carbs}g</Text>
-            //         <Text style={styles.itemText}>Fats: {subItem.fats}g</Text>
-            //       </View>
-            //     </View>
-            //   )}
-            // </Pressable>
-          )}
+          {Object.keys(groupedData).map((date, index) => {
+            return (
+              <View key={index}>
+                <View style={styles.dateContainer}>
+                  <View style={styles.dateHeader}>
+                    <Text style={styles.dateText}>{date}</Text>
+                  </View>
+                </View>
+                <FlatList
+                  data={groupedData[date]}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <Food
+                      key={item.date}
+                      title={item.ingest}
+                      linkeable={false}
+                      s3Img={item.signed_url}
+                      {...item}
+                    ></Food>
+                  )}
+                />
+              </View>
+            );
+          })}
+          {/* {ingestData.map((subItem, index) => {
+            return (
+              <Food
+                key={index}
+                title={subItem.ingest}
+                linkeable={false}
+                s3Img={subItem.signed_url}
+                {...subItem}
+              ></Food>
+            );
+          })} */}
         </View>
         {/* <View style={styles.newDateContainer}> */}
         {/* <TextInput

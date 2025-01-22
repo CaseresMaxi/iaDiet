@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   dateContainer: {
-    marginBottom: 20,
+    // marginBottom: 20,
     borderWidth: 1,
     borderColor: "#4E4C67", // Borde gris oscuro
     borderRadius: 15,
