@@ -28,6 +28,7 @@ import {
   useCopilot,
   walkthroughable,
 } from "react-native-copilot";
+import moment from "moment";
 
 const CopilotText = walkthroughable(Text);
 
@@ -391,17 +392,21 @@ export default function Home() {
             </TouchableOpacity>
           </View>
           <View>
-            {ingestData.map((ingest, index) => (
-              <Food
-                key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                title={ingest.ingest}
-                calories={ingest.calories}
-                s3Img={ingest.signed_url}
-                stimatedTime={ingest.stimatedTime}
-                linkeable={false}
-                description={ingest.description}
-              />
-            ))}
+            {ingestData.map((ingest, index) => {
+              return (
+                moment().diff(ingest.date, "days") === 0 && (
+                  <Food
+                    key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
+                    title={ingest.ingest}
+                    calories={ingest.calories}
+                    s3Img={ingest.signed_url}
+                    stimatedTime={ingest.stimatedTime}
+                    linkeable={false}
+                    description={ingest.description}
+                  />
+                )
+              );
+            })}
           </View>
         </View>
       </View>
