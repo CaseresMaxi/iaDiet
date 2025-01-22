@@ -3,8 +3,10 @@ import * as ImagePicker from "expo-image-picker";
 export const createImage = (
   setGeneratedImage = () => {},
   prompt = "",
-  keywords = ""
-) =>
+  keywords = "",
+  setisLoading = () => {}
+) => {
+  setisLoading(true);
   fetch(`https://ainutritioner.click/chat/create-image`, {
     headers: {
       Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
@@ -18,11 +20,11 @@ export const createImage = (
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       setGeneratedImage(data.response);
+      setisLoading(false);
     })
     .catch((error) => console.error(error));
-
+};
 export const extractNutritionInfo = (responseText) => {
   const nutritionPattern =
     /&&&nombre:(.*?)&&&calorias:(.*?)&&&proteinas:(.*?)&&&grasas:(.*?)&&&carbohidratos:(.*?)&&&/;

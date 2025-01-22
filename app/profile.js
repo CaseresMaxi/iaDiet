@@ -91,7 +91,6 @@ export default function Profile() {
   }, [userData]);
   // Nueva función onSubmit
   const onSubmit = (data) => {
-    console.log("Datos enviados:", data);
     // Aquí puedes enviar los datos al servidor o manejarlos como necesites
     modifyUserData(data);
   };

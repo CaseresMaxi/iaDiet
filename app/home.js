@@ -71,8 +71,7 @@ export default function Home() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const addItem = (formData) => {
-    console.log("formData", formData);
-    postIngest(() => {}, formData, formData.image);
+    postIngest(setIngestData, formData, formData.image);
     reset(); // Limpiar el formulario después de añadir el item
     // setNewItemImage(null);
     setModalVisible(false);
@@ -133,7 +132,6 @@ export default function Home() {
         <Button
           title="Start tutorial"
           onPress={() => {
-            console.log("start");
             start();
           }}
         />
@@ -393,7 +391,6 @@ export default function Home() {
             </TouchableOpacity>
           </View>
           <View>
-            {console.log("ingestData", ingestData)}
             {ingestData.map((ingest, index) => (
               <Food
                 key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
@@ -401,6 +398,7 @@ export default function Home() {
                 calories={ingest.calories}
                 s3Img={ingest.signed_url}
                 stimatedTime={ingest.stimatedTime}
+                linkeable={false}
                 description={ingest.description}
               />
             ))}

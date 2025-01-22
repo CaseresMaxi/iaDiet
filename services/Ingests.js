@@ -22,7 +22,6 @@ export const postIngest = (
   formData,
   lastSelectedImg
 ) => {
-  console.log("formData", formData);
   fetch("https://ainutritioner.click/ingests", {
     method: "POST",
     headers: {

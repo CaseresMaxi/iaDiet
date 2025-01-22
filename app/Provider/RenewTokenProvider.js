@@ -24,7 +24,6 @@ export const RenewTokenProvider = ({ children }) => {
     // Limpieza del intervalo cuando el componente se desmonta
     return () => {
       clearInterval(interval);
-      console.log("Intervalo limpiado");
     };
   }, []); // [] asegura que solo se configure al montar el componente
   return (

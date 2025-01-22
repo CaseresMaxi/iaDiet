@@ -26,11 +26,11 @@ const Food = ({
   s3Img,
   generatedImg,
   enableGenerateImg = false,
+  generatingImg = false,
 }) => {
   const [s3ImgB64, sets3ImgB64] = useState("");
   const [imgLoading, setimgLoading] = useState(false);
 
-  console.log("title", title, calories, enableGenerateImg);
   useEffect(() => {
     if (s3Img && !generatedImg) {
       setimgLoading(true);
@@ -91,7 +91,7 @@ const Food = ({
           alignItems: "center",
         }}
       >
-        {imgLoading ? (
+        {imgLoading || generatingImg ? (
           <View style={styles.mealImage}>
             <ActivityIndicator size="large" color="#0000ff" />
           </View>

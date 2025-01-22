@@ -311,7 +311,6 @@ const Traker = () => {
       /> */}
 
         <View style={{ height: "90%" }}>
-          {console.log(ingestData, "ingestData")}
           {ingestData.map(
             (subItem, index) => {
               return (

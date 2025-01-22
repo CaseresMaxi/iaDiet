@@ -14,7 +14,6 @@ import { fetchDiet } from "../../services/Diet";
 export default function Detail() {
   const insets = useSafeAreaInsets();
   const { everything } = useLocalSearchParams(); // Captura id y dietId
-  console.log(everything);
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   const [s3ImgB64, sets3ImgB64] = useState("");
@@ -37,7 +36,6 @@ export default function Detail() {
   };
 
   useEffect(() => {
-    console.log(dietData, "everything[1]");
     fetchImg(dietData?.foods[everything[1]]?.s3_url);
   }, [dietData]);
 

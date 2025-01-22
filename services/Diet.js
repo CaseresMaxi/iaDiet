@@ -11,7 +11,6 @@ export const fetchDiet = (setdietData, setdietLoading) =>
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data, "data");
       setdietLoading(false);
       setdietData(data);
     })

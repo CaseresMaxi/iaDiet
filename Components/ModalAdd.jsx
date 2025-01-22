@@ -1,4 +1,4 @@
-import { Controller } from "react-hook-form";
+import { Controller, set } from "react-hook-form";
 import { Image, Modal, Pressable, Text, TextInput, View } from "react-native";
 import { styles } from "../styles/TrakerStyles";
 import GlobalStyles from "../styles/Global";
@@ -21,6 +21,7 @@ export const ModalAdd = ({
   const [formValues, setFormValues] = useState({});
   const [generateImg, setgenerateImg] = useState(null);
   // Update formValues whenever the control values change
+  const [isLoadingImg, setisLoadingImg] = useState(false);
 
   useEffect(() => {
     if (lastSelectedImg) {
@@ -28,10 +29,15 @@ export const ModalAdd = ({
         ...prev,
         image: lastSelectedImg,
       }));
-    } else {
-      createImage(setgenerateImg, nutritionData?.nombre, "test");
+    } else if (!isLoadingImg && !generateImg) {
+      createImage(
+        setgenerateImg,
+        nutritionData?.nombre,
+        "test",
+        setisLoadingImg
+      );
     }
-  }, [nutritionData, lastSelectedImg]);
+  }, [nutritionData, lastSelectedImg, isLoadingImg]);
   useEffect(() => {
     if (!lastSelectedImg)
       setNutritionData((prev) => ({
@@ -192,7 +198,6 @@ export const ModalAdd = ({
           </View> */}
 
           {/* Pasar los valores del formulario al componente Food */}
-          {console.log("nutritionData123", nutritionData)}
           {
             <Food
               title={nutritionData?.nombre || formValues.foodName}
@@ -203,6 +208,7 @@ export const ModalAdd = ({
               enableGenerateImg={true}
               linkeable={false}
               generatedImg={lastSelectedImg || nutritionData?.image}
+              generatingImg={isLoadingImg}
             />
           }
 

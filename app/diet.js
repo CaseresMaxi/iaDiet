@@ -66,10 +66,7 @@ export default function Diet() {
   };
 
   const [newDiet, setnewDiet] = useState({});
-  useEffect(() => {
-    console.log(newDiet, "newDiets");
-    console.log(dietData, "dietData");
-  }, [newDiet, dietData]);
+
   const sendMessage = async () => {
     setnewDiet(null);
     if (newMessage.trim()) {
@@ -104,7 +101,6 @@ export default function Diet() {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log(extractDietData(data.response), "extractDietData");
           setnewDiet(extractDietData(data.response));
           setMessages((prevMessages) => [
             ...prevMessages,
@@ -198,7 +194,6 @@ export default function Diet() {
             height: "fit-content",
           }}
         >
-          {console.log(dietData, "ingestData")}
           {Object.keys(dietData.foods).map((meal) => {
             return (
               <Food
