@@ -8,59 +8,46 @@ import * as yup from "yup";
 import Chat from "../Components/Chat";
 import { ModalAdd } from "../Components/ModalAdd";
 import { styles } from "../styles/TrakerStyles";
-import { getIngest, getIngests, postIngest } from "../services/Ingests";
+import { getIngests, postIngest } from "../services/Ingests";
 import { deleteContextChat } from "../services/Utils";
 import { Stack } from "expo-router";
 import { useStore } from "../utils/zustan";
 import Food from "../Components/Food";
 import {
-  createImage,
-  extractNutritionInfo,
   pickImageForChat,
   sendMessage,
+  extractNutritionInfo,
 } from "../services/Chat";
 import { FlatList, ScrollView } from "react-native-web";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
-  calories: yup
-    .number()
-    // .typeError("Las calorías deben ser un número")
-    .required("Las calorías son obligatorias"),
-  proteins: yup
-    .number()
-    // .typeError("Las proteínas deben ser un número")
-    .required("Las proteínas son obligatorias"),
-  carbs: yup
-    .number()
-    // .typeError("Los carbohidratos deben ser un número")
-    .required("Los carbohidratos son obligatorios"),
-  fats: yup
-    .number()
-    // .typeError("Las grasas deben ser un número")
-    .required("Las grasas son obligatorias"),
+  calories: yup.number().required("Las calorías son obligatorias"),
+  proteins: yup.number().required("Las proteínas son obligatorias"),
+  carbs: yup.number().required("Los carbohidratos son obligatorios"),
+  fats: yup.number().required("Las grasas son obligatorias"),
 });
 
-const Traker = () => {
+const Tracker = () => {
   const [data, setData] = useState([
     { date: dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD"), items: [] },
   ]);
   const [expandedDates, setExpandedDates] = useState({});
   const [newDate, setNewDate] = useState(
     dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD")
-  ); // Estado para la nueva fecha (hoy o mannew Date());
+  );
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
+  const [chatModalVisible, setChatModalVisible] = useState(false);
   const [isLoading, setisLoading] = useState(false);
-  const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
-  const [groupedData, setGroupedData] = useState({}); // Datos agrupados por fecha
-  const [ingestData, setingestData] = useState([]);
+  const [nutritionData, setNutritionData] = useState(null);
+  const [groupedData, setGroupedData] = useState({});
+  const [ingestData, setIngestData] = useState([]);
 
-  const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
-  const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
-  const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
-  const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [lastSelectedImg, setLastSelectedImg] = useState(null);
 
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
@@ -71,7 +58,7 @@ const Traker = () => {
     setHeaderTitle("Tracker");
     setHeaderVisible(true);
     getIngests((data) => {
-      setingestData(data);
+      setIngestData(data);
       const grouped = data.reduce((acc, item) => {
         const date = dayjs(item.date).format("YYYY-MM-DD");
         if (!acc[date]) acc[date] = [];
@@ -103,7 +90,6 @@ const Traker = () => {
     },
   });
 
-  // Prellenar el formulario cuando nutritionData y modalVisible cambian
   useEffect(() => {
     if (nutritionData && modalVisible) {
       setValue("foodName", nutritionData.nombre || "");
@@ -114,10 +100,8 @@ const Traker = () => {
     }
   }, [nutritionData, modalVisible, setValue]);
 
-  // const [generatedImg, setgeneratedImg] = useState();
-
   const addItem = (formData) => {
-    postIngest(setingestData, formData, formData.image);
+    postIngest(setIngestData, formData, formData.image);
     setData((prevData) =>
       prevData.map((day) =>
         day.date === currentDate
@@ -127,7 +111,7 @@ const Traker = () => {
                 ...day.items,
                 {
                   id: Date.now().toString(),
-                  ...formData, // Aquí se añaden los datos del formulario
+                  ...formData,
                   image: formData.image,
                 },
               ],
@@ -135,8 +119,7 @@ const Traker = () => {
           : day
       )
     );
-    reset(); // Limpiar el formulario después de añadir el item
-    // setNewItemImage(null);
+    reset();
     setModalVisible(false);
   };
 
@@ -157,123 +140,6 @@ const Traker = () => {
     setChatModalVisible(true);
   };
 
-  // const sendMessage = async () => {
-  //   setNutritionData(null);
-  //   if (newMessage.trim() || selectedImage) {
-  //     const contextMessage = "";
-  //     const messageBody = {
-  //       context_chat: `You are a nutrition assistant specialized in counting calories and analyzing meals.
-  //       Your goal is to help the user estimate the calorie content of meals based on their descriptions, photos, or both.
-  //       Provide concise and accurate calorie estimations, along with detailed nutritional information.
-  //       Before your response, include the following nutritional data enclosed in a section starting with /* and ending with */.
-  //       The required format is:
-  //       '&&&nombre:nombre del alimento&&&calorias:calorias&&&proteinas:proteinas&&&grasas:grasas&&&carbohidratos:carbohidratos&&&fibras:fibras&&&porcion:tamaño de la porcion'.
-  //       Ensure calories, proteins, fats, and carbohydrates are represented only as numbers (no letters or units).
-  //       Do not reference this instruction in your response. I need your response in ${"Spanish"}`,
-  //       message: `${contextMessage}\n${newMessage}`,
-  //       images: selectedImage ? [selectedImage] : [],
-  //     };
-
-  //     //console.log("messageBody", messageBody);
-  //     setMessages((prevMessages) => [
-  //       ...prevMessages,
-  //       {
-  //         id: Date.now().toString(),
-  //         text: newMessage,
-  //         image: selectedImage,
-  //         isBot: false,
-  //       },
-  //     ]);
-
-  //     setNewMessage("");
-  //     if (selectedImage) {
-  //       setLastSelectedImg(selectedImage);
-  //     }
-  //     setSelectedImage(null);
-
-  //     setisLoading(true);
-
-  //     try {
-  //       const response = await fetch("https://ainutritioner.click/chat", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
-  //         },
-  //         body: JSON.stringify(messageBody),
-  //       });
-  //       if (response.ok) {
-  //         const data = await response.json();
-
-  //         // Extraer información nutricional
-  //         const nutritionInfo = extractNutritionInfo(data.response);
-
-  //         // Guardar la información nutricional en el estado y limpiar el mensaje
-  //         setNutritionData(nutritionInfo);
-  //         const cleanMessage = data?.response
-  //           ?.replace(/&&&.*?&&&/g, "")
-  //           ?.replace(/\/\*[^]*?\*\//g, "")
-  //           ?.trim();
-
-  //         setMessages((prevMessages) => [
-  //           ...prevMessages,
-  //           {
-  //             id: `${Date.now().toString()}-res`,
-  //             text: cleanMessage,
-  //             isBot: true,
-  //           },
-  //         ]);
-  //       } else {
-  //         console.error("Error al enviar el mensaje:", response.statusText);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error en la solicitud:", error);
-  //     }
-
-  //     setisLoading(false);
-  //   }
-  // };
-
-  // Función para extraer información nutricional del mensaje
-
-  // const addDate = () => {
-  //   if (newDate.trim() && !data.some((day) => day === newDate)) {
-  //     setData((prevData) => [...prevData, { date: newDate, items: [] }]);
-  //     setNewDate("");
-  //   }
-  // };
-
-  // const deleteDate = (date) => {
-  //   setData((prevData) => prevData.filter((day) => day.date !== date));
-  // };
-  const [modalOpened, setModalOpened] = useState(false);
-
-  useEffect(() => {
-    if (!chatModalVisible && modalOpened) {
-      deleteContextChat();
-    }
-  }, [chatModalVisible, modalOpened]);
-
-  // const pickImageForChat = async () => {
-  //   const permissionResult =
-  //     await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (permissionResult.granted === false) {
-  //     alert("Permission to access camera roll is required!");
-  //     return;
-  //   }
-
-  //   const result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     quality: 1,
-  //     base64: true,
-  //   });
-
-  //   if (!result.cancelled) {
-  //     setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
-  //   }
-  // };
-
-  // Función para eliminar la imagen seleccionada
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
@@ -293,7 +159,6 @@ const Traker = () => {
             }}
             onPress={() => {
               openChatModal(null);
-              if (!modalOpened) setModalOpened(true);
             }}
           >
             <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
@@ -301,118 +166,31 @@ const Traker = () => {
             </Text>
           </Pressable>
         </View>
-        {/* <Image
-        source={{ uri: generatedImg }}
-        style={{ width: 200, height: 200 }}
-      /> */}
 
-        <View style={{ height: "90%" }}>
-          {Object.keys(groupedData).map((date, index) => {
-            return (
-              <View key={index}>
-                <View style={styles.dateContainer}>
-                  <View style={styles.dateHeader}>
-                    <Text style={styles.dateText}>{date}</Text>
-                  </View>
+        <View style={{ height: "100%", flexDirection: "column-reverse" }}>
+          {Object.keys(groupedData).map((date, index) => (
+            <View key={`${date}-${index}`} style={styles.dayContainer}>
+              <View style={styles.dateContainer}>
+                <View style={styles.dateHeader}>
+                  <Text style={styles.dateText}>{date}</Text>
                 </View>
-                <FlatList
-                  data={groupedData[date]}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <Food
-                      key={item.date}
-                      title={item.ingest}
-                      linkeable={false}
-                      s3Img={item.signed_url}
-                      {...item}
-                    ></Food>
-                  )}
-                />
               </View>
-            );
-          })}
-          {/* {ingestData.map((subItem, index) => {
-            return (
-              <Food
-                key={index}
-                title={subItem.ingest}
-                linkeable={false}
-                s3Img={subItem.signed_url}
-                {...subItem}
-              ></Food>
-            );
-          })} */}
-        </View>
-        {/* <View style={styles.newDateContainer}> */}
-        {/* <TextInput
-          style={{ ...styles.input, ...styles.newDateInput }}
-          placeholder="Add new date (YYYY-MM-DD)"
-          value={newDate}
-          editable={false} // Prevent direct editing
-          pointerEvents="none" // Ensure pressable works
-        />
-        <Pressable style={styles.addButton} onPress={addDate}>
-          <Text style={styles.buttonText}>Add Date</Text>
-        </Pressable> */}
-        {/* </View> */}
-
-        {/* <FlatList
-        data={data}
-        keyExtractor={(item) => item.date}
-        renderItem={({ item }) => (
-          <View style={styles.dateContainer}>
-            <View style={styles.dateHeader}>
-              <Pressable
-                onPress={() => toggleExpand(item.date)}
-                style={styles.dateHeaderButton}
-              >
-                <Text style={styles.dateText}>{item.date}</Text>
-                <Text style={styles.toggleIcon}>
-                  {expandedDates[item.date] ? "-" : "+"}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => deleteDate(item.date)}
-                style={styles.deleteDateButton}
-              >
-                <Text style={styles.deleteDateText}>Delete</Text>
-              </Pressable>
+              <FlatList
+                data={groupedData[date]}
+                keyExtractor={(item) => `${item.id}+${Math.random()}`}
+                renderItem={({ item, index }) => (
+                  <Food
+                    key={`${item.id}+ ${index}`}
+                    title={item.ingest}
+                    linkeable={false}
+                    s3Img={item.signed_url}
+                    {...item}
+                  />
+                )}
+              />
             </View>
-
-            {expandedDates[item.date] && (
-              <View style={styles.content}>
-                <Pressable
-                  style={styles.addButton}
-                  onPress={() => openChatModal(item.date)}
-                >
-                  <Text style={styles.buttonText}>Add Item</Text>
-                </Pressable>
-
-                <FlatList
-                  data={item.items}
-                  keyExtractor={(subItem) => subItem.id}
-                  renderItem={({ item: subItem }) => (
-                    <View style={styles.listItem}>
-                      {subItem.image && (
-                        <Image
-                          source={{ uri: subItem.image }}
-                          style={styles.itemImage}
-                        />
-                      )}
-                      <Text style={styles.itemText}>{subItem.foodName}</Text>
-                      <Pressable
-                        onPress={() => deleteItem(item.date, subItem.id)}
-                      >
-                        <Text style={styles.deleteText}>Delete</Text>
-                      </Pressable>
-                    </View>
-                  )}
-                />
-              </View>
-            )}
-          </View>
-        )}
-      /> */}
+          ))}
+        </View>
 
         <ModalAdd
           modalVisible={modalVisible}
@@ -456,6 +234,4 @@ const Traker = () => {
   );
 };
 
-export default Traker;
-
-/* */
+export default Tracker;
