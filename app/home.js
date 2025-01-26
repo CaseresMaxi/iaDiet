@@ -32,6 +32,7 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import "../utils/i18n";
 import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import { fetchDiet } from "../services/Diet";
 
 const CopilotText = walkthroughable(Text);
 
@@ -58,6 +59,7 @@ export default function Home() {
   const [totalProteins, setTotalProteins] = useState(0);
   const [totalFats, setTotalFats] = useState(0);
   const [totalCarbs, setTotalCarbs] = useState(0);
+  const [dietData, setdietData] = useState({});
 
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
@@ -80,6 +82,8 @@ export default function Home() {
   useEffect(() => {
     fetchUserData(setUserData, setisLoading);
     setHeaderVisible(false);
+    fetchDiet(setdietData, setisLoading);
+
     setNavigationVisible(true);
     getIngests(setIngestData);
     return () => {
@@ -251,12 +255,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        {totalProteins}/150g
+                        {totalProteins}/{dietData.proteins || 0}
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={totalProteins / 150}
+                          progress={totalProteins / (dietData.proteins || 0)}
                           color={Colors.Font2}
                         />
                       </View>
@@ -285,12 +289,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        {totalFats}/65g
+                        {totalFats}/{dietData.fats || 0}
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={totalFats / 65}
+                          progress={totalFats / dietData.fats || 0}
                           color={Colors.Font2}
                         />
                       </View>
@@ -319,12 +323,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        {totalCarbs}/300g
+                        {totalCarbs}/{dietData.carbs || 0}
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={totalCarbs / 300}
+                          progress={totalCarbs / dietData.carbs || 0}
                           color={Colors.Font2}
                         />
                       </View>
@@ -355,12 +359,12 @@ export default function Home() {
                         marginBottom: 2,
                       }}
                     >
-                      {totalCalories}/3000
+                      {totalCalories}/{dietData.calories || 0}
                     </Text>
                     <View style={{ height: 10, width: "100%" }}>
                       <ProgressBar
                         style={{ width: "auto" }}
-                        progress={totalCalories / 3000}
+                        progress={totalCalories / dietData.calories || 0}
                         color={Colors.Font2}
                       />
                     </View>
