@@ -54,6 +54,10 @@ export default function Home() {
   const [isLoading, setisLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [modalOpened, setModalOpened] = useState(false);
+  const [totalCalories, setTotalCalories] = useState(0);
+  const [totalProteins, setTotalProteins] = useState(0);
+  const [totalFats, setTotalFats] = useState(0);
+  const [totalCarbs, setTotalCarbs] = useState(0);
 
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
@@ -77,17 +81,40 @@ export default function Home() {
     fetchUserData(setUserData, setisLoading);
     setHeaderVisible(false);
     setNavigationVisible(true);
-    getIngests(
-      setIngestData
-      //   {
-      //   start: moment().subtract(7, "days").format("YYYY-MM-DD"),
-      //   end: moment().format("YYYY-MM-DD"),
-      // }
-    );
+    getIngests(setIngestData);
     return () => {
       setHeaderVisible(true);
     };
   }, []);
+
+  useEffect(() => {
+    // Calcular totales cuando cambie ingestData
+    const calculateTotals = () => {
+      const totals = ingestData.reduce(
+        (sum, ingest) => {
+          // Solo sumar las ingestas de los últimos 7 días
+          if (moment().diff(ingest.date, "days") < 7) {
+            return {
+              calories: sum.calories + (Number(ingest.calories) || 0),
+              proteins: sum.proteins + (Number(ingest.proteins) || 0),
+              fats: sum.fats + (Number(ingest.fats) || 0),
+              carbs: sum.carbs + (Number(ingest.carbs) || 0),
+            };
+          }
+          return sum;
+        },
+        { calories: 0, proteins: 0, fats: 0, carbs: 0 }
+      );
+
+      setTotalCalories(totals.calories);
+      setTotalProteins(totals.proteins);
+      setTotalFats(totals.fats);
+      setTotalCarbs(totals.carbs);
+    };
+
+    calculateTotals();
+  }, [ingestData]);
+
   const {
     control,
     handleSubmit,
@@ -224,12 +251,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        300g/600g
+                        {totalProteins}/150g
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={0.6}
+                          progress={totalProteins / 150}
                           color={Colors.Font2}
                         />
                       </View>
@@ -258,12 +285,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        300g/600g
+                        {totalFats}/65g
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={0.6}
+                          progress={totalFats / 65}
                           color={Colors.Font2}
                         />
                       </View>
@@ -292,12 +319,12 @@ export default function Home() {
                           marginBottom: 6,
                         }}
                       >
-                        300g/600g
+                        {totalCarbs}/300g
                       </Text>
                       <View style={{ height: 10, width: "80%" }}>
                         <ProgressBar
                           style={{ width: "auto" }}
-                          progress={0.6}
+                          progress={totalCarbs / 300}
                           color={Colors.Font2}
                         />
                       </View>
@@ -328,12 +355,12 @@ export default function Home() {
                         marginBottom: 2,
                       }}
                     >
-                      2000/3000
+                      {totalCalories}/3000
                     </Text>
                     <View style={{ height: 10, width: "100%" }}>
                       <ProgressBar
                         style={{ width: "auto" }}
-                        progress={0.6}
+                        progress={totalCalories / 3000}
                         color={Colors.Font2}
                       />
                     </View>
@@ -403,7 +430,7 @@ export default function Home() {
                 <View>
                   {ingestData.map((ingest, index) => {
                     return (
-                      (moment().diff(ingest.date, "days") === 7 || true) && (
+                      moment().diff(ingest.date, "days") < 7 && (
                         <Food
                           key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
                           title={ingest.ingest}
