@@ -20,6 +20,15 @@ import {
 } from "../services/Chat";
 import { FlatList, ScrollView } from "react-native-web";
 import { useTranslation } from "react-i18next";
+import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import {
+  CopilotProvider,
+  CopilotStep,
+  walkthroughable,
+} from "react-native-copilot";
+
+const CopilotText = walkthroughable(Text);
+const CopilotView = walkthroughable(View);
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -28,6 +37,10 @@ const schema = yup.object().shape({
   carbs: yup.number().required("Los carbohidratos son obligatorios"),
   fats: yup.number().required("Las grasas son obligatorias"),
 });
+
+const CustomComponents = ({ copilot, children }) => (
+  <View {...copilot}>{children}</View>
+);
 
 const Tracker = () => {
   const { t } = useTranslation();
@@ -70,10 +83,6 @@ const Tracker = () => {
       setGroupedData(grouped);
     });
   }, []);
-
-  useEffect(() => {
-    console.log("grouped", groupedData);
-  }, [groupedData]);
 
   const {
     control,
@@ -147,94 +156,120 @@ const Tracker = () => {
   };
 
   return (
-    <ScrollView style={{ ...styles.container }}>
-      <>
-        <Stack.Screen />
-        <View style={{ display: "fixed", right: 0 }}>
-          <Pressable
-            style={{
-              ...styles.addButton,
-              color: "white",
-              fontSize: 30,
-              borderRadius: 100,
-              fontWeight: "bold",
-            }}
-            onPress={() => {
-              openChatModal(null);
-            }}
+    <>
+      <TutorialButton />
+
+      <ScrollView style={{ ...styles.container }}>
+        <>
+          <Stack.Screen />
+          <CopilotStep
+            text={t("tutorial.addButton")}
+            order={1}
+            name="addButton"
           >
-            <Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>
-              +
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={{ height: "100%", flexDirection: "column-reverse" }}>
-          {Object.keys(groupedData).map((date, index) => (
-            <View key={`${date}-${index}`} style={styles.dayContainer}>
-              <View style={styles.dateContainer}>
-                <View style={styles.dateHeader}>
-                  <Text style={styles.dateText}>{date}</Text>
-                </View>
+            <CustomComponents>
+              <View style={{ display: "fixed", right: 0 }}>
+                <Pressable
+                  style={{
+                    ...styles.addButton,
+                    color: "white",
+                    fontSize: 30,
+                    borderRadius: 100,
+                    fontWeight: "bold",
+                  }}
+                  onPress={() => {
+                    openChatModal(null);
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 30, fontWeight: "bold" }}
+                  >
+                    +
+                  </Text>
+                </Pressable>
               </View>
-              <FlatList
-                data={groupedData[date]}
-                keyExtractor={(item) => `${item.id}+${Math.random()}`}
-                renderItem={({ item, index }) => (
-                  <Food
-                    key={`${item.id}+ ${index}`}
-                    title={item.ingest}
-                    linkeable={false}
-                    s3Img={item.signed_url}
-                    {...item}
-                  />
-                )}
-              />
-            </View>
-          ))}
-        </View>
+            </CustomComponents>
+          </CopilotStep>
 
-        <ModalAdd
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          control={control}
-          handleSubmit={handleSubmit}
-          errors={errors}
-          addItem={addItem}
-          lastSelectedImg={lastSelectedImg}
-          nutritionData={nutritionData}
-          setNutritionData={setNutritionData}
-        />
-        <Chat
-          chatModalVisible={chatModalVisible}
-          setChatModalVisible={setChatModalVisible}
-          isLoading={isLoading}
-          messages={messages}
-          nutritionData={nutritionData}
-          setModalVisible={setModalVisible}
-          selectedImage={selectedImage}
-          removeSelectedImage={removeSelectedImage}
-          pickImageForChat={() => pickImageForChat(setSelectedImage)}
-          sendMessage={() =>
-            sendMessage(
-              setNutritionData,
-              newMessage,
-              selectedImage,
-              setMessages,
-              setNewMessage,
-              setLastSelectedImg,
-              setSelectedImage,
-              setisLoading,
-              extractNutritionInfo
-            )
-          }
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-        />
-      </>
-      <Text>{t("tracker.title")}</Text>
-    </ScrollView>
+          <CopilotStep
+            text={t("tutorial.historyList")}
+            order={2}
+            name="historyList"
+          >
+            <CustomComponents>
+              <View style={{ height: "100%", flexDirection: "column-reverse" }}>
+                {Object.keys(groupedData).map((date, index) => (
+                  <View key={`${date}-${index}`} style={styles.dayContainer}>
+                    <View style={styles.dateContainer}>
+                      <View style={styles.dateHeader}>
+                        <Text style={styles.dateText}>{date}</Text>
+                      </View>
+                    </View>
+                    <FlatList
+                      data={groupedData[date]}
+                      keyExtractor={(item) => `${item.id}+${Math.random()}`}
+                      renderItem={({ item, index }) => (
+                        <Food
+                          key={`${item.id}+ ${index}`}
+                          title={item.ingest}
+                          linkeable={false}
+                          s3Img={item.signed_url}
+                          {...item}
+                        />
+                      )}
+                    />
+                  </View>
+                ))}
+              </View>
+            </CustomComponents>
+          </CopilotStep>
+
+          <ModalAdd
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            control={control}
+            handleSubmit={handleSubmit}
+            errors={errors}
+            addItem={addItem}
+            lastSelectedImg={lastSelectedImg}
+            nutritionData={nutritionData}
+            setNutritionData={setNutritionData}
+          />
+          <Chat
+            chatModalVisible={chatModalVisible}
+            setChatModalVisible={setChatModalVisible}
+            isLoading={isLoading}
+            messages={messages}
+            nutritionData={nutritionData}
+            setModalVisible={setModalVisible}
+            selectedImage={selectedImage}
+            removeSelectedImage={removeSelectedImage}
+            pickImageForChat={() => pickImageForChat(setSelectedImage)}
+            sendMessage={() =>
+              sendMessage(
+                setNutritionData,
+                newMessage,
+                selectedImage,
+                setMessages,
+                setNewMessage,
+                setLastSelectedImg,
+                setSelectedImage,
+                setisLoading,
+                extractNutritionInfo
+              )
+            }
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+          />
+        </>
+        <Text>{t("tracker.title")}</Text>
+      </ScrollView>
+    </>
   );
 };
 
-export default Tracker;
+export default () => (
+  <CopilotProvider>
+    <Tracker />
+  </CopilotProvider>
+);

@@ -13,8 +13,21 @@ import { useStore } from "../utils/zustan";
 import MealPlans from "../assets/icons/MealPlans.svg";
 import Colors from "../styles/Colors";
 import { useTranslation } from "react-i18next";
+import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import {
+  CopilotProvider,
+  CopilotStep,
+  walkthroughable,
+} from "react-native-copilot";
 
-export default function Diet() {
+const CopilotText = walkthroughable(Text);
+const CopilotView = walkthroughable(View);
+
+const CustomComponents = ({ copilot, children }) => (
+  <View {...copilot}>{children}</View>
+);
+
+const Diet = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [dietData, setdietData] = useState({});
@@ -141,127 +154,141 @@ export default function Diet() {
   }, []);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        justifyContent: "flex-start",
-        ...styles.container,
-        paddingTop: 60,
-        paddingBottom: insets.bottom,
-        overflow: "scroll",
-      }}
-    >
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <Button
-          text="Open Chat"
-          width={250}
-          type={"secondary"}
-          onClick={() => {
-            setMessages([]);
-            setChatOpen(true);
-            deleteContextChat();
-          }}
-        />
-      </View>
-      {!dietData?.foods && !dietLoading && (
-        <View style={{ height: "100%", justifyContent: "center" }}>
-          <View style={styles.headerContainer}>
-            <Image source={MealPlans} />
-            <Text style={styles.header}>Meal Plans</Text>
-          </View>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: 65,
-            }}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                color: Colors.Font2,
-                fontSize: 20,
-                fontWeight: "medium",
-              }}
-            >
-              Access your personalized meal plans and get healthy
-              recommendations tailored to your goals. Connect with an expert or
-              explore options that fit your lifestyle.
-            </Text>
-          </View>
-          <View style={{ alignItems: "center", marginBottom: 20 }}>
-            <Button
-              text="Open Chat"
-              width={250}
-              type={"secondary"}
-              onClick={() => {
-                setMessages([]);
-                setChatOpen(true);
-                deleteContextChat();
-              }}
-            />
-          </View>
-        </View>
-      )}
-      {dietData?.foods && !dietLoading && (
-        <View
-          style={{
-            height: "fit-content",
-          }}
-        >
-          {Object.keys(dietData.foods).map((meal) => {
-            return (
-              <Food
-                dietId={dietData?.diet_id}
-                meal={meal}
-                key={meal}
-                stimatedTime={dietData.foods[meal]?.tiempo_estimado}
-                title={dietData.foods[meal]?.title}
-                ingredients={dietData.foods[meal]?.ingredientes}
-                description={dietData.foods[meal]?.description}
-                calories={dietData.foods[meal]?.calorias}
-                instructions={dietData.foods[meal]?.instrucciones}
-                s3Img={dietData.foods[meal]?.s3_url}
-              />
-            );
-          })}
-        </View>
-      )}
-
-      {/* <Pressable
-        onPress={() => {
-          setMessages([]);
-          setChatOpen(true);
-          deleteContextChat();
-        }}
-        style={{
-          // with: "100%",
-          height: 50,
-          backgroundColor: "#7F56DA",
-          borderRadius: 10,
-          justifyContent: "center",
-          alignItems: "center",
+    <>
+      <ScrollView
+        contentContainerStyle={{
+          justifyContent: "flex-start",
+          ...styles.container,
+          paddingTop: 60,
+          paddingBottom: insets.bottom,
+          overflow: "scroll",
         }}
       >
-        <Text style={styles.mealTitle}>Crear una nueva dieta</Text>
-      </Pressable> */}
+        <View style={{ alignItems: "center", marginBottom: 20 }}>
+          <CopilotStep
+            text={t("tutorial.diet.addMeal")}
+            order={1}
+            name="addMeal"
+          >
+            <CustomComponents>
+              <Button
+                text="Open Chat"
+                width={250}
+                type={"secondary"}
+                onClick={() => {
+                  setMessages([]);
+                  setChatOpen(true);
+                  deleteContextChat();
+                }}
+              />
+            </CustomComponents>
+          </CopilotStep>
+        </View>
 
-      <Chat
-        chatModalVisible={chatOpen}
-        setChatModalVisible={setChatOpen}
-        isLoading={isChatLoading}
-        messages={messages}
-        nutritionData={newDiet}
-        setModalVisible={() => {
-          addDiet();
-        }}
-        disabledImgPicker
-        selectedImage={selectedImage}
-        removeSelectedImage={removeSelectedImage}
-        pickImageForChat={() => {}}
-        sendMessage={sendMessage}
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
-      />
-    </ScrollView>
+        {!dietData?.foods && !dietLoading && (
+          <View style={{ height: "100%", justifyContent: "center" }}>
+            <CopilotStep
+              text={t("tutorial.diet.mealPlan")}
+              order={2}
+              name="mealPlan"
+            >
+              <CustomComponents>
+                <View style={styles.headerContainer}>
+                  <Image source={MealPlans} />
+                  <Text style={styles.header}>Meal Plans</Text>
+                </View>
+              </CustomComponents>
+            </CopilotStep>
+
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: 65,
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: Colors.Font2,
+                  fontSize: 20,
+                  fontWeight: "medium",
+                }}
+              >
+                Access your personalized meal plans and get healthy
+                recommendations tailored to your goals. Connect with an expert
+                or explore options that fit your lifestyle.
+              </Text>
+            </View>
+            <View style={{ alignItems: "center", marginBottom: 20 }}>
+              <Button
+                text="Open Chat"
+                width={250}
+                type={"secondary"}
+                onClick={() => {
+                  setMessages([]);
+                  setChatOpen(true);
+                  deleteContextChat();
+                }}
+              />
+            </View>
+          </View>
+        )}
+
+        {dietData?.foods && !dietLoading && (
+          <CopilotStep text={t("tutorial.diet.meals")} order={3} name="meals">
+            <CustomComponents>
+              <View
+                style={{
+                  height: "fit-content",
+                }}
+              >
+                {Object.keys(dietData.foods).map((meal) => {
+                  return (
+                    <Food
+                      dietId={dietData?.diet_id}
+                      meal={meal}
+                      key={meal}
+                      stimatedTime={dietData.foods[meal]?.tiempo_estimado}
+                      title={dietData.foods[meal]?.title}
+                      ingredients={dietData.foods[meal]?.ingredientes}
+                      description={dietData.foods[meal]?.description}
+                      calories={dietData.foods[meal]?.calorias}
+                      instructions={dietData.foods[meal]?.instrucciones}
+                      s3Img={dietData.foods[meal]?.s3_url}
+                    />
+                  );
+                })}
+              </View>
+            </CustomComponents>
+          </CopilotStep>
+        )}
+
+        <Chat
+          chatModalVisible={chatOpen}
+          setChatModalVisible={setChatOpen}
+          isLoading={isChatLoading}
+          messages={messages}
+          nutritionData={newDiet}
+          setModalVisible={() => {
+            addDiet();
+          }}
+          disabledImgPicker
+          selectedImage={selectedImage}
+          removeSelectedImage={removeSelectedImage}
+          pickImageForChat={() => {}}
+          sendMessage={sendMessage}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+        />
+      </ScrollView>
+      <TutorialButton />
+    </>
   );
-}
+};
+
+export default () => (
+  <CopilotProvider>
+    <Diet />
+  </CopilotProvider>
+);

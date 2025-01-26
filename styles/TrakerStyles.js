@@ -2,6 +2,14 @@ import { StyleSheet } from "react-native";
 import Colors from "./Colors";
 
 export const styles = StyleSheet.create({
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.Color1,
+    marginBottom: 20,
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
   container: {
     flex: 1,
     padding: 20,

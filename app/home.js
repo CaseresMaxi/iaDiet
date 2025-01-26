@@ -31,6 +31,7 @@ import {
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import "../utils/i18n";
+import TutorialButton from "../Components/TutorialButton/TutorialButton";
 
 const CopilotText = walkthroughable(Text);
 
@@ -126,14 +127,14 @@ export default function Home() {
   );
   return (
     <ScrollView style={{ backgroundColor: Colors.Color4 }}>
-      <View>
+      {/* <View>
         <Button
           title={t("tutorial.start")}
           onPress={() => {
             start();
           }}
         />
-      </View>
+      </View> */}
 
       <View
         style={{
@@ -143,6 +144,8 @@ export default function Home() {
           paddingHorizontal: 36,
         }}
       >
+        <TutorialButton />
+
         <Stack.Screen />
         <View
           style={{

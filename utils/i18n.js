@@ -23,6 +23,9 @@ const resources = {
         macros: "Aqui puedes ver los macros y las calorias que consumiste hoy",
         today: "Aqui podras ver las comidas que has consumido hoy.",
         add: "Aqui podras agregar rapidamente una comida a tu dieta hablando con nuestro chat.",
+        addButton: "Aquí puedes agregar una nueva comida a tu registro",
+        historyList:
+          "Aquí puedes ver el historial de todas tus comidas organizadas por fecha",
       },
       validation: {
         required: {
@@ -99,6 +102,13 @@ const resources = {
         macros: "Here you can see the macros and calories you consumed today",
         today: "Here you can see the food you have eaten today.",
         add: "Here you can quickly add food to your diet by talking to our chat.",
+        diet: {
+          mealPlan: "Here you can see your meal plan organized by categories",
+          meals:
+            "Here you can see all your planned meals with details and instructions",
+          addMeal:
+            "Use this button to create a new personalized meal plan with our AI",
+        },
       },
       validation: {
         required: {
