@@ -1,6 +1,6 @@
-export const getIngests = (setingestData) => {
+export const getIngests = (setingestData, period = null) => {
   fetch(
-    `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
+    `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}${period?.start ? `/by_date?start_date=${period.start}&end_date=${period.end}` : ""}`, // implementar el filtro por fecha
     {
       headers: {
         Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,

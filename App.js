@@ -3,7 +3,8 @@ import { StyleSheet, View } from "react-native";
 import Main from "./Components/Main";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { CopilotProvider } from "react-native-copilot";
-import { RenewTokenProvider } from "./app/Provider/RenewTokenProvider";
+import { useTranslation, initReactI18next } from "react-i18next";
+
 
 export default function App() {
   return (

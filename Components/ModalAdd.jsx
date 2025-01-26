@@ -6,6 +6,7 @@ import FormInput from "./Input/Input";
 import Food from "./Food";
 import { useEffect, useState } from "react";
 import { createImage } from "../services/Chat";
+import { useTranslation } from "react-i18next";
 
 export const ModalAdd = ({
   modalVisible,
@@ -22,6 +23,7 @@ export const ModalAdd = ({
   const [generateImg, setgenerateImg] = useState(null);
   // Update formValues whenever the control values change
   const [isLoadingImg, setisLoadingImg] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (lastSelectedImg) {
@@ -56,12 +58,13 @@ export const ModalAdd = ({
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
+          <Text style={styles.title}>{t("modal.add.title")}</Text>
           <Controller
             control={control}
             name="foodName"
             render={({ field: { onChange, value } }) => (
               <FormInput
-                placeholder="Nombre de la comida"
+                placeholder={t("modal.add.food_name")}
                 value={value}
                 onChangeText={(text) => {
                   onChange(text);
@@ -90,7 +93,7 @@ export const ModalAdd = ({
                 render={({ field: { onChange, value } }) => (
                   <FormInput
                     style={{ maxWidth: 100 }}
-                    placeholder="Calorias"
+                    placeholder={t("modal.add.calories")}
                     value={value}
                     onChangeText={(text) => {
                       onChange(text);

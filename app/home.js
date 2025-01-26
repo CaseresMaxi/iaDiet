@@ -29,29 +29,20 @@ import {
   walkthroughable,
 } from "react-native-copilot";
 import moment from "moment";
+import { useTranslation } from "react-i18next";
+import "../utils/i18n";
 
 const CopilotText = walkthroughable(Text);
 
 export default function Home() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const schema = yup.object().shape({
-    foodName: yup.string().required("El nombre de la comida es obligatorio"),
-    calories: yup
-      .number()
-      // .typeError("Las calorías deben ser un número")
-      .required("Las calorías son obligatorias"),
-    proteins: yup
-      .number()
-      // .typeError("Las proteínas deben ser un número")
-      .required("Las proteínas son obligatorias"),
-    carbs: yup
-      .number()
-      // .typeError("Los carbohidratos deben ser un número")
-      .required("Los carbohidratos son obligatorios"),
-    fats: yup
-      .number()
-      // .typeError("Las grasas deben ser un número")
-      .required("Las grasas son obligatorias"),
+    foodName: yup.string().required(t("validation.required.foodName")),
+    calories: yup.number().required(t("validation.required.calories")),
+    proteins: yup.number().required(t("validation.required.proteins")),
+    carbs: yup.number().required(t("validation.required.carbs")),
+    fats: yup.number().required(t("validation.required.fats")),
   });
 
   const setHeaderVisible = useStore((state) => state.setHeaderVisible);
@@ -85,7 +76,13 @@ export default function Home() {
     fetchUserData(setUserData, setisLoading);
     setHeaderVisible(false);
     setNavigationVisible(true);
-    getIngests(setIngestData);
+    getIngests(
+      setIngestData
+      //   {
+      //   start: moment().subtract(7, "days").format("YYYY-MM-DD"),
+      //   end: moment().format("YYYY-MM-DD"),
+      // }
+    );
     return () => {
       setHeaderVisible(true);
     };
@@ -131,7 +128,7 @@ export default function Home() {
     <ScrollView style={{ backgroundColor: Colors.Color4 }}>
       <View>
         <Button
-          title="Tutotial"
+          title={t("tutorial.start")}
           onPress={() => {
             start();
           }}
@@ -155,11 +152,7 @@ export default function Home() {
             marginBottom: 32,
           }}
         >
-          <CopilotStep
-            text="Aquí puedes ver tu nombre de usuario y acceder al perfil."
-            order={1}
-            name="header"
-          >
+          <CopilotStep text={t("tutorial.header")} order={1} name="header">
             <CustomComponents>
               <Text
                 style={{
@@ -168,7 +161,7 @@ export default function Home() {
                   fontSize: 20,
                 }}
               >
-                {`Hello, ${userData?.username}!`}
+                {t("greeting", { username: userData?.username })}
               </Text>
             </CustomComponents>
           </CopilotStep>
@@ -188,13 +181,9 @@ export default function Home() {
               marginBottom: 12,
             }}
           >
-            Today
+            {t("today")}
           </Text>
-          <CopilotStep
-            text="Aqui puedes ver los macros y las calorias que consumiste hoy"
-            order={2}
-            name="macros"
-          >
+          <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
             <CustomComponents>
               <View
                 style={{
@@ -249,7 +238,7 @@ export default function Home() {
                         fontWeight: 600,
                       }}
                     >
-                      proteins:
+                      {t("macros.proteins")}:
                     </Text>
                   </View>
                   <View
@@ -283,7 +272,7 @@ export default function Home() {
                         fontWeight: 600,
                       }}
                     >
-                      fats:
+                      {t("macros.fats")}:
                     </Text>
                   </View>
                   <View
@@ -317,7 +306,7 @@ export default function Home() {
                         fontWeight: 600,
                       }}
                     >
-                      Carbs:
+                      {t("macros.carbs")}:
                     </Text>
                   </View>
                 </View>
@@ -354,7 +343,7 @@ export default function Home() {
                       fontWeight: 600,
                     }}
                   >
-                    Caloeries:
+                    {t("macros.calories")}:
                   </Text>
                 </View>
               </View>
@@ -384,13 +373,9 @@ export default function Home() {
                 flex: 1,
               }}
             >
-              Your lasts ingests
+              {t("ingests.title")}
             </Text>
-            <CopilotStep
-              text="Aqui podras agregar rapidamente una comida a tu dieta hablando con nuestro chat."
-              order={4}
-              name="add"
-            >
+            <CopilotStep text={t("tutorial.add")} order={4} name="add">
               <CustomComponents>
                 <TouchableOpacity
                   onPress={() => {
@@ -411,11 +396,7 @@ export default function Home() {
               </CustomComponents>
             </CopilotStep>
           </View>
-          <CopilotStep
-            text="Aqui podras ver las comidas que has consumido hoy."
-            order={3}
-            name="hoy"
-          >
+          <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
             <CustomComponents>
               <View>
                 {ingestData.map((ingest, index) => {

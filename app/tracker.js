@@ -19,6 +19,7 @@ import {
   extractNutritionInfo,
 } from "../services/Chat";
 import { FlatList, ScrollView } from "react-native-web";
+import { useTranslation } from "react-i18next";
 
 const schema = yup.object().shape({
   foodName: yup.string().required("El nombre de la comida es obligatorio"),
@@ -29,6 +30,7 @@ const schema = yup.object().shape({
 });
 
 const Tracker = () => {
+  const { t } = useTranslation();
   const [data, setData] = useState([
     { date: dayjs("2024-10-11", "YYYY-MM-DD").format("YYYY-MM-DD"), items: [] },
   ]);
@@ -230,6 +232,7 @@ const Tracker = () => {
           setNewMessage={setNewMessage}
         />
       </>
+      <Text>{t("tracker.title")}</Text>
     </ScrollView>
   );
 };

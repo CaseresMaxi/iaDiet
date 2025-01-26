@@ -12,8 +12,10 @@ import { Image, ScrollView } from "react-native";
 import { useStore } from "../utils/zustan";
 import MealPlans from "../assets/icons/MealPlans.svg";
 import Colors from "../styles/Colors";
+import { useTranslation } from "react-i18next";
 
 export default function Diet() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [dietData, setdietData] = useState({});
   const [dietLoading, setdietLoading] = useState(true);
