@@ -262,7 +262,6 @@ const Tracker = () => {
             setNewMessage={setNewMessage}
           />
         </>
-        <Text>{t("tracker.title")}</Text>
       </ScrollView>
     </>
   );

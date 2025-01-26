@@ -26,7 +26,7 @@ export const renewToken = () => {
       return response.json();
     })
     .then((data) => {
-      console.log("data", data);
+     
       window.sessionStorage.setItem("token", data.token);
     })
 

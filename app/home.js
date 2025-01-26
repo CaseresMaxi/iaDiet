@@ -126,8 +126,9 @@ export default function Home() {
     <View {...copilot}>{children}</View>
   );
   return (
-    <ScrollView style={{ backgroundColor: Colors.Color4 }}>
-      {/* <View>
+    <>
+      <ScrollView style={{ backgroundColor: Colors.Color4 }}>
+        {/* <View>
         <Button
           title={t("tutorial.start")}
           onPress={() => {
@@ -136,333 +137,333 @@ export default function Home() {
         />
       </View> */}
 
-      <View
-        style={{
-          ...styles.container,
-          paddingTop: insets.top || 30,
-          backgroundColor: Colors.Color4,
-          paddingHorizontal: 36,
-        }}
-      >
-        <TutorialButton />
-
-        <Stack.Screen />
         <View
           style={{
-            justifyContent: "space-between",
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 32,
+            ...styles.container,
+            paddingTop: insets.top || 30,
+            backgroundColor: Colors.Color4,
+            paddingHorizontal: 36,
           }}
         >
-          <CopilotStep text={t("tutorial.header")} order={1} name="header">
-            <CustomComponents>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color: Colors.Color2,
-                  fontSize: 20,
-                }}
-              >
-                {t("greeting", { username: userData?.username })}
-              </Text>
-            </CustomComponents>
-          </CopilotStep>
-          <View style={{ flexDirection: "row", gap: 20 }}>
-            <Image style={{ width: 14, height: 18 }} source={Notification} />
-            <TouchableOpacity onPress={() => router.push("/profile")}>
-              <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <Text
-            style={{
-              fontWeight: "bold",
-              color: Colors.Color1,
-              fontSize: 20,
-              marginBottom: 12,
-            }}
-          >
-            {t("today")}
-          </Text>
-          <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
-            <CustomComponents>
-              <View
-                style={{
-                  backgroundColor: Colors.Color2,
-                  height: "fit-content",
-                  paddingHorizontal: 18,
-                  paddingVertical: 24,
-                  borderRadius: 24,
-                  gap: 8,
-                  alignItems: "center",
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    // flex: 1,
-                    width: "100%",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  {/* <View>
-              <ProgressBar progress={0.5} title="Carbs" />
-            </View> */}
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                        marginBottom: 6,
-                      }}
-                    >
-                      300g/600g
-                    </Text>
-                    <View style={{ height: 10, width: "80%" }}>
-                      <ProgressBar
-                        style={{ width: "auto" }}
-                        progress={0.6}
-                        color={Colors.Font2}
-                      />
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {t("macros.proteins")}:
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                        marginBottom: 6,
-                      }}
-                    >
-                      300g/600g
-                    </Text>
-                    <View style={{ height: 10, width: "80%" }}>
-                      <ProgressBar
-                        style={{ width: "auto" }}
-                        progress={0.6}
-                        color={Colors.Font2}
-                      />
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {t("macros.fats")}:
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                        marginBottom: 6,
-                      }}
-                    >
-                      300g/600g
-                    </Text>
-                    <View style={{ height: 10, width: "80%" }}>
-                      <ProgressBar
-                        style={{ width: "auto" }}
-                        progress={0.6}
-                        color={Colors.Font2}
-                      />
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {t("macros.carbs")}:
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                      marginBottom: 2,
-                    }}
-                  >
-                    2000/3000
-                  </Text>
-                  <View style={{ height: 10, width: "100%" }}>
-                    <ProgressBar
-                      style={{ width: "auto" }}
-                      progress={0.6}
-                      color={Colors.Font2}
-                    />
-                  </View>
-
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: Colors.Font2,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {t("macros.calories")}:
-                  </Text>
-                </View>
-              </View>
-            </CustomComponents>
-          </CopilotStep>
-        </View>
-        <View
-          style={{
-            marginTop: 32,
-            // flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+          <Stack.Screen />
           <View
             style={{
-              flexDirection: "row",
               justifyContent: "space-between",
-              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 32,
             }}
           >
-            <Text
-              style={{
-                color: Colors.Color1,
-                fontSize: 20,
-                fontWeight: "bold",
-                flex: 1,
-              }}
-            >
-              {t("ingests.title")}
-            </Text>
-            <CopilotStep text={t("tutorial.add")} order={4} name="add">
+            <CopilotStep text={t("tutorial.header")} order={1} name="header">
               <CustomComponents>
-                <TouchableOpacity
-                  onPress={() => {
-                    openChatModal(null);
-                    if (!modalOpened) setModalOpened(true);
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: Colors.Color2,
+                    fontSize: 20,
                   }}
                 >
-                  <Text
+                  {t("greeting", { username: userData?.username })}
+                </Text>
+              </CustomComponents>
+            </CopilotStep>
+            <View style={{ flexDirection: "row", gap: 20 }}>
+              <Image style={{ width: 14, height: 18 }} source={Notification} />
+              <TouchableOpacity onPress={() => router.push("/profile")}>
+                <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View>
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: Colors.Color1,
+                fontSize: 20,
+                marginBottom: 12,
+              }}
+            >
+              {t("today")}
+            </Text>
+            <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
+              <CustomComponents>
+                <View
+                  style={{
+                    backgroundColor: Colors.Color2,
+                    height: "fit-content",
+                    paddingHorizontal: 18,
+                    paddingVertical: 24,
+                    borderRadius: 24,
+                    gap: 8,
+                    alignItems: "center",
+                  }}
+                >
+                  <View
                     style={{
-                      color: Colors.Color1,
-                      fontSize: 20,
-                      fontWeight: "bold",
+                      flexDirection: "row",
+                      // flex: 1,
+                      width: "100%",
+                      justifyContent: "space-between",
                     }}
                   >
-                    +
-                  </Text>
-                </TouchableOpacity>
+                    {/* <View>
+              <ProgressBar progress={0.5} title="Carbs" />
+            </View> */}
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        300g/600g
+                      </Text>
+                      <View style={{ height: 10, width: "80%" }}>
+                        <ProgressBar
+                          style={{ width: "auto" }}
+                          progress={0.6}
+                          color={Colors.Font2}
+                        />
+                      </View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t("macros.proteins")}:
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        300g/600g
+                      </Text>
+                      <View style={{ height: 10, width: "80%" }}>
+                        <ProgressBar
+                          style={{ width: "auto" }}
+                          progress={0.6}
+                          color={Colors.Font2}
+                        />
+                      </View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t("macros.fats")}:
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        300g/600g
+                      </Text>
+                      <View style={{ height: 10, width: "80%" }}>
+                        <ProgressBar
+                          style={{ width: "auto" }}
+                          progress={0.6}
+                          color={Colors.Font2}
+                        />
+                      </View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: Colors.Font2,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {t("macros.carbs")}:
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                        marginBottom: 2,
+                      }}
+                    >
+                      2000/3000
+                    </Text>
+                    <View style={{ height: 10, width: "100%" }}>
+                      <ProgressBar
+                        style={{ width: "auto" }}
+                        progress={0.6}
+                        color={Colors.Font2}
+                      />
+                    </View>
+
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: Colors.Font2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t("macros.calories")}:
+                    </Text>
+                  </View>
+                </View>
               </CustomComponents>
             </CopilotStep>
           </View>
-          <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
-            <CustomComponents>
-              <View>
-                {ingestData.map((ingest, index) => {
-                  return (
-                    moment().diff(ingest.date, "days") === 0 && (
-                      <Food
-                        key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                        title={ingest.ingest}
-                        calories={ingest.calories}
-                        s3Img={ingest.signed_url}
-                        stimatedTime={ingest.stimatedTime}
-                        linkeable={false}
-                        description={ingest.description}
-                      />
-                    )
-                  );
-                })}
-              </View>
-            </CustomComponents>
-          </CopilotStep>
+          <View
+            style={{
+              marginTop: 32,
+              // flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.Color1,
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  flex: 1,
+                }}
+              >
+                {t("ingests.title")}
+              </Text>
+              <CopilotStep text={t("tutorial.add")} order={4} name="add">
+                <CustomComponents>
+                  <TouchableOpacity
+                    onPress={() => {
+                      openChatModal(null);
+                      if (!modalOpened) setModalOpened(true);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: Colors.Color1,
+                        fontSize: 20,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      +
+                    </Text>
+                  </TouchableOpacity>
+                </CustomComponents>
+              </CopilotStep>
+            </View>
+            <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
+              <CustomComponents>
+                <View>
+                  {ingestData.map((ingest, index) => {
+                    return (
+                      (moment().diff(ingest.date, "days") === 7 || true) && (
+                        <Food
+                          key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
+                          title={ingest.ingest}
+                          calories={ingest.calories}
+                          s3Img={ingest.signed_url}
+                          stimatedTime={ingest.stimatedTime}
+                          linkeable={false}
+                          description={ingest.description}
+                        />
+                      )
+                    );
+                  })}
+                </View>
+              </CustomComponents>
+            </CopilotStep>
+          </View>
         </View>
-      </View>
-      {modalVisible && (
-        <ModalAdd
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          control={control}
-          handleSubmit={handleSubmit}
-          errors={errors}
-          addItem={addItem}
-          lastSelectedImg={lastSelectedImg}
+        {modalVisible && (
+          <ModalAdd
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            control={control}
+            handleSubmit={handleSubmit}
+            errors={errors}
+            addItem={addItem}
+            lastSelectedImg={lastSelectedImg}
+            nutritionData={nutritionData}
+            enableGenerateImg={true}
+            setNutritionData={setNutritionData}
+          />
+        )}
+        <Chat
+          chatModalVisible={chatModalVisible}
+          setChatModalVisible={setChatModalVisible}
+          isLoading={isLoading}
+          messages={messages}
           nutritionData={nutritionData}
-          enableGenerateImg={true}
-          setNutritionData={setNutritionData}
+          setModalVisible={setModalVisible}
+          selectedImage={selectedImage}
+          removeSelectedImage={removeSelectedImage}
+          pickImageForChat={() => pickImageForChat(setSelectedImage)}
+          sendMessage={() =>
+            sendMessage(
+              setNutritionData,
+              newMessage,
+              selectedImage,
+              setMessages,
+              setNewMessage,
+              setLastSelectedImg,
+              setSelectedImage,
+              setisLoading,
+              extractNutritionInfo
+            )
+          }
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
         />
-      )}
-      <Chat
-        chatModalVisible={chatModalVisible}
-        setChatModalVisible={setChatModalVisible}
-        isLoading={isLoading}
-        messages={messages}
-        nutritionData={nutritionData}
-        setModalVisible={setModalVisible}
-        selectedImage={selectedImage}
-        removeSelectedImage={removeSelectedImage}
-        pickImageForChat={() => pickImageForChat(setSelectedImage)}
-        sendMessage={() =>
-          sendMessage(
-            setNutritionData,
-            newMessage,
-            selectedImage,
-            setMessages,
-            setNewMessage,
-            setLastSelectedImg,
-            setSelectedImage,
-            setisLoading,
-            extractNutritionInfo
-          )
-        }
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
-      />
-    </ScrollView>
+      </ScrollView>
+      <TutorialButton />
+    </>
   );
 }
 
