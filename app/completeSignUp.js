@@ -26,8 +26,10 @@ import maleUser from "../assets/male_user.png";
 import femaleUser from "../assets/female_user.png";
 import { fetchUserData, modifyUserData } from "../services/UserData";
 import { styles } from "../styles/CompleteSingUp";
+import { useTranslation } from "react-i18next";
 
 export default function CompleteSignUp() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [val, setval] = useState(0);
 
@@ -66,21 +68,31 @@ export default function CompleteSignUp() {
 
   const titles = [
     "",
-    "What’s Your Gender",
-    "How Old Are You?",
-    "What’s Your Weight?",
-    "What’s Your Height?",
-    "What Is Your Goal?",
-    "Physical Activity Level",
-    "Fill Your Profile",
+    t("completeSignUp.gender.title"),
+    t("completeSignUp.age"),
+    t("completeSignUp.weight.title"),
+    t("completeSignUp.height"),
+    t("completeSignUp.goal.title"),
+    t("completeSignUp.activity.title"),
+    t("completeSignUp.profile.title"),
   ];
 
   const activityLevels = {
-    Sedentary: "Little or no exercise",
-    Light: "Light exercise/sports 1-3 days/week",
-    Moderate: "Moderate exercise/sports 3-5 days/week",
-    Active: "Hard exercise/sports 6-7 days/week",
-    "Very Active": "Hard exercise/sports 2x a day",
+    [t("completeSignUp.activity.sedentary")]: t(
+      "completeSignUp.activity.sedentaryDesc"
+    ),
+    [t("completeSignUp.activity.light")]: t(
+      "completeSignUp.activity.lightDesc"
+    ),
+    [t("completeSignUp.activity.moderate")]: t(
+      "completeSignUp.activity.moderateDesc"
+    ),
+    [t("completeSignUp.activity.active")]: t(
+      "completeSignUp.activity.activeDesc"
+    ),
+    [t("completeSignUp.activity.veryActive")]: t(
+      "completeSignUp.activity.veryActiveDesc"
+    ),
   };
   const {
     control,
@@ -112,12 +124,10 @@ export default function CompleteSignUp() {
             </View>
             <View style={styles.step0TextContainer}>
               <Text style={styles.step0Text}>
-                Consistency Is the Key To progress. Don't Give Up!
+                {t("completeSignUp.motivation")}
               </Text>
               <Text style={styles.step0Subtext}>
-                Invest in your physical and mental well-being. Every step, no
-                matter how small, brings you closer to your goals. You’ve got
-                this!
+                {t("completeSignUp.motivationSubtext")}
               </Text>
             </View>
           </View>
@@ -140,7 +150,9 @@ export default function CompleteSignUp() {
                 <Image
                   source={userValues.gender === "m" ? maleSelected : male}
                 ></Image>
-                <Text style={styles.step1GenderSelectorButtonText}>Male</Text>
+                <Text style={styles.step1GenderSelectorButtonText}>
+                  {t("completeSignUp.gender.male")}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setUserValues({ ...userValues, gender: "f" })}
@@ -149,7 +161,9 @@ export default function CompleteSignUp() {
                 <Image
                   source={userValues.gender === "f" ? femaleSelected : female}
                 ></Image>
-                <Text style={styles.step1GenderSelectorButtonText}>Female</Text>
+                <Text style={styles.step1GenderSelectorButtonText}>
+                  {t("completeSignUp.gender.female")}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -262,17 +276,19 @@ export default function CompleteSignUp() {
             <View style={styles.step5Wrapper}>
               <TouchableOpacity
                 onPress={() =>
-                  setUserValues({ ...userValues, goal: "Lose Web" })
+                  setUserValues({ ...userValues, goal: "Lose Weight" })
                 }
                 style={{
                   ...styles.step5GoalSelectorButton,
                   backgroundColor:
-                    userValues.goal === "Lose Web"
+                    userValues.goal === "Lose Weight"
                       ? Colors.Color1
                       : Colors.Font2,
                 }}
               >
-                <Text style={styles.step5GoalSelectorButtonText}>Lose Web</Text>
+                <Text style={styles.step5GoalSelectorButtonText}>
+                  {t("completeSignUp.goal.loseWeight")}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() =>
@@ -287,7 +303,7 @@ export default function CompleteSignUp() {
                 }}
               >
                 <Text style={styles.step5GoalSelectorButtonText}>
-                  Gain weight{" "}
+                  {t("completeSignUp.goal.gainWeight")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -303,7 +319,7 @@ export default function CompleteSignUp() {
                 }}
               >
                 <Text style={styles.step5GoalSelectorButtonText}>
-                  Muscle Mass Gain{" "}
+                  {t("completeSignUp.goal.muscleMassGain")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -319,7 +335,7 @@ export default function CompleteSignUp() {
                 }}
               >
                 <Text style={styles.step5GoalSelectorButtonText}>
-                  shape body{" "}
+                  {t("completeSignUp.goal.shapeBody")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -330,7 +346,9 @@ export default function CompleteSignUp() {
                   ...styles.step5GoalSelectorButton,
                 }}
               >
-                <Text style={styles.step5GoalSelectorButtonText}>Others </Text>
+                <Text style={styles.step5GoalSelectorButtonText}>
+                  {t("completeSignUp.goal.others")}
+                </Text>
               </TouchableOpacity>
             </View>
             {/* <TapeMeasureSlider orientation="vertical" /> */}
@@ -376,7 +394,7 @@ export default function CompleteSignUp() {
                   </Text>
                 </View>
                 {/* <Text style={{ color: Colors.Font2 }}>
-                  What Sport’s do you do? Tell us
+                  What Sport's do you do? Tell us
                 </Text>
                 <TextArea
                   onChange={(e) =>
@@ -419,17 +437,19 @@ export default function CompleteSignUp() {
                 <Controller
                   name="username"
                   control={control}
-                  rules={{ required: "Username is required" }}
+                  rules={{
+                    required: t("completeSignUp.validation.usernameRequired"),
+                  }}
                   render={({ field: { onBlur, value } }) => (
                     <FormInput
-                      placeholder="Username"
+                      placeholder={t("completeSignUp.profile.username")}
                       placeholderTextColor="#888"
                       onBlur={onBlur}
                       onChangeText={(text) =>
                         handleInputChange("username", text)
                       }
                       value={userValues.username}
-                      label="Username"
+                      label={t("completeSignUp.profile.username")}
                     />
                   )}
                 />
@@ -443,10 +463,10 @@ export default function CompleteSignUp() {
                   name="email"
                   control={control}
                   rules={{
-                    required: "Email is required",
+                    required: t("completeSignUp.validation.emailRequired"),
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Enter a valid email address",
+                      message: t("completeSignUp.validation.emailInvalid"),
                     },
                   }}
                   render={({ field: { onBlur, onChange } }) => (
@@ -459,7 +479,7 @@ export default function CompleteSignUp() {
                         onChange(text);
                       }}
                       value={confirmStepUserData.email}
-                      label="Email"
+                      label={t("completeSignUp.profile.email")}
                     />
                   )}
                 />
@@ -473,10 +493,10 @@ export default function CompleteSignUp() {
                   name="phoneNumber"
                   control={control}
                   rules={{
-                    required: "Phone Number is required",
+                    required: t("completeSignUp.validation.phoneRequired"),
                     pattern: {
                       value: /^[0-9]+$/,
-                      message: "Enter a valid phone number",
+                      message: t("completeSignUp.validation.phoneInvalid"),
                     },
                   }}
                   render={({ field: { onBlur, value } }) => (
@@ -488,7 +508,7 @@ export default function CompleteSignUp() {
                         handleInputChange("phoneNumber", text)
                       }
                       value={userValues.phoneNumber}
-                      label="Phone Number"
+                      label={t("completeSignUp.profile.phoneNumber")}
                     />
                   )}
                 />
@@ -502,6 +522,37 @@ export default function CompleteSignUp() {
       }
     }
   };
+
+  const isStepValid = () => {
+    switch (val) {
+      case 0:
+        return true; // Paso de motivación, siempre válido
+      case 1:
+        return userValues.gender !== ""; // Validar selección de género
+      case 2:
+        return userValues.age > 0; // Validar edad
+      case 3:
+        return userValues.weight > 0; // Validar peso
+      case 4:
+        return userValues.height > 0; // Validar altura
+      case 5:
+        return userValues.goal !== ""; // Validar objetivo
+      case 6:
+        return userValues.daily_activity !== ""; // Validar nivel de actividad
+      case 7:
+        return (
+          userValues.username !== "" &&
+          userValues.email !== "" &&
+          userValues.phoneNumber !== "" &&
+          !errors.username &&
+          !errors.email &&
+          !errors.phoneNumber
+        ); // Validar campos del perfil
+      default:
+        return false;
+    }
+  };
+
   return (
     <View
       style={{
@@ -548,8 +599,13 @@ export default function CompleteSignUp() {
               } else setval((prev) => prev + 1);
             }}
             type={val === 7 ? "secondary" : "primary"}
-            text={val === 7 ? "Finish" : "Continue"}
+            text={
+              val === 7
+                ? t("completeSignUp.buttons.finish")
+                : t("completeSignUp.buttons.continue")
+            }
             style={{ width: 180 }}
+            disabled={!isStepValid()}
           />
         </View>
       </View>
