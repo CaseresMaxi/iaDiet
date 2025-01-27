@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { useStore } from "../../utils/zustan";
 import { useEffect, useState } from "react";
-import { FlatList, Image, Text } from "react-native";
+import { FlatList, Image, Text, ActivityIndicator } from "react-native";
 import Colors from "../../styles/Colors";
 import FoodImg from "../../assets/genericFood.jpg";
 import Calories from "../../assets/icons/CaloriesColor.svg";
@@ -18,6 +18,7 @@ export default function Detail() {
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   const [s3ImgB64, sets3ImgB64] = useState("");
   const [dietData, setdietData] = useState();
+  const [loading, setloading] = useState(true);
   const fetchImg = (s3Img) => {
     fetch(s3Img)
       .then((response) => {
@@ -44,7 +45,7 @@ export default function Detail() {
       ""
       // everything[2].slice(0, 1).toUpperCase() + everything[2].slice(1)
     );
-    fetchDiet(setdietData);
+    fetchDiet(setdietData, setloading);
     // setLeftTitle(everything[0]);
     return () => {
       setHeaderTitle("Diet");
@@ -62,67 +63,94 @@ export default function Detail() {
         paddingHorizontal: 32,
       }}
     >
-      <View style={{ width: "100%" }}>
-        <Text
-          style={{ fontSize: 24, color: Colors.Color1, fontWeight: "Bold" }}
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          {dietData && dietData?.foods[everything[1]]?.title}
-        </Text>
-        <View style={{ flexDirection: "row", gap: 24 }}>
-          <Text style={{ fontSize: 14, color: Colors.Font2 }}>
-            <Image source={Clock} />{" "}
-            {dietData && ` ${dietData?.foods[everything[1]]?.tiempo_estimado}`}
-          </Text>
-          <Text style={{ fontSize: 14, color: Colors.Font2 }}>
-            <Image source={Calories} style={{ marginRight: 6 }} />
-            {dietData && ` ${dietData?.foods[everything[1]]?.calorias} kcal`}
-          </Text>
+          <ActivityIndicator size="large" color={Colors.Color1} />
         </View>
-        <Image
-          style={{
-            width: "100%",
-            height: 200,
-            borderRadius: 20,
-            marginTop: 24,
-          }}
-          source={{ uri: s3ImgB64 }}
-        ></Image>
-        <View style={{ marginTop: 48 }}>
+      ) : (
+        <View style={{ width: "100%" }}>
           <Text
-            style={{
-              fontSize: 24,
-              color: Colors.Color1,
-              fontWeight: "semibold",
-            }}
+            style={{ fontSize: 24, color: Colors.Color1, fontWeight: "Bold" }}
           >
-            Ingredientes
+            {dietData && dietData?.foods[everything[1]]?.title}
           </Text>
-          <FlatList
-            style={{ marginLeft: 12, marginTop: 8 }}
-            data={dietData?.foods[everything[1]]?.ingredientes} // Pasa el array como datos
-            keyExtractor={(item, index) => index.toString()} // Genera claves únicas
-            renderItem={({ item }) => (
-              <Text style={styles.item}>{`• ${item}`}</Text> // Renderiza cada ingrediente
-            )}
-          />
+          <View style={{ flexDirection: "row", gap: 24 }}>
+            <Text style={{ fontSize: 14, color: Colors.Font2 }}>
+              <Image source={Clock} />{" "}
+              {dietData &&
+                ` ${dietData?.foods[everything[1]]?.tiempo_estimado}`}
+            </Text>
+            <Text style={{ fontSize: 14, color: Colors.Font2 }}>
+              <Image source={Calories} style={{ marginRight: 6 }} />
+              {dietData && ` ${dietData?.foods[everything[1]]?.calorias} kcal`}
+            </Text>
+          </View>
+          {s3ImgB64 ? (
+            <Image
+              style={{
+                width: "100%",
+                height: 200,
+                borderRadius: 20,
+                marginTop: 24,
+              }}
+              source={{ uri: s3ImgB64 }}
+            />
+          ) : (
+            <View
+              style={{
+                width: "100%",
+                height: 200,
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 24,
+              }}
+            >
+              <ActivityIndicator size="large" color={Colors.Color1} />
+            </View>
+          )}
+          <View style={{ marginTop: 48 }}>
+            <Text
+              style={{
+                fontSize: 24,
+                color: Colors.Color1,
+                fontWeight: "semibold",
+              }}
+            >
+              Ingredientes
+            </Text>
+            <FlatList
+              style={{ marginLeft: 12, marginTop: 8 }}
+              data={dietData?.foods[everything[1]]?.ingredientes} // Pasa el array como datos
+              keyExtractor={(item, index) => index.toString()} // Genera claves únicas
+              renderItem={({ item }) => (
+                <Text style={styles.item}>{`• ${item}`}</Text> // Renderiza cada ingrediente
+              )}
+            />
+          </View>
+          <View style={{ marginTop: 24, gap: 12 }}>
+            <Text
+              style={{
+                fontSize: 24,
+                color: Colors.Color1,
+                fontWeight: "semibold",
+              }}
+            >
+              Preparation
+            </Text>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "medium",
+                color: Colors.Font2,
+              }}
+            >
+              {dietData && dietData?.foods[everything[1]]?.instrucciones}
+            </Text>
+          </View>
         </View>
-        <View style={{ marginTop: 24, gap: 12 }}>
-          <Text
-            style={{
-              fontSize: 24,
-              color: Colors.Color1,
-              fontWeight: "semibold",
-            }}
-          >
-            Preparation
-          </Text>
-          <Text
-            style={{ fontSize: 18, fontWeight: "medium", color: Colors.Font2 }}
-          >
-            {dietData && dietData?.foods[everything[1]]?.instrucciones}
-          </Text>
-        </View>
-      </View>
+      )}
       <Stack.Screen />
     </View>
   );
