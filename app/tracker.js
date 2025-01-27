@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import { set, useForm } from "react-hook-form";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View, ActivityIndicator } from "react-native";
 import * as yup from "yup";
 import Chat from "../Components/Chat";
 import { ModalAdd } from "../Components/ModalAdd";
@@ -26,6 +26,7 @@ import {
   CopilotStep,
   walkthroughable,
 } from "react-native-copilot";
+import Colors from "../styles/Colors";
 
 const CopilotText = walkthroughable(Text);
 const CopilotView = walkthroughable(View);
@@ -58,6 +59,7 @@ const Tracker = () => {
   const [nutritionData, setNutritionData] = useState(null);
   const [groupedData, setGroupedData] = useState({});
   const [ingestData, setIngestData] = useState([]);
+  const [loadingIngest, setloadingIngest] = useState(true);
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -72,16 +74,20 @@ const Tracker = () => {
     setNavigationVisible(true);
     setHeaderTitle("Tracker");
     setHeaderVisible(true);
-    getIngests((data) => {
-      setIngestData(data);
-      const grouped = data.reduce((acc, item) => {
-        const date = dayjs(item.date).format("YYYY-MM-DD");
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(item);
-        return acc;
-      }, {});
-      setGroupedData(grouped);
-    });
+    getIngests(
+      (data) => {
+        setIngestData(data);
+        const grouped = data.reduce((acc, item) => {
+          const date = dayjs(item.date).format("YYYY-MM-DD");
+          if (!acc[date]) acc[date] = [];
+          acc[date].push(item);
+          return acc;
+        }, {});
+        setGroupedData(grouped);
+      },
+      null,
+      setloadingIngest
+    );
   }, []);
 
   const {
@@ -134,15 +140,15 @@ const Tracker = () => {
     setModalVisible(false);
   };
 
-  const deleteItem = (date, id) => {
-    setData((prevData) =>
-      prevData.map((day) =>
-        day.date === date
-          ? { ...day, items: day.items.filter((item) => item.id !== id) }
-          : day
-      )
-    );
-  };
+  // const deleteItem = (date, id) => {
+  //   setData((prevData) =>
+  //     prevData.map((day) =>
+  //       day.date === date
+  //         ? { ...day, items: day.items.filter((item) => item.id !== id) }
+  //         : day
+  //     )
+  //   );
+  // };
 
   const openChatModal = (date) => {
     setCurrentDate(date);
@@ -198,28 +204,41 @@ const Tracker = () => {
           >
             <CustomComponents>
               <View style={{ height: "100%", flexDirection: "column-reverse" }}>
-                {Object.keys(groupedData).map((date, index) => (
-                  <View key={`${date}-${index}`} style={styles.dayContainer}>
-                    <View style={styles.dateContainer}>
-                      <View style={styles.dateHeader}>
-                        <Text style={styles.dateText}>{date}</Text>
+                {!loadingIngest ? (
+                  Object.keys(groupedData).map((date, index) => (
+                    <View key={`${date}-${index}`} style={styles.dayContainer}>
+                      <View style={styles.dateContainer}>
+                        <View style={styles.dateHeader}>
+                          <Text style={styles.dateText}>{date}</Text>
+                        </View>
                       </View>
+                      <FlatList
+                        data={groupedData[date]}
+                        keyExtractor={(item) => `${item.id}+${Math.random()}`}
+                        renderItem={({ item, index }) => (
+                          <Food
+                            key={`${item.id}+ ${index}`}
+                            title={item.ingest}
+                            linkeable={false}
+                            s3Img={item.signed_url}
+                            {...item}
+                          />
+                        )}
+                      />
                     </View>
-                    <FlatList
-                      data={groupedData[date]}
-                      keyExtractor={(item) => `${item.id}+${Math.random()}`}
-                      renderItem={({ item, index }) => (
-                        <Food
-                          key={`${item.id}+ ${index}`}
-                          title={item.ingest}
-                          linkeable={false}
-                          s3Img={item.signed_url}
-                          {...item}
-                        />
-                      )}
-                    />
+                  ))
+                ) : (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingTop: 50,
+                    }}
+                  >
+                    <ActivityIndicator size="large" color={Colors.Color1} />
                   </View>
-                ))}
+                )}
               </View>
             </CustomComponents>
           </CopilotStep>

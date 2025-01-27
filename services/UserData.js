@@ -44,7 +44,10 @@ export const modifyUserData = async (
       }
     );
     if (!response.ok) throw new Error("Network response was not ok.");
-    callback();
+    setLoading(true);
+    setTimeout(() => {
+      callback();
+    }, 1000);
   } catch (error) {
     console.error(error);
   } finally {

@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Food from "../Components/Food";
 import { styles } from "../styles/DietStyles";
@@ -232,6 +232,19 @@ const Diet = () => {
                 }}
               />
             </View>
+          </View>
+        )}
+
+        {dietLoading && (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingTop: 50,
+            }}
+          >
+            <ActivityIndicator size="large" color={Colors.Color2} />
           </View>
         )}
 

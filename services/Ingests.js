@@ -1,4 +1,8 @@
-export const getIngests = (setingestData, period = null) => {
+export const getIngests = (
+  setingestData,
+  period = null,
+  setloadingIngest = () => {}
+) => {
   fetch(
     `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}${period?.start ? `/by_date?start_date=${period.start}&end_date=${period.end}` : ""}`, // implementar el filtro por fecha
     {
@@ -14,7 +18,11 @@ export const getIngests = (setingestData, period = null) => {
     .then((data) => {
       setingestData(data);
     })
-    .catch((error) => console.error(error));
+    .catch((error) => console.error(error))
+    .finally(() => {
+      console.log("finally");
+      setloadingIngest(false);
+    });
 };
 
 export const postIngest = (

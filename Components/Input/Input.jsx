@@ -14,17 +14,28 @@ const FormInput = ({
   type = "default",
   password = false,
 }) => {
+  const handleChange = (text) => {
+    if (type === "number") {
+      // Solo permitir números y punto decimal
+      const numericValue = text.replace(/[^0-9.]/g, "");
+      // Evitar múltiples puntos decimales
+      if (numericValue.split(".").length > 2) return;
+      onChangeText(numericValue);
+    } else {
+      onChangeText(text);
+    }
+  };
+
   return (
     <View style={{ paddingHorizontal }}>
       <Text style={styles.label}>{label}</Text>
 
       <TextInput
         secureTextEntry={password}
-        type={type}
-        // label={label}
+        keyboardType={type === "number" ? "numeric" : "default"}
         placeholder={placeholder}
         value={value}
-        onChangeText={(texto) => onChangeText(texto)}
+        onChangeText={handleChange}
         style={{
           ...styles.customInput,
           ...style,

@@ -1,6 +1,6 @@
 import { router, Stack } from "expo-router";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "../utils/zustan";
 import { useEffect, useState } from "react";
@@ -68,6 +68,8 @@ export default function Home() {
   const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
   const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
 
+  const [loadingIngest, setloadingIngest] = useState(true);
+
   const [modalVisible, setModalVisible] = useState(false);
   const addItem = (formData) => {
     postIngest(setIngestData, formData, formData.image);
@@ -85,7 +87,7 @@ export default function Home() {
     fetchDiet(setdietData, setisLoading);
 
     setNavigationVisible(true);
-    getIngests(setIngestData);
+    getIngests(setIngestData, null, setloadingIngest);
     return () => {
       setHeaderVisible(true);
     };
@@ -159,15 +161,6 @@ export default function Home() {
   return (
     <>
       <ScrollView style={{ backgroundColor: Colors.Color4 }}>
-        {/* <View>
-        <Button
-          title={t("tutorial.start")}
-          onPress={() => {
-            start();
-          }}
-        />
-      </View> */}
-
         <View
           style={{
             ...styles.container,
@@ -429,27 +422,33 @@ export default function Home() {
                 </CustomComponents>
               </CopilotStep>
             </View>
-            <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
-              <CustomComponents>
-                <View>
-                  {ingestData.map((ingest, index) => {
-                    return (
-                      moment().diff(ingest.date, "days") < 7 && (
-                        <Food
-                          key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                          title={ingest.ingest}
-                          calories={ingest.calories}
-                          s3Img={ingest.signed_url}
-                          stimatedTime={ingest.stimatedTime}
-                          linkeable={false}
-                          description={ingest.description}
-                        />
-                      )
-                    );
-                  })}
-                </View>
-              </CustomComponents>
-            </CopilotStep>
+            {!loadingIngest ? (
+              <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
+                <CustomComponents>
+                  <View>
+                    {ingestData.map((ingest, index) => {
+                      return (
+                        moment().diff(ingest.date, "days") < 7 && (
+                          <Food
+                            key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
+                            title={ingest.ingest}
+                            calories={ingest.calories}
+                            s3Img={ingest.signed_url}
+                            stimatedTime={ingest.stimatedTime}
+                            linkeable={false}
+                            description={ingest.description}
+                          />
+                        )
+                      );
+                    })}
+                  </View>
+                </CustomComponents>
+              </CopilotStep>
+            ) : (
+              <View style={{ padding: 20, alignItems: "center" }}>
+                <ActivityIndicator size="large" color={Colors.Color1} />
+              </View>
+            )}
           </View>
         </View>
         {modalVisible && (

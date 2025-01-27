@@ -64,7 +64,9 @@ export default function Profile() {
   // Nueva función onSubmit
   const onSubmit = (data) => {
     // Aquí puedes enviar los datos al servidor o manejarlos como necesites
-    modifyUserData(data);
+    modifyUserData(data, setLoading, () =>
+      fetchUserData(setuserData, setLoading)
+    );
   };
   return (
     <ScrollView
@@ -300,6 +302,7 @@ export default function Profile() {
                 placeholder="25"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
+                type="number"
                 onChangeText={onChange}
                 value={value}
                 label="Age"
@@ -319,6 +322,7 @@ export default function Profile() {
                 placeholder="70Kg"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
+                type="number"
                 onChangeText={onChange}
                 value={value || ""}
                 label="Weight (kg)"
