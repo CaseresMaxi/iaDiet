@@ -1,4 +1,4 @@
-export const fetchDiet = (setdietData, setdietLoading) =>
+export const fetchDiet = (setdietData, setdietLoading = () => {}) =>
   fetch(
     `https://ainutritioner.click/diets/last/${window.sessionStorage?.getItem(
       "user_id"

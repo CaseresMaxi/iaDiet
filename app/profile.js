@@ -20,13 +20,16 @@ export default function Profile() {
   const insets = useSafeAreaInsets();
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
   const setHeaderColor = useStore((state) => state.setHeaderColor);
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
 
   useEffect(() => {
-    setHeaderTitle("My Profile");
-    setHeaderColor(Colors.Font2);
+    // setHeaderTitle("My Profile");
+    // setHeaderColor(Colors.Font2);
+    setHeaderVisible(false);
     setNavigationVisible(true);
+    fetchUserData(setuserData, setLoading);
   }, []);
   const {
     control,
@@ -45,37 +48,6 @@ export default function Profile() {
 
   const [userData, setuserData] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // const fetchUserData = async (setuserData) => {
-    //   setLoading(true); // Indica que la carga ha comenzado
-    //   try {
-    //     const response = await fetch(
-    //       `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
-    //         },
-    //       }
-    //     );
-    //     const data = await response.json();
-    //     setuserData(data);
-    //     reset({
-    //       username: data.username || "",
-    //       email: data.email || "",
-    //       birdthday: data.birdthday || "",
-    //       weight: data.weight || "",
-    //       height: data.height || "",
-    //     });
-    //   } catch (error) {
-    //     console.error(error);
-    //   } finally {
-    //     setLoading(false); // Indica que la carga ha terminado
-    //   }
-    // };
-
-    fetchUserData(setuserData, setLoading);
-  }, []);
 
   useEffect(() => {
     reset({
