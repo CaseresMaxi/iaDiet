@@ -27,6 +27,7 @@ const Food = ({
   generatedImg,
   enableGenerateImg = false,
   generatingImg = false,
+  day = "",
 }) => {
   const [s3ImgB64, sets3ImgB64] = useState("");
   const [imgLoading, setimgLoading] = useState(false);
@@ -109,7 +110,7 @@ const Food = ({
     return (
       <Link
         style={styles.mealCard}
-        href={"/foodDetail/" + "/" + dietId + "/" + meal}
+        href={"/foodDetail/" + "/" + dietId + "/" + meal + "/" + day}
         asChild
         replace={false}
       >

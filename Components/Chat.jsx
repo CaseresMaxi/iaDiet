@@ -3,6 +3,8 @@ import { Image, Pressable } from "react-native";
 import { FlatList, Modal, Text, TextInput, View } from "react-native";
 import { styles } from "../styles/TrakerStyles";
 import DotTypingAnimation from "./DotTyping";
+import Markdown from "react-native-markdown-display";
+import Colors from "../styles/Colors";
 
 const Chat = ({
   chatModalVisible,
@@ -20,7 +22,54 @@ const Chat = ({
   setNewMessage,
   ...props
 }) => {
-  // Estado del componente
+  const markdownStyles = {
+    body: {
+      color: Colors.Font2,
+    },
+    heading1: {
+      color: Colors.Font2,
+      fontSize: 24,
+      fontWeight: "bold",
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    heading2: {
+      color: Colors.Font2,
+      fontSize: 20,
+      fontWeight: "bold",
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    heading3: {
+      color: Colors.Font2,
+      fontSize: 18,
+      fontWeight: "bold",
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    strong: {
+      color: Colors.Font2,
+      fontWeight: "bold",
+    },
+    bullet_list: {
+      color: Colors.Font2,
+      marginLeft: 20,
+    },
+    bullet_list_icon: {
+      color: Colors.Font2,
+    },
+    ordered_list: {
+      color: Colors.Font2,
+      marginLeft: 20,
+    },
+    ordered_list_icon: {
+      color: Colors.Font2,
+    },
+    paragraph: {
+      color: Colors.Font2,
+      marginVertical: 8,
+    },
+  };
 
   return (
     <Modal
@@ -56,7 +105,11 @@ const Chat = ({
                       style={styles.messageImage}
                     />
                   )}
-                  <Text style={styles.messageText}>{item.text}</Text>
+                  {item.isBot ? (
+                    <Markdown style={markdownStyles}>{item.text}</Markdown>
+                  ) : (
+                    <Text style={styles.messageText}>{item.text}</Text>
+                  )}
                   {nutritionData && index === messages.length - 1 && (
                     <Pressable
                       style={styles.openModalButton}

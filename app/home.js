@@ -34,6 +34,7 @@ import "../utils/i18n";
 import TutorialButton from "../Components/TutorialButton/TutorialButton";
 import { fetchDiet } from "../services/Diet";
 import UserInfoRectangle from "../Components/UserInfoRectangle";
+import MacronutrientsProgress from "../Components/MacronutrientsProgress/MacronutrientsProgress";
 
 const CopilotText = walkthroughable(Text);
 
@@ -220,168 +221,16 @@ export default function Home() {
             </Text>
             <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
               <CustomComponents>
-                <View
-                  style={{
-                    backgroundColor: Colors.Color2,
-                    height: "fit-content",
-                    paddingHorizontal: 18,
-                    paddingVertical: 24,
-                    borderRadius: 24,
-                    gap: 8,
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      // flex: 1,
-                      width: "100%",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    {/* <View>
-              <ProgressBar progress={0.5} title="Carbs" />
-            </View> */}
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {totalProteins}/{dietData.proteins || 0}
-                      </Text>
-                      <View style={{ height: 10, width: "80%" }}>
-                        <ProgressBar
-                          style={{ width: "auto" }}
-                          progress={totalProteins / (dietData.proteins || 0)}
-                          color={Colors.Font2}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t("macros.proteins")}:
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {totalFats}/{dietData.fats || 0}
-                      </Text>
-                      <View style={{ height: 10, width: "80%" }}>
-                        <ProgressBar
-                          style={{ width: "auto" }}
-                          progress={totalFats / dietData.fats || 0}
-                          color={Colors.Font2}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t("macros.fats")}:
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {totalCarbs}/{dietData.carbs || 0}
-                      </Text>
-                      <View style={{ height: 10, width: "80%" }}>
-                        <ProgressBar
-                          style={{ width: "auto" }}
-                          progress={totalCarbs / dietData.carbs || 0}
-                          color={Colors.Font2}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: Colors.Font2,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t("macros.carbs")}:
-                      </Text>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                        marginBottom: 2,
-                      }}
-                    >
-                      {totalCalories}/{dietData.calories || 0}
-                    </Text>
-                    <View style={{ height: 10, width: "100%" }}>
-                      <ProgressBar
-                        style={{ width: "auto" }}
-                        progress={totalCalories / dietData.calories || 0}
-                        color={Colors.Font2}
-                      />
-                    </View>
-
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: Colors.Font2,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {t("macros.calories")}:
-                    </Text>
-                  </View>
-                </View>
+                <MacronutrientsProgress
+                  totalProteins={totalProteins}
+                  totalFats={totalFats}
+                  totalCarbs={totalCarbs}
+                  totalCalories={totalCalories}
+                  targetProteins={dietData.proteins}
+                  targetFats={dietData.fats}
+                  targetCarbs={dietData.carbs}
+                  targetCalories={dietData.calories}
+                />
               </CustomComponents>
             </CopilotStep>
           </View>

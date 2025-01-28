@@ -14,6 +14,8 @@ import MealPlans from "../assets/icons/MealPlans.svg";
 import Colors from "../styles/Colors";
 import { useTranslation } from "react-i18next";
 import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import moment from "moment";
+import "moment/locale/es";
 import {
   CopilotProvider,
   CopilotStep,
@@ -34,6 +36,66 @@ const Diet = () => {
   const [dietData, setdietData] = useState({});
   const [dietLoading, setdietLoading] = useState(true);
   const [userData, setUserData] = useState();
+  const [currentDay, setCurrentDay] = useState(
+    moment().locale("es").format("dddd")
+  );
+  const [organizedMeals, setOrganizedMeals] = useState({});
+
+  const organizeMealsByDay = (foods) => {
+    const daysOrder = [
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+      "Domingo",
+    ];
+    const organized = {};
+
+    // Inicializar los días
+    daysOrder.forEach((day) => {
+      organized[day] = {
+        desayuno: null,
+        almuerzo: null,
+        cena: null,
+        otras_comidas: {},
+      };
+    });
+
+    // Organizar las comidas por día
+    Object.entries(foods).forEach(([key, meal]) => {
+      console.log("meal", meal);
+      const day = meal.day_of_week;
+      // Agregar la key original al objeto meal
+      const mealWithKey = {
+        ...meal,
+        original_key: key,
+      };
+
+      if (key.includes("desayuno")) {
+        organized[day].desayuno = mealWithKey;
+      } else if (key.includes("almuerzo")) {
+        organized[day].almuerzo = mealWithKey;
+      } else if (key.includes("cena")) {
+        organized[day].cena = mealWithKey;
+      } else {
+        const comidaNombre = key.split("_")[0];
+        if (!organized[day].otras_comidas[comidaNombre]) {
+          organized[day].otras_comidas[comidaNombre] = mealWithKey;
+        }
+      }
+    });
+
+    return organized;
+  };
+
+  useEffect(() => {
+    if (dietData?.foods) {
+      const organized = organizeMealsByDay(dietData.foods);
+      setOrganizedMeals(organized);
+    }
+  }, [dietData]);
 
   const addDiet = () => {
     setdietLoading(true);
@@ -101,58 +163,93 @@ const Diet = () => {
     if (newMessage.trim()) {
       const contextMessage = "";
       const messageBody = {
-        context_chat: `Lo que se está enviando aquí es en el contexto de una aplicación para crear dietas personalizadas. Divide el mensaje en dos partes:
+        context_chat: `Eres un asistente experto en nutrición y dietas personalizadas que cuenta con la siguiente información del usuario:
 
-Un JSON válido rodeado por &&& al principio y al final.
+Datos del usuario (edad, peso, altura, objetivos, etc.): ${JSON.stringify(userData)}
+Dieta actual (si la hay): ${JSON.stringify(dietData)}
+Día actual de la semana (si está disponible): ${currentDay}
+Instrucciones generales:
 
-Cada comida agregada a la dieta debe ser una clave.
+Si el usuario no pide explícitamente que se le diseñe o modifique una dieta, entonces simplemente analiza y conversa sobre la información proporcionada (puede ser sobre sus objetivos, dudas generales de nutrición, la dieta que ya sigue, etc.).
 
-Cada clave tendrá como valor un objeto que incluya:
+Las respuestas que no sean sobre la dieta, no deberán estar en formato JSON, todo lo que el usuario solicite, deberá ser respondido en lenguaje natural y amigable a excepción de las dietas que deberán estar en el formato que se te indico.
 
+Si el usuario solicita una nueva dieta o pide modificar la existente, deberás:
+
+Generar una respuesta que incluya:
+Un bloque de texto en formato JSON (sin mencionar que es JSON) rodeado por &&& al inicio y al final.
+Dentro de este bloque, se deberán incluir las comidas planeadas para 3 días, tomando en cuenta el día de la semana actual y asignando los siguientes 2 días consecutivos (por ejemplo, si hoy es miércoles, las comidas se asignan a "Miércoles", "Jueves" y "Viernes").
+Por ejemplo: "desayuno_dia_1", "almuerzo_dia_1", "cena_dia_1", "desayuno_dia_2", etc.
+En cada comida (por ejemplo, "desayuno_dia_1") deberás incluir:
+day_of_week: El día de la semana en el que se consumirá esa comida (ej. "Miércoles").
 title: Título de la receta o comida.
 description: Descripción breve del plato.
-total_calories: Calorías totales de la preparación.
-ingredients: Lista de ingredientes necesarios.
-instructions: Pasos detallados para preparar la comida.
+total_calories: Calorías totales de esa preparación.
+ingredients: Lista con los ingredientes necesarios.
+instructions: Pasos detallados de preparación (explicados de forma clara, sin ambigüedades).
 estimated_time: Tiempo estimado de preparación en minutos.
 proteins: Cantidad de proteínas en gramos.
 fats: Cantidad de grasas en gramos.
 carbohydrates: Cantidad de carbohidratos en gramos.
-keywords: Una cadena de texto con palabras descriptivas del plato separadas por guion bajo (por ejemplo: avena_frutas_saludable_rapido).
-Además, incluye un resumen total de la dieta, que debe estar en el mismo JSON con los siguientes campos:
+keywords: Palabras descriptivas separadas por guion bajo (p. ej. "avena_frutas_saludable_rapido").
+Incluir una sección "totals" con los valores totales de toda la dieta de 3 días:
+calories: Calorías totales de la dieta en 3 días.
+proteins: Proteínas totales en gramos.
+fats: Grasas totales en gramos.
+carbs: Carbohidratos totales en gramos.
+Asegúrate de que el valor total de calorías, proteínas, grasas y carbohidratos coincida estrictamente con lo que el usuario solicita o con las indicaciones específicas de su plan (por ejemplo, si menciona 1600 kcal diarias, entonces para los 3 días en total deben ser 4800 kcal exactas, a menos que el usuario pida algo diferente).
+Tras el bloque JSON, generar un texto en lenguaje natural y amigable que describa de forma general la dieta creada, invite al usuario a dar su opinión y pregunte si desea modificar algo.
+No hagas mención explícita a la estructura del JSON en la respuesta ni uses frases como "aquí tienes el JSON". Simplemente preséntalo entre &&&.
 
-calories: Calorías totales de toda la dieta.
-proteins: Proteínas totales de toda la dieta en gramos.
-fats: Grasas totales de toda la dieta en gramos.
-carbs: Carbohidratos totales de toda la dieta en gramos.
-Un texto en lenguaje natural que:
+Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes.
 
-Describa la dieta creada en términos generales para el usuario.
-Sea amigable y simpático.
-Pregunte si la dieta cumple con sus expectativas o si desea realizar modificaciones.
-Es importante que:
+Mantén un tono cercano y positivo en el texto final.
 
-El JSON sea completamente válido.
-No se haga mención explícita a su estructura en el texto para que el usuario lo perciba de manera transparente.
-Es Extremadamente importante que si se hacen menciones a valores de calorías, proteínas, grasas o carbohidratos, se respete de forma estricta en la elaboración de la dieta, por ejemplo, si se menciona que la dieta tiene 770 calorías, la dieta debe tener 770 calorías, no menos ni más, si estos valores no son correctos, la dieta no será valdia. ES DE VITAL IMPORTANCIA QUE SE RESPETEN LOS VALORES NNUTRICIONALES INDICADOS POR EL USUARIO.
-Las instrucciones deben ser claras y detalladas, no deben ser ambiguas y tener todo lo necesario para que alguien con poco conocimiento en cocina pueda preparar la comida.
-La dieta tenga en cuenta los datos del usuario: ${JSON.stringify(userData)}
-Y si se hace mencion de la dieta actual tambien la tengas en cuenta ${JSON.stringify(dietData)}
-Ejemplo de salida:
+Ejemplo de salida (simplificado):
 
-&&& { "desayuno": { "title": "Avena con frutas frescas", "description": "Un desayuno balanceado con avena y frutas de temporada.", "total_calories": 320, "ingredients": ["1/2 taza de avena", "1 taza de leche descremada", "1/2 plátano", "5 fresas"], "instructions": "Cocina la avena con la leche durante 5 minutos, corta las frutas y colócalas sobre la avena antes de servir.", "estimated_time": 10, "proteins": 8, "fats": 4, "carbohydrates": 45, "keywords": "avena_frutas_frescas_saludable" }, "almuerzo": { "title": "Pechuga de pollo con verduras al vapor", "description": "Una opción ligera y rica en proteínas con pollo y verduras frescas.", "total_calories": 450, "ingredients": ["200g de pechuga de pollo", "1 taza de brócoli", "1/2 taza de zanahorias", "1 cda de aceite de oliva"], "instructions": "Cocina el pollo a la plancha y sirve con las verduras al vapor aderezadas con aceite de oliva.", "estimated_time": 20, "proteins": 40, "fats": 10, "carbohydrates": 15, "keywords": "pollo_verduras_vapor_alto_proteinas_saludable" }, "totals": { "calories": 770, "proteins": 48, "fats": 14, "carbs": 60 } } &&&
+bash
+Copiar
+Editar
+&&&
+{
+  "desayuno_dia_1": {
+    "day_of_week": "Miércoles",
+    "title": "Avena con frutas frescas",
+    "description": "Un desayuno balanceado con avena y frutas de temporada.",
+    "total_calories": 320,
+    "ingredients": [
+      "1/2 taza de avena",
+      "1 taza de leche descremada",
+      "1/2 plátano",
+      "5 fresas"
+    ],
+    "instructions": "Cocina la avena con la leche durante 5 minutos...",
+    "estimated_time": 10,
+    "proteins": 8,
+    "fats": 4,
+    "carbohydrates": 45,
+    "keywords": "avena_frutas_frescas_saludable"
+  },
+  "almuerzo_dia_1": {
+    "day_of_week": "Miércoles",
+    "title": "Pechuga de pollo con verduras al vapor",
+    ...
+  },
+  ...
+  "totals": {
+    "calories": 2400,
+    "proteins": 144,
+    "fats": 48,
+    "carbs": 300
+  }
+}
+&&&
 
-¡Hola! 🎉 Hemos creado esta dieta personalizada para ti:
+¡Hola! Hemos creado esta dieta para los próximos 3 días, empezando hoy miércoles...
 
-Desayuno: Avena con frutas frescas. Un desayuno delicioso y nutritivo que te dará energía para el día.
-Almuerzo: Pechuga de pollo con verduras al vapor, una comida ligera pero llena de sabor y proteínas.
-Totales de la dieta:
+(Texto amigable con saludo y explicación general)
 
-Calorías: 770 kcal
-Proteínas: 48 g
-Grasas: 14 g
-Carbohidratos: 60 g
-¿Te parece que esta dieta es adecuada? 😊 Si necesitas ajustar algo (ingredientes, calorías o preferencias), no dudes en decírmelo. ¡Estoy aquí para ayudarte!`,
+¿Te parece adecuada? Si necesitas cambiar algo, ¡avísame!`,
         message: `${newMessage}`,
         images: [],
       };
@@ -169,7 +266,7 @@ Carbohidratos: 60 g
       // setSelectedImage(null);
 
       setIsChatLoading(true);
-
+      setNewMessage("");
       try {
         const response = await fetch("https://ainutritioner.click/chat", {
           method: "POST",
@@ -321,21 +418,96 @@ Carbohidratos: 60 g
                   height: "fit-content",
                 }}
               >
-                {Object.keys(dietData.foods).map((meal) => {
-                  return (
-                    <Food
-                      dietId={dietData?.diet_id}
-                      meal={meal}
-                      key={meal}
-                      stimatedTime={dietData.foods[meal]?.estimated_time}
-                      title={dietData.foods[meal]?.title}
-                      ingredients={dietData.foods[meal]?.ingredients}
-                      description={dietData.foods[meal]?.description}
-                      calories={dietData.foods[meal]?.total_calories}
-                      instructions={dietData.foods[meal]?.instructions}
-                      s3Img={dietData.foods[meal]?.s3_url}
-                    />
-                  );
+                {Object.entries(organizedMeals).map(([day, meals]) => {
+                  if (
+                    meals.desayuno ||
+                    meals.almuerzo ||
+                    meals.cena ||
+                    Object.keys(meals.otras_comidas).length > 0
+                  ) {
+                    return (
+                      <View key={day}>
+                        <Text style={{ ...styles.dayTitle, paddingLeft: 0 }}>
+                          {day}
+                        </Text>
+                        {meals.desayuno && (
+                          <View>
+                            <Text style={styles.mealTypeTitle}>
+                              {"desayuno"}
+                            </Text>
+                            <Food
+                              dietId={dietData?.diet_id}
+                              meal={meals.desayuno.original_key}
+                              stimatedTime={meals.desayuno?.estimated_time}
+                              title={meals.desayuno?.title}
+                              ingredients={meals.desayuno?.ingredients}
+                              description={meals.desayuno?.description}
+                              calories={meals.desayuno?.total_calories}
+                              instructions={meals.desayuno?.instructions}
+                              s3Img={meals.desayuno?.s3_url}
+                            />
+                          </View>
+                        )}
+                        {meals.almuerzo && (
+                          <View>
+                            <Text style={styles.mealTypeTitle}>
+                              {"almuerzo"}
+                            </Text>
+                            <Food
+                              dietId={dietData?.diet_id}
+                              meal={meals.almuerzo.original_key}
+                              stimatedTime={meals.almuerzo?.estimated_time}
+                              title={meals.almuerzo?.title}
+                              ingredients={meals.almuerzo?.ingredients}
+                              description={meals.almuerzo?.description}
+                              calories={meals.almuerzo?.total_calories}
+                              instructions={meals.almuerzo?.instructions}
+                              s3Img={meals.almuerzo?.s3_url}
+                            />
+                          </View>
+                        )}
+                        {meals.cena && (
+                          <View>
+                            <Text style={styles.mealTypeTitle}>{"cena"}</Text>
+                            <Food
+                              dietId={dietData?.diet_id}
+                              meal={meals.cena.original_key}
+                              stimatedTime={meals.cena?.estimated_time}
+                              title={meals.cena?.title}
+                              ingredients={meals.cena?.ingredients}
+                              description={meals.cena?.description}
+                              calories={meals.cena?.total_calories}
+                              instructions={meals.cena?.instructions}
+                              s3Img={meals.cena?.s3_url}
+                              day={meals.cena?.original_key}
+                            />
+                          </View>
+                        )}
+                        {Object.entries(meals.otras_comidas).map(
+                          ([nombreComida, comida]) => (
+                            <View key={nombreComida}>
+                              <Text style={styles.mealTypeTitle}>
+                                {nombreComida.charAt(0).toUpperCase() +
+                                  nombreComida.slice(1)}
+                              </Text>
+                              <Food
+                                dietId={dietData?.diet_id}
+                                meal={comida.original_key}
+                                stimatedTime={comida?.estimated_time}
+                                title={comida?.title}
+                                ingredients={comida?.ingredients}
+                                description={comida?.description}
+                                calories={comida?.total_calories}
+                                instructions={comida?.instructions}
+                                s3Img={comida?.s3_url}
+                              />
+                            </View>
+                          )
+                        )}
+                      </View>
+                    );
+                  }
+                  return null;
                 })}
               </View>
             </CustomComponents>

@@ -56,4 +56,20 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 24,
   },
+  dayTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: Colors.Color2,
+    marginTop: 20,
+    marginBottom: 10,
+    paddingHorizontal: 24,
+  },
+  mealTypeTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: Colors.Color2,
+    marginTop: 10,
+    marginBottom: 5,
+    paddingHorizontal: 24,
+  },
 });

@@ -52,7 +52,7 @@ export default function Detail() {
       // setLeftTitle(null);
     };
   }, []);
-
+  console.log("everything", dietData);
   return (
     <View
       style={{
@@ -79,12 +79,12 @@ export default function Detail() {
           <View style={{ flexDirection: "row", gap: 24 }}>
             <Text style={{ fontSize: 14, color: Colors.Font2 }}>
               <Image source={Clock} />{" "}
-              {dietData &&
-                ` ${dietData?.foods[everything[1]]?.estimated_time}`}
+              {dietData && ` ${dietData?.foods[everything[1]]?.estimated_time}`}
             </Text>
             <Text style={{ fontSize: 14, color: Colors.Font2 }}>
               <Image source={Calories} style={{ marginRight: 6 }} />
-              {dietData && ` ${dietData?.foods[everything[1]]?.total_calories} kcal`}
+              {dietData &&
+                ` ${dietData?.foods[everything[1]]?.total_calories} kcal`}
             </Text>
           </View>
           {s3ImgB64 ? (
