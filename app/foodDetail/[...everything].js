@@ -80,11 +80,11 @@ export default function Detail() {
             <Text style={{ fontSize: 14, color: Colors.Font2 }}>
               <Image source={Clock} />{" "}
               {dietData &&
-                ` ${dietData?.foods[everything[1]]?.tiempo_estimado}`}
+                ` ${dietData?.foods[everything[1]]?.estimated_time}`}
             </Text>
             <Text style={{ fontSize: 14, color: Colors.Font2 }}>
               <Image source={Calories} style={{ marginRight: 6 }} />
-              {dietData && ` ${dietData?.foods[everything[1]]?.calorias} kcal`}
+              {dietData && ` ${dietData?.foods[everything[1]]?.total_calories} kcal`}
             </Text>
           </View>
           {s3ImgB64 ? (
@@ -122,7 +122,7 @@ export default function Detail() {
             </Text>
             <FlatList
               style={{ marginLeft: 12, marginTop: 8 }}
-              data={dietData?.foods[everything[1]]?.ingredientes} // Pasa el array como datos
+              data={dietData?.foods[everything[1]]?.ingredients} // Pasa el array como datos
               keyExtractor={(item, index) => index.toString()} // Genera claves únicas
               renderItem={({ item }) => (
                 <Text style={styles.item}>{`• ${item}`}</Text> // Renderiza cada ingrediente
@@ -146,7 +146,7 @@ export default function Detail() {
                 color: Colors.Font2,
               }}
             >
-              {dietData && dietData?.foods[everything[1]]?.instrucciones}
+              {dietData && dietData?.foods[everything[1]]?.instructions}
             </Text>
           </View>
         </View>

@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import dayjs from "dayjs";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { set, useForm } from "react-hook-form";
 import { Image, Pressable, Text, View, ActivityIndicator } from "react-native";
 import * as yup from "yup";
@@ -160,7 +160,47 @@ const Tracker = () => {
   const removeSelectedImage = () => {
     setSelectedImage(null);
   };
-
+  const memoFood = useMemo(() => {
+    return (
+      <View style={{ height: "100%", flexDirection: "column-reverse" }}>
+        {!loadingIngest ? (
+          Object.keys(groupedData).map((date, index) => (
+            <View key={`${date}-${index}`} style={styles.dayContainer}>
+              <View style={styles.dateContainer}>
+                <View style={styles.dateHeader}>
+                  <Text style={styles.dateText}>{date}</Text>
+                </View>
+              </View>
+              <FlatList
+                data={groupedData[date]}
+                keyExtractor={(item) => `${item.id}+${Math.random()}`}
+                renderItem={({ item, index }) => (
+                  <Food
+                    key={`${item.id}+ ${index}`}
+                    title={item.ingest}
+                    linkeable={false}
+                    s3Img={item.signed_url}
+                    {...item}
+                  />
+                )}
+              />
+            </View>
+          ))
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingTop: 50,
+            }}
+          >
+            <ActivityIndicator size="large" color={Colors.Color1} />
+          </View>
+        )}
+      </View>
+    );
+  }, [loadingIngest, groupedData]);
   return (
     <>
       <TutorialButton />
@@ -202,45 +242,7 @@ const Tracker = () => {
             order={2}
             name="historyList"
           >
-            <CustomComponents>
-              <View style={{ height: "100%", flexDirection: "column-reverse" }}>
-                {!loadingIngest ? (
-                  Object.keys(groupedData).map((date, index) => (
-                    <View key={`${date}-${index}`} style={styles.dayContainer}>
-                      <View style={styles.dateContainer}>
-                        <View style={styles.dateHeader}>
-                          <Text style={styles.dateText}>{date}</Text>
-                        </View>
-                      </View>
-                      <FlatList
-                        data={groupedData[date]}
-                        keyExtractor={(item) => `${item.id}+${Math.random()}`}
-                        renderItem={({ item, index }) => (
-                          <Food
-                            key={`${item.id}+ ${index}`}
-                            title={item.ingest}
-                            linkeable={false}
-                            s3Img={item.signed_url}
-                            {...item}
-                          />
-                        )}
-                      />
-                    </View>
-                  ))
-                ) : (
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingTop: 50,
-                    }}
-                  >
-                    <ActivityIndicator size="large" color={Colors.Color1} />
-                  </View>
-                )}
-              </View>
-            </CustomComponents>
+            <CustomComponents>{memoFood}</CustomComponents>
           </CopilotStep>
 
           <ModalAdd

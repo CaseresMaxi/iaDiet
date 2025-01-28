@@ -40,6 +40,10 @@ export const ModalAdd = ({
       );
     }
   }, [nutritionData, lastSelectedImg, isLoadingImg]);
+
+  useEffect(() => {
+    console.log("nutritionData", nutritionData);
+  }, [nutritionData]);
   useEffect(() => {
     if (!lastSelectedImg)
       setNutritionData((prev) => ({

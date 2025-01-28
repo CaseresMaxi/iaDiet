@@ -99,7 +99,7 @@ export default function Home() {
       const totals = ingestData.reduce(
         (sum, ingest) => {
           // Solo sumar las ingestas de los últimos 7 días
-          if (moment().diff(ingest.date, "days") < 7) {
+          if (moment().diff(ingest.date, "days") === 0) {
             return {
               calories: sum.calories + (Number(ingest.calories) || 0),
               proteins: sum.proteins + (Number(ingest.proteins) || 0),
@@ -428,7 +428,7 @@ export default function Home() {
                   <View>
                     {ingestData.map((ingest, index) => {
                       return (
-                        moment().diff(ingest.date, "days") < 7 && (
+                        moment().diff(ingest.date, "days") === 0 && (
                           <Food
                             key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
                             title={ingest.ingest}
