@@ -479,7 +479,6 @@ Editar
                               calories={meals.cena?.total_calories}
                               instructions={meals.cena?.instructions}
                               s3Img={meals.cena?.s3_url}
-                              day={meals.cena?.original_key}
                             />
                           </View>
                         )}

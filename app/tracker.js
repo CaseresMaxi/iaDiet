@@ -77,6 +77,7 @@ const Tracker = () => {
     getIngests(
       (data) => {
         setIngestData(data);
+        setloadingIngest(false);
         const grouped = data.reduce((acc, item) => {
           const date = dayjs(item.date).format("YYYY-MM-DD");
           if (!acc[date]) acc[date] = [];
@@ -118,23 +119,21 @@ const Tracker = () => {
   }, [nutritionData, modalVisible, setValue]);
 
   const addItem = (formData) => {
-    postIngest(setIngestData, formData, formData.image);
-    setData((prevData) =>
-      prevData.map((day) =>
-        day.date === currentDate
-          ? {
-              ...day,
-              items: [
-                ...day.items,
-                {
-                  id: Date.now().toString(),
-                  ...formData,
-                  image: formData.image,
-                },
-              ],
-            }
-          : day
-      )
+    setloadingIngest(true);
+    postIngest(
+      (data) => {
+        setIngestData(data);
+        const grouped = data.reduce((acc, item) => {
+          const date = dayjs(item.date).format("YYYY-MM-DD");
+          if (!acc[date]) acc[date] = [];
+          acc[date].push(item);
+          return acc;
+        }, {});
+        setGroupedData(grouped);
+        setloadingIngest(false);
+      },
+      formData,
+      formData.image
     );
     reset();
     setModalVisible(false);

@@ -1,10 +1,10 @@
-import { Controller, set } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Image, Modal, Pressable, Text, TextInput, View } from "react-native";
 import { styles } from "../styles/TrakerStyles";
 import GlobalStyles from "../styles/Global";
 import FormInput from "./Input/Input";
 import Food from "./Food";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { createImage } from "../services/Chat";
 import { useTranslation } from "react-i18next";
 
@@ -21,36 +21,100 @@ export const ModalAdd = ({
 }) => {
   const [formValues, setFormValues] = useState({});
   const [generateImg, setgenerateImg] = useState(null);
-  // Update formValues whenever the control values change
   const [isLoadingImg, setisLoadingImg] = useState(false);
   const { t } = useTranslation();
 
+  // Memoizar la función de actualización de nutritionData
+  const updateNutritionData = useCallback(
+    (field, value) => {
+      setNutritionData((prev) => ({ ...prev, [field]: value }));
+    },
+    [setNutritionData]
+  );
+
   useEffect(() => {
     if (lastSelectedImg) {
-      setNutritionData((prev) => ({
-        ...prev,
-        image: lastSelectedImg,
-      }));
-    } else if (!isLoadingImg && !generateImg) {
+      updateNutritionData("image", lastSelectedImg);
+    } else if (!isLoadingImg && !generateImg && nutritionData?.nombre) {
       createImage(
         setgenerateImg,
-        nutritionData?.nombre,
+        nutritionData.nombre,
         "test",
         setisLoadingImg
       );
     }
-  }, [nutritionData, lastSelectedImg, isLoadingImg]);
+  }, [
+    lastSelectedImg,
+    isLoadingImg,
+    generateImg,
+    nutritionData?.nombre,
+    updateNutritionData,
+  ]);
 
   useEffect(() => {
-    console.log("nutritionData", nutritionData);
-  }, [nutritionData]);
-  useEffect(() => {
-    if (!lastSelectedImg)
-      setNutritionData((prev) => ({
-        ...prev,
-        image: generateImg,
-      }));
-  }, [generateImg]);
+    if (!lastSelectedImg && generateImg) {
+      updateNutritionData("image", generateImg);
+    }
+  }, [generateImg, lastSelectedImg, updateNutritionData]);
+
+  // Memoizar el componente Food para evitar rerenders innecesarios
+  const memoizedFood = useMemo(
+    () => (
+      <Food
+        title={nutritionData?.nombre || formValues.foodName}
+        calories={nutritionData?.calorias || formValues.calories}
+        proteins={nutritionData?.proteinas || formValues.proteins}
+        carbs={nutritionData?.carbohidratos || formValues.carbs}
+        fats={nutritionData?.grasas || formValues.fats}
+        enableGenerateImg={true}
+        linkeable={false}
+        generatedImg={lastSelectedImg || nutritionData?.image}
+        generatingImg={isLoadingImg}
+      />
+    ),
+    [nutritionData, formValues, lastSelectedImg, isLoadingImg]
+  );
+
+  // Memoizar los controladores de cambio para los inputs
+  const handleFoodNameChange = useCallback(
+    (onChange) => (text) => {
+      onChange(text);
+      updateNutritionData("nombre", text);
+    },
+    [updateNutritionData]
+  );
+
+  const handleCaloriesChange = useCallback(
+    (onChange) => (text) => {
+      onChange(text);
+      updateNutritionData("calorias", text);
+    },
+    [updateNutritionData]
+  );
+
+  const handleProteinsChange = useCallback(
+    (onChange) => (text) => {
+      onChange(text);
+      updateNutritionData("proteinas", text);
+    },
+    [updateNutritionData]
+  );
+
+  const handleCarbsChange = useCallback(
+    (onChange) => (text) => {
+      onChange(text);
+      updateNutritionData("carbohidratos", text);
+    },
+    [updateNutritionData]
+  );
+
+  const handleFatsChange = useCallback(
+    (onChange) => (text) => {
+      onChange(text);
+      updateNutritionData("grasas", text);
+    },
+    [updateNutritionData]
+  );
 
   return (
     <Modal
@@ -70,10 +134,7 @@ export const ModalAdd = ({
               <FormInput
                 placeholder={t("modal.add.food_name")}
                 value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  setNutritionData((prev) => ({ ...prev, foodName: text }));
-                }}
+                onChangeText={handleFoodNameChange(onChange)}
                 label={"Nombre de la comida"}
               />
             )}
@@ -99,13 +160,7 @@ export const ModalAdd = ({
                     style={{ maxWidth: 100 }}
                     placeholder={t("modal.add.calories")}
                     value={value}
-                    onChangeText={(text) => {
-                      onChange(text);
-                      setNutritionData((prev) => ({
-                        ...prev,
-                        calories: text || prev.calories,
-                      }));
-                    }}
+                    onChangeText={handleCaloriesChange(onChange)}
                     label={"Calorias"}
                   />
                 )}
@@ -125,13 +180,7 @@ export const ModalAdd = ({
                     placeholder="Proteinas (g)"
                     style={{ maxWidth: 100 }}
                     value={value}
-                    onChangeText={(text) => {
-                      onChange(text);
-                      setNutritionData((prev) => ({
-                        ...prev,
-                        proteins: text || prev.proteins,
-                      }));
-                    }}
+                    onChangeText={handleProteinsChange(onChange)}
                     label={"Proteinas (g)"}
                   />
                 )}
@@ -153,13 +202,7 @@ export const ModalAdd = ({
                     style={{ maxWidth: 100 }}
                     placeholder="Carbohidratos (g)"
                     value={value}
-                    onChangeText={(text) => {
-                      onChange(text);
-                      setNutritionData((prev) => ({
-                        ...prev,
-                        carbs: text || prev.carbs,
-                      }));
-                    }}
+                    onChangeText={handleCarbsChange(onChange)}
                     label={"Carbohidratos (g)"}
                   />
                 )}
@@ -177,13 +220,7 @@ export const ModalAdd = ({
                     placeholder="Grasas (g)"
                     style={{ maxWidth: 100 }}
                     value={value}
-                    onChangeText={(text) => {
-                      onChange(text);
-                      setNutritionData((prev) => ({
-                        ...prev,
-                        fats: text || prev.fats,
-                      }));
-                    }}
+                    onChangeText={handleFatsChange(onChange)}
                     label={"Grasas (g)"}
                   />
                 )}
@@ -195,29 +232,8 @@ export const ModalAdd = ({
               )}
             </View>
           </View>
-          {/* <View style={styles.imagePickerContainer}>
-            {lastSelectedImg && (
-              <Image
-                source={{ uri: lastSelectedImg }}
-                style={styles.previewImageSmall}
-              />
-            )}
-          </View> */}
 
-          {/* Pasar los valores del formulario al componente Food */}
-          {
-            <Food
-              title={nutritionData?.nombre || formValues.foodName}
-              calories={nutritionData?.calorias || formValues.calories}
-              proteins={nutritionData?.proteinas || formValues.proteins}
-              carbs={nutritionData?.carbohidratos || formValues.carbs}
-              fats={nutritionData?.grasas || formValues.fats}
-              enableGenerateImg={true}
-              linkeable={false}
-              generatedImg={lastSelectedImg || nutritionData?.image}
-              generatingImg={isLoadingImg}
-            />
-          }
+          {memoizedFood}
 
           <View style={styles.modalButtons}>
             <Pressable

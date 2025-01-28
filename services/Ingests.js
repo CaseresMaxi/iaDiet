@@ -48,8 +48,20 @@ export const postIngest = (
     }),
   })
     .then((response) => response.json())
-    .then((data) => {
-      getIngests(setingestData);
+    .then(() => {
+      fetch(
+        `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
+        {
+          headers: {
+            Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setingestData(data);
+        })
+        .catch((error) => console.error(error));
     })
     .catch((error) => console.error(error));
 };

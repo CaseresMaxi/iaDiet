@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Image, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "../utils/zustan";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import HeaderUser from "../assets/icons/HeaderUser.svg";
 import Notification from "../assets/icons/Notification.svg";
 import Food from "../Components/Food";
@@ -74,9 +74,36 @@ export default function Home() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const addItem = (formData) => {
-    postIngest(setIngestData, formData, formData.image);
-    reset(); // Limpiar el formulario después de añadir el item
-    // setNewItemImage(null);
+    setloadingIngest(true);
+    postIngest(
+      (data) => {
+        setIngestData(data);
+        // Recalcular totales inmediatamente después de actualizar los datos
+        const totals = data.reduce(
+          (sum, ingest) => {
+            if (moment().diff(ingest.date, "days") === 0) {
+              return {
+                calories: sum.calories + (Number(ingest.calories) || 0),
+                proteins: sum.proteins + (Number(ingest.proteins) || 0),
+                fats: sum.fats + (Number(ingest.fats) || 0),
+                carbs: sum.carbs + (Number(ingest.carbs) || 0),
+              };
+            }
+            return sum;
+          },
+          { calories: 0, proteins: 0, fats: 0, carbs: 0 }
+        );
+
+        setTotalCalories(totals.calories);
+        setTotalProteins(totals.proteins);
+        setTotalFats(totals.fats);
+        setTotalCarbs(totals.carbs);
+        setloadingIngest(false);
+      },
+      formData,
+      formData.image
+    );
+    reset();
     setModalVisible(false);
   };
   const removeSelectedImage = () => {
@@ -155,11 +182,87 @@ export default function Home() {
     setLastSelectedImg(null);
     setChatModalVisible(true);
   };
-  const { start } = useCopilot();
 
   const CustomComponents = ({ copilot, children }) => (
     <View {...copilot}>{children}</View>
   );
+  //TODO: ESTA PORONGA SIGUE HACEINDO EL FETCH DE LAS IMAGENES LA REPUTA MADRE QUE ME PARIO, DESPUES LO ARREGLO
+  const memoizedFoodList = useMemo(() => {
+    return (
+      <View>
+        {ingestData.map((ingest, index) => {
+          console.log(moment().diff(ingest.date, "days"), "diff");
+          return (
+            moment().diff(ingest.date, "days") === 0 && (
+              <Food
+                key={`${index}-${ingest.ingest_id}`}
+                title={ingest.ingest}
+                calories={ingest.calories}
+                s3Img={ingest.signed_url}
+                stimatedTime={ingest.stimatedTime}
+                linkeable={false}
+                description={ingest.description}
+              />
+            )
+          );
+        })}
+      </View>
+    );
+  }, [ingestData]);
+
+  const loadingView = useMemo(
+    () => (
+      <View style={{ padding: 20, alignItems: "center" }}>
+        <ActivityIndicator size="large" color={Colors.Color1} />
+      </View>
+    ),
+    []
+  );
+
+  const MemoizedChat = useMemo(
+    () => (
+      <Chat
+        chatModalVisible={chatModalVisible}
+        setChatModalVisible={setChatModalVisible}
+        isLoading={isLoading}
+        messages={messages}
+        nutritionData={nutritionData}
+        setModalVisible={setModalVisible}
+        selectedImage={selectedImage}
+        removeSelectedImage={removeSelectedImage}
+        pickImageForChat={() => pickImageForChat(setSelectedImage)}
+        sendMessage={() =>
+          sendMessage(
+            setNutritionData,
+            newMessage,
+            selectedImage,
+            setMessages,
+            setNewMessage,
+            setLastSelectedImg,
+            setSelectedImage,
+            setisLoading,
+            extractNutritionInfo
+          )
+        }
+        newMessage={newMessage}
+        setNewMessage={setNewMessage}
+      />
+    ),
+    [
+      chatModalVisible,
+      isLoading,
+      messages,
+      nutritionData,
+      selectedImage,
+      newMessage,
+    ]
+  );
+
+  const handleOpenChat = useCallback(() => {
+    openChatModal(null);
+    if (!modalOpened) setModalOpened(true);
+  }, [modalOpened]);
+
   return (
     <>
       <ScrollView style={{ backgroundColor: Colors.Color4 }}>
@@ -238,7 +341,6 @@ export default function Home() {
           <View
             style={{
               marginTop: 32,
-              // flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
             }}
@@ -262,12 +364,7 @@ export default function Home() {
               </Text>
               <CopilotStep text={t("tutorial.add")} order={4} name="add">
                 <CustomComponents>
-                  <TouchableOpacity
-                    onPress={() => {
-                      openChatModal(null);
-                      if (!modalOpened) setModalOpened(true);
-                    }}
-                  >
+                  <TouchableOpacity onPress={handleOpenChat}>
                     <Text
                       style={{
                         color: Colors.Color1,
@@ -281,33 +378,11 @@ export default function Home() {
                 </CustomComponents>
               </CopilotStep>
             </View>
-            {!loadingIngest ? (
-              <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
-                <CustomComponents>
-                  <View>
-                    {ingestData.map((ingest, index) => {
-                      return (
-                        moment().diff(ingest.date, "days") === 0 && (
-                          <Food
-                            key={`${index}-${ingest.ingest_id}`} // Agregamos la propiedad key única
-                            title={ingest.ingest}
-                            calories={ingest.calories}
-                            s3Img={ingest.signed_url}
-                            stimatedTime={ingest.stimatedTime}
-                            linkeable={false}
-                            description={ingest.description}
-                          />
-                        )
-                      );
-                    })}
-                  </View>
-                </CustomComponents>
-              </CopilotStep>
-            ) : (
-              <View style={{ padding: 20, alignItems: "center" }}>
-                <ActivityIndicator size="large" color={Colors.Color1} />
-              </View>
-            )}
+            <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
+              <CustomComponents>
+                {loadingIngest ? loadingView : memoizedFoodList}
+              </CustomComponents>
+            </CopilotStep>
           </View>
         </View>
         {modalVisible && (
@@ -324,32 +399,7 @@ export default function Home() {
             setNutritionData={setNutritionData}
           />
         )}
-        <Chat
-          chatModalVisible={chatModalVisible}
-          setChatModalVisible={setChatModalVisible}
-          isLoading={isLoading}
-          messages={messages}
-          nutritionData={nutritionData}
-          setModalVisible={setModalVisible}
-          selectedImage={selectedImage}
-          removeSelectedImage={removeSelectedImage}
-          pickImageForChat={() => pickImageForChat(setSelectedImage)}
-          sendMessage={() =>
-            sendMessage(
-              setNutritionData,
-              newMessage,
-              selectedImage,
-              setMessages,
-              setNewMessage,
-              setLastSelectedImg,
-              setSelectedImage,
-              setisLoading,
-              extractNutritionInfo
-            )
-          }
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-        />
+        {MemoizedChat}
       </ScrollView>
       <TutorialButton />
     </>
