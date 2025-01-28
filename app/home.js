@@ -33,6 +33,7 @@ import { useTranslation } from "react-i18next";
 import "../utils/i18n";
 import TutorialButton from "../Components/TutorialButton/TutorialButton";
 import { fetchDiet } from "../services/Diet";
+import UserInfoRectangle from "../Components/UserInfoRectangle";
 
 const CopilotText = walkthroughable(Text);
 
@@ -170,6 +171,7 @@ export default function Home() {
           }}
         >
           <Stack.Screen />
+
           <View
             style={{
               justifyContent: "space-between",
@@ -197,6 +199,13 @@ export default function Home() {
                 <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
               </TouchableOpacity>
             </View>
+          </View>
+          <View style={{ paddingVertical: 24, paddingTop: 0, width: "100%" }}>
+            <UserInfoRectangle
+              weight={userData?.weight}
+              age={userData?.age}
+              height={userData?.height}
+            />
           </View>
           <View>
             <Text
@@ -376,6 +385,7 @@ export default function Home() {
               </CustomComponents>
             </CopilotStep>
           </View>
+
           <View
             style={{
               marginTop: 32,

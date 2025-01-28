@@ -15,6 +15,7 @@ import Button from "../Components/Button/Button";
 import { fetchUserData, modifyUserData } from "../services/UserData";
 import { ScrollView } from "react-native-web";
 import { router } from "expo-router";
+import UserInfoRectangle from "../Components/UserInfoRectangle";
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -130,106 +131,13 @@ export default function Profile() {
           </Text>{" "}
           01/01/2000
         </Text>
-        <View style={{ paddingHorizontal: 24, width: "100%" }}>
-          <View style={styles.rectangleInfoContainer}>
-            <View
-              style={{
-                ...styles.rectangeItem,
-                width: "25%",
-              }}
-            >
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "600",
-                  }}
-                >
-                  {`${userData?.weight || 0} kg`}
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "400",
-                  }}
-                >
-                  Weight
-                </Text>
-              </View>
-            </View>
-            <View
-              style={{
-                ...styles.rectangeItem,
-                width: "50%",
-                justifyContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  width: 1,
-                  backgroundColor: Colors.Font2,
-                  height: "80%",
-                }}
-              ></View>
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "600",
-                  }}
-                >
-                  25
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "400",
-                  }}
-                >
-                  Years Old
-                </Text>
-              </View>
-              <View
-                style={{
-                  width: 1,
-                  backgroundColor: Colors.Font2,
-                  height: "80%",
-                }}
-              ></View>
-            </View>
-            <View
-              style={{
-                ...styles.rectangeItem,
-                width: "25%",
-              }}
-            >
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "600",
-                  }}
-                >
-                  {userData?.height || 0} cm
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.Font2,
-                    fontSize: 15,
-                    fontWeight: "400",
-                  }}
-                >
-                  Height
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        {/* <View style={{ paddingHorizontal: 24, width: "100%" }}>
+          <UserInfoRectangle
+            weight={userData?.weight}
+            age={25}
+            height={userData?.height}
+          />
+        </View> */}
         <View
           style={{
             width: "100%",
