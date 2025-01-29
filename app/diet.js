@@ -65,7 +65,7 @@ const Diet = () => {
 
     // Organizar las comidas por día
     Object.entries(foods).forEach(([key, meal]) => {
-      console.log("meal", meal);
+      // console.log("meal", meal);
       const day = meal.day_of_week;
       // Agregar la key original al objeto meal
       const mealWithKey = {

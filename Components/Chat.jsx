@@ -196,7 +196,7 @@ const Chat = memo(
                 onPress={handleSendMessage}
                 disabled={localLoading || isLoading}
               >
-                <Text style={styles.sendButtonText}>Enviar</Text>
+                <Text style={styles.sendButtonText}>➡️</Text>
               </Pressable>
             </View>
           </View>

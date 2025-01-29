@@ -219,7 +219,7 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: "#4E4C67", // Borde gris oscuro
     width: "100%",
-    backgroundColor: "red",
+    overflow: "hidden",
   },
   chatInput: {
     flex: 1,
@@ -235,9 +235,14 @@ export const styles = StyleSheet.create({
   chatSendButton: {
     marginLeft: 10,
     backgroundColor: "#7F56DA", // Botón morado para enviar mensajes
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25,
+    // paddingVertical: 10,
+    // paddingHorizontal: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: "100%",
+    width: "10%",
+    height: "100%",
+    flex: 1,
   },
   sendButtonText: {
     color: "#FFFFFF", // Texto en blanco
@@ -245,13 +250,21 @@ export const styles = StyleSheet.create({
   },
   imagePickerButton: {
     backgroundColor: "#4E4C67", // Botón gris oscuro para elegir imagen
-    padding: 10,
-    borderRadius: 25,
+    // paddingVertical: 10,
+    // paddingHorizontal: 10,
+    borderRadius: "100%",
     marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "10%",
+    height: "100%",
+    flex: 1,
   },
   imagePickerButtonText: {
-    fontSize: 24,
+    // fontSize: 24,
     color: "#FFFFFF", // Icono blanco para el botón de imagen
+    // textAlign: "center",
+    // paddingBottom: 10,
   },
   selectedImageContainer: {
     position: "relative",

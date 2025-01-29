@@ -191,7 +191,7 @@ export default function Home() {
     return (
       <View>
         {ingestData.map((ingest, index) => {
-          console.log(moment().diff(ingest.date, "days"), "diff");
+          // console.log(moment().diff(ingest.date, "days"), "diff");
           return (
             moment().diff(ingest.date, "days") === 0 && (
               <Food

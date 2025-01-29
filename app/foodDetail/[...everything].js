@@ -52,7 +52,7 @@ export default function Detail() {
       // setLeftTitle(null);
     };
   }, []);
-  console.log("everything", dietData);
+  // console.log("everything", dietData);
   return (
     <View
       style={{
