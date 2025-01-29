@@ -41,7 +41,7 @@ const MessageItem = memo(
         )}
         {nutritionData && index === messagesLength - 1 && (
           <Pressable style={styles.openModalButton} onPress={onOpenModal}>
-            <Text style={styles.openModalButtonText}>Abrir Modal</Text>
+            <Text style={styles.openModalButtonText}>Me parece bien!</Text>
           </Pressable>
         )}
       </View>

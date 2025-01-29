@@ -240,9 +240,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: "100%",
-    width: "10%",
-    height: "100%",
-    flex: 1,
+    width: "40px",
+    height: "40px",
   },
   sendButtonText: {
     color: "#FFFFFF", // Texto en blanco
@@ -256,9 +255,9 @@ export const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: "10%",
-    height: "100%",
-    flex: 1,
+
+    width: "40px",
+    height: "40px",
   },
   imagePickerButtonText: {
     // fontSize: 24,
