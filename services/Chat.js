@@ -1,4 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export const createImage = (
   setGeneratedImage = () => {},
@@ -45,18 +46,51 @@ export const pickImageForChat = async (setSelectedImage) => {
   const permissionResult =
     await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (permissionResult.granted === false) {
-    alert("Permission to access camera roll is required!");
+    alert("¡Se requiere permiso para acceder a la galería!");
     return;
   }
 
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 1,
-    base64: true,
-  });
+  try {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+    });
 
-  if (!result.cancelled) {
-    setSelectedImage(`data:image/jpeg;base64,${result?.assets[0]?.base64}`); // Guardar la imagen seleccionada
+    if (!result.canceled && result.assets && result.assets[0]) {
+      const { width, height } = result.assets[0];
+      let newWidth = width;
+      let newHeight = height;
+      const maxDimension = 800;
+
+      // Calcular las nuevas dimensiones manteniendo la relación de aspecto
+      if (width > height && width > maxDimension) {
+        newWidth = maxDimension;
+        newHeight = Math.floor((height * maxDimension) / width);
+      } else if (height > width && height > maxDimension) {
+        newHeight = maxDimension;
+        newWidth = Math.floor((width * maxDimension) / height);
+      }
+
+      // Redimensionar y comprimir la imagen
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: newWidth, height: newHeight } }],
+        {
+          compress: 0.5,
+          format: ImageManipulator.SaveFormat.JPEG,
+          base64: true,
+        }
+      );
+
+      if (manipulatedImage.base64) {
+        const imageBase64 = `data:image/jpeg;base64,${manipulatedImage.base64}`;
+        setSelectedImage(imageBase64);
+      }
+    }
+  } catch (error) {
+    console.error("Error al procesar la imagen:", error);
+    alert("Hubo un error al procesar la imagen. Por favor, intenta de nuevo.");
   }
 };
 export const addItem = (formData, setModalVisible, setData, postIngest) => {

@@ -218,6 +218,8 @@ export const styles = StyleSheet.create({
     paddingTop: 10,
     borderTopWidth: 1,
     borderColor: "#4E4C67", // Borde gris oscuro
+    width: "100%",
+    backgroundColor: "red",
   },
   chatInput: {
     flex: 1,
