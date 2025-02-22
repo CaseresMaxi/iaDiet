@@ -17,7 +17,7 @@ export default function Detail() {
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   const [s3ImgB64, sets3ImgB64] = useState("");
-  const [dietData, setdietData] = useState();
+  const [dietData, setDietData] = useState();
   const [loading, setloading] = useState(true);
   const fetchImg = (s3Img) => {
     fetch(s3Img)
@@ -45,7 +45,7 @@ export default function Detail() {
       ""
       // everything[2].slice(0, 1).toUpperCase() + everything[2].slice(1)
     );
-    fetchDiet(setdietData, setloading);
+    fetchDiet(setDietData, setloading);
     // setLeftTitle(everything[0]);
     return () => {
       setHeaderTitle("Diet");

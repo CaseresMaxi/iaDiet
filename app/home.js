@@ -35,6 +35,8 @@ import TutorialButton from "../Components/TutorialButton/TutorialButton";
 import { fetchDiet } from "../services/Diet";
 import UserInfoRectangle from "../Components/UserInfoRectangle";
 import MacronutrientsProgress from "../Components/MacronutrientsProgress/MacronutrientsProgress";
+import { LineChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
 
 const CopilotText = walkthroughable(Text);
 
@@ -53,7 +55,9 @@ export default function Home() {
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
 
   const [ingestData, setIngestData] = useState([]);
-  const [userData, setUserData] = useState();
+  // const [userData, setUserData] = useState();
+  const userData = useStore((state) => state.userData);
+  const setUserData = useStore((state) => state.setUserData);
   const [isLoading, setisLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const [modalOpened, setModalOpened] = useState(false);
@@ -61,13 +65,17 @@ export default function Home() {
   const [totalProteins, setTotalProteins] = useState(0);
   const [totalFats, setTotalFats] = useState(0);
   const [totalCarbs, setTotalCarbs] = useState(0);
-  const [dietData, setdietData] = useState({});
+  // const [dietData, setDietData] = useState({});
+  const dietData = useStore((state) => state.dietData);
+  const setDietData = useStore((state) => state.setDietData);
 
   const [messages, setMessages] = useState([]); // Estado para los mensajes del chat
   const [newMessage, setNewMessage] = useState(""); // Estado para el mensaje actual
   const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
   const [lastSelectedImg, setLastSelectedImg] = useState(null); // Estado para la imagen seleccionada
-  const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
+  // const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
+  const chatVisible = useStore((state) => state.chatVisible);
+  const setChatVisible = useStore((state) => state.setChatVisible);
   const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
 
   const [loadingIngest, setloadingIngest] = useState(true);
@@ -111,9 +119,9 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchUserData(setUserData, setisLoading);
     setHeaderVisible(false);
-    fetchDiet(setdietData, setisLoading);
+    fetchUserData(setUserData, setisLoading);
+    fetchDiet(setDietData, setisLoading);
 
     setNavigationVisible(true);
     getIngests(setIngestData, null, setloadingIngest);
@@ -189,7 +197,7 @@ export default function Home() {
   //TODO: ESTA PORONGA SIGUE HACEINDO EL FETCH DE LAS IMAGENES LA REPUTA MADRE QUE ME PARIO, DESPUES LO ARREGLO
   const memoizedFoodList = useMemo(() => {
     return (
-      <View>
+      <View style={{ marginBottom: 50 }}>
         {ingestData.map((ingest, index) => {
           // console.log(moment().diff(ingest.date, "days"), "diff");
           return (
@@ -222,8 +230,8 @@ export default function Home() {
   const MemoizedChat = useMemo(
     () => (
       <Chat
-        chatModalVisible={chatModalVisible}
-        setChatModalVisible={setChatModalVisible}
+        chatModalVisible={chatVisible}
+        setChatModalVisible={setChatVisible}
         isLoading={isLoading}
         messages={messages}
         nutritionData={nutritionData}
@@ -248,20 +256,42 @@ export default function Home() {
         setNewMessage={setNewMessage}
       />
     ),
-    [
-      chatModalVisible,
-      isLoading,
-      messages,
-      nutritionData,
-      selectedImage,
-      newMessage,
-    ]
+    [chatVisible, isLoading, messages, nutritionData, selectedImage, newMessage]
   );
 
   const handleOpenChat = useCallback(() => {
     openChatModal(null);
     if (!modalOpened) setModalOpened(true);
   }, [modalOpened]);
+
+  // Datos de prueba para el gráfico de peso
+  const weightData = {
+    labels: ["1 Ene", "15 Ene", "1 Feb", "15 Feb", "1 Mar", "15 Mar"],
+    datasets: [
+      {
+        data: [75, 74.5, 73.8, 73.2, 72.5, 72],
+        color: (opacity = 1) => Colors.Color1,
+        strokeWidth: 2,
+      },
+    ],
+  };
+
+  const chartConfig = {
+    backgroundColor: Colors.Color6,
+    backgroundGradientFrom: Colors.Color6,
+    backgroundGradientTo: Colors.Color6,
+    decimalPlaces: 1,
+    color: (opacity = 1) => Colors.Font2,
+    labelColor: (opacity = 1) => Colors.Font2,
+    style: {
+      borderRadius: 16,
+    },
+    propsForDots: {
+      r: "4",
+      strokeWidth: "2",
+      stroke: Colors.Color1,
+    },
+  };
 
   return (
     <>
@@ -304,85 +334,169 @@ export default function Home() {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={{ paddingVertical: 24, paddingTop: 0, width: "100%" }}>
-            <UserInfoRectangle
-              weight={userData?.weight}
-              age={userData?.age}
-              height={userData?.height}
-            />
-          </View>
-          <View>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: Colors.Color1,
-                fontSize: 20,
-                marginBottom: 12,
-              }}
-            >
-              {t("today")}
-            </Text>
-            <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
-              <CustomComponents>
-                <MacronutrientsProgress
-                  totalProteins={totalProteins}
-                  totalFats={totalFats}
-                  totalCarbs={totalCarbs}
-                  totalCalories={totalCalories}
-                  targetProteins={dietData.proteins}
-                  targetFats={dietData.fats}
-                  targetCarbs={dietData.carbs}
-                  targetCalories={dietData.calories}
-                />
-              </CustomComponents>
-            </CopilotStep>
-          </View>
-
           <View
             style={{
-              marginTop: 32,
-              justifyContent: "space-between",
-              alignItems: "center",
+              paddingVertical: 24,
+              paddingTop: 0,
+
+              width: "100%",
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
+            <View style={{ marginBottom: 12 }}>
+              <UserInfoRectangle
+                weight={
+                  userData?.weight
+                    ? userData.weight[userData.weight.length - 1]
+                    : 0
+                }
+                age={userData?.age}
+                height={userData?.height}
+                userData={userData}
+                setUserData={setUserData}
+              />
+            </View>
+            <View>
               <Text
                 style={{
+                  fontWeight: "bold",
                   color: Colors.Color1,
                   fontSize: 20,
-                  fontWeight: "bold",
-                  flex: 1,
+                  marginBottom: 12,
                 }}
               >
-                {t("ingests.title")}
+                {t("today")}
               </Text>
-              <CopilotStep text={t("tutorial.add")} order={4} name="add">
+              <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
                 <CustomComponents>
-                  <TouchableOpacity onPress={handleOpenChat}>
-                    <Text
-                      style={{
-                        color: Colors.Color1,
-                        fontSize: 20,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      +
-                    </Text>
-                  </TouchableOpacity>
+                  <MacronutrientsProgress
+                    totalProteins={totalProteins}
+                    totalFats={totalFats}
+                    totalCarbs={totalCarbs}
+                    totalCalories={totalCalories}
+                    targetProteins={dietData.proteins}
+                    targetFats={dietData.fats}
+                    targetCarbs={dietData.carbs}
+                    targetCalories={dietData.calories}
+                  />
                 </CustomComponents>
               </CopilotStep>
             </View>
-            <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
-              <CustomComponents>
-                {loadingIngest ? loadingView : memoizedFoodList}
-              </CustomComponents>
-            </CopilotStep>
+
+            <View
+              style={{
+                marginTop: 12,
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ marginBottom: 12 }}>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: Colors.Color1,
+                    fontSize: 20,
+                  }}
+                >
+                  {t("weight.history")}
+                </Text>
+                {userData?.weight && userData.weight.length > 0 && (
+                  <View style={styles.chartContainer}>
+                    <LineChart
+                      data={{
+                        labels: userData.weight.map(
+                          (value, index) => `${index + 1}°`
+                        ),
+                        datasets: [
+                          {
+                            data: userData.weight,
+
+                            color: (opacity = 1) =>
+                              `${Colors.Color1}${Math.floor(opacity * 255)
+                                .toString(16)
+                                .padStart(2, "0")}`,
+                            strokeWidth: 2,
+                            text: (value) => `${value}kg`,
+                          },
+                        ],
+                      }}
+                      width={Dimensions.get("window").width - 72}
+                      height={160}
+                      chartConfig={{
+                        backgroundColor: "transparent",
+                        backgroundGradientFrom: Colors.Color6,
+                        backgroundGradientTo: Colors.Color6,
+                        decimalPlaces: 0,
+                        color: (opacity = 1) =>
+                          `${Colors.Font2}${Math.floor(opacity * 255)
+                            .toString(16)
+                            .padStart(2, "0")}`,
+                        labelColor: (opacity = 1) =>
+                          `${Colors.Font2}${Math.floor(opacity * 255)
+                            .toString(16)
+                            .padStart(2, "0")}`,
+
+                        propsForLabels: {
+                          fontSize: 10,
+                        },
+                        propsForDots: {
+                          r: "3",
+                          strokeWidth: "1",
+                          stroke: Colors.Color1,
+                        },
+                        strokeWidth: 1,
+                      }}
+                      style={{
+                        marginHorizontal: -16,
+                        marginVertical: 4,
+                      }}
+                      bezier
+                      withInnerLines={false}
+                      withOuterLines={false}
+                      withDots={true}
+                      withShadow={false}
+                    />
+                  </View>
+                )}
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.Color1,
+                    fontSize: 20,
+                    fontWeight: "bold",
+                    flex: 1,
+                  }}
+                >
+                  {t("ingests.title")}
+                </Text>
+                {/* <CopilotStep text={t("tutorial.add")} order={4} name="add">
+                    <CustomComponents>
+                      <TouchableOpacity onPress={handleOpenChat}>
+                        <Text
+                          style={{
+                            color: Colors.Color1,
+                            fontSize: 20,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          +
+                        </Text>
+                      </TouchableOpacity>
+                    </CustomComponents>
+                  </CopilotStep> */}
+              </View>
+              <CopilotStep text={t("tutorial.hoy")} order={3} name="hoy">
+                <CustomComponents>
+                  {loadingIngest ? loadingView : memoizedFoodList}
+                </CustomComponents>
+              </CopilotStep>
+            </View>
           </View>
         </View>
         {modalVisible && (
@@ -410,5 +524,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-start",
+  },
+  chartContainer: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: Colors.Color6,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  chartTitle: {
+    color: Colors.Font2,
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
+    paddingHorizontal: 12,
   },
 });

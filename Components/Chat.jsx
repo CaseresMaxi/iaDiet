@@ -8,6 +8,7 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { styles } from "../styles/TrakerStyles";
 import DotTypingAnimation from "./DotTyping";
@@ -113,14 +114,38 @@ const Chat = memo(
     disabledImgPicker = false,
     newMessage,
     setNewMessage,
+    suggestedMessages = [],
+    initialMessage = null,
   }) => {
     const [localLoading, setLocalLoading] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(true);
+
+    React.useEffect(() => {
+      if (initialMessage && messages.length === 0) {
+        const botMessage = {
+          id: Date.now().toString(),
+          text: initialMessage,
+          isBot: true,
+        };
+        messages.push(botMessage);
+      }
+    }, [chatModalVisible]);
 
     const handleSendMessage = useCallback(async () => {
       setLocalLoading(true);
+      setShowSuggestions(false);
       await sendMessage();
       setLocalLoading(false);
     }, [sendMessage]);
+
+    const handleSuggestedMessage = useCallback(
+      async (message) => {
+        setNewMessage(message);
+        setShowSuggestions(false);
+        await sendMessage();
+      },
+      [sendMessage, setNewMessage]
+    );
 
     const handleOpenModal = useCallback(() => {
       setChatModalVisible(false);
@@ -149,8 +174,14 @@ const Chat = memo(
         visible={chatModalVisible}
         onRequestClose={() => setChatModalVisible(false)}
       >
-        <View style={styles.modalCenteredContainer}>
-          <View style={styles.chatModalFixedContent}>
+        <Pressable
+          style={styles.modalCenteredContainer}
+          onPress={() => setChatModalVisible(false)}
+        >
+          <Pressable
+            style={styles.chatModalFixedContent}
+            onPress={(e) => e.stopPropagation()}
+          >
             <FlatList
               data={
                 isLoading
@@ -160,6 +191,24 @@ const Chat = memo(
               keyExtractor={keyExtractor}
               renderItem={renderItem}
             />
+
+            {showSuggestions && suggestedMessages.length > 0 && (
+              <ScrollView
+                vertical
+                style={styles.suggestionsContainer}
+                showsHorizontalScrollIndicator={false}
+              >
+                {suggestedMessages.map((suggestion, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.suggestionBubble}
+                    onPress={() => handleSuggestedMessage(suggestion)}
+                  >
+                    <Text style={styles.suggestionText}>{suggestion}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
 
             {selectedImage && (
               <View style={styles.selectedImageContainer}>
@@ -189,7 +238,11 @@ const Chat = memo(
                 style={styles.chatInput}
                 placeholder="Escribe tu mensaje..."
                 value={newMessage}
-                onChangeText={setNewMessage}
+                onChangeText={(text) => {
+                  setNewMessage(text);
+                  if (text) setShowSuggestions(false);
+                  else setShowSuggestions(true);
+                }}
               />
               <Pressable
                 style={styles.chatSendButton}
@@ -199,11 +252,30 @@ const Chat = memo(
                 <Text style={styles.sendButtonText}>➡️</Text>
               </Pressable>
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     );
   }
 );
+
+// const styles = StyleSheet.create({
+//   suggestionsContainer: {
+//     marginBottom: 10,
+//     paddingHorizontal: 10,
+//   },
+//   suggestionBubble: {
+//     backgroundColor: Colors.Color1,
+//     paddingHorizontal: 16,
+//     paddingVertical: 8,
+//     borderRadius: 20,
+//     marginRight: 8,
+//     marginVertical: 4,
+//   },
+//   suggestionText: {
+//     color: Colors.Color6,
+//     fontSize: 14,
+//   },
+// });
 
 export default Chat;

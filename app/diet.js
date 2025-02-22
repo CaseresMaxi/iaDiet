@@ -1,27 +1,31 @@
-import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Pressable, Text, View, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Food from "../Components/Food";
-import { styles } from "../styles/DietStyles";
-import Button from "../Components/Button/Button";
-import Chat from "../Components/Chat";
-import { fetchDiet } from "../services/Diet";
-import { deleteContextChat } from "../services/Utils";
-import { Image, ScrollView } from "react-native";
-import { useStore } from "../utils/zustan";
-import MealPlans from "../assets/icons/MealPlans.svg";
-import Colors from "../styles/Colors";
 import { useTranslation } from "react-i18next";
-import TutorialButton from "../Components/TutorialButton/TutorialButton";
-import moment from "moment";
-import "moment/locale/es";
 import {
   CopilotProvider,
   CopilotStep,
   walkthroughable,
 } from "react-native-copilot";
+import moment from "moment";
+import "moment/locale/es";
+
+import { styles } from "../styles/DietStyles";
+import Colors from "../styles/Colors";
+
+import MealPlans from "../assets/icons/MealPlans.svg";
+
+import Button from "../Components/Button/Button";
+import Food from "../Components/Food";
+import Chat from "../Components/Chat";
+import TutorialButton from "../Components/TutorialButton/TutorialButton";
+
+import { useStore } from "../utils/zustan";
+import { fetchDiet } from "../services/Diet";
+import { deleteContextChat } from "../services/Utils";
 import { fetchUserData } from "../services/UserData";
+
+moment.locale("es");
 
 const CopilotText = walkthroughable(Text);
 const CopilotView = walkthroughable(View);
@@ -30,77 +34,110 @@ const CustomComponents = ({ copilot, children }) => (
   <View {...copilot}>{children}</View>
 );
 
+/**
+ * Organizes meals by day according to a predefined day order.
+ * Returns an object containing the structured meals for each day.
+ */
+const organizeMealsByDay = (foods) => {
+  const daysOrder = [
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+    "Domingo",
+  ];
+
+  const organized = {};
+  daysOrder.forEach((day) => {
+    organized[day] = {
+      desayuno: null,
+      almuerzo: null,
+      cena: null,
+      otras_comidas: {},
+    };
+  });
+
+  Object.entries(foods).forEach(([key, meal]) => {
+    const day = meal.day_of_week;
+    const mealWithKey = { ...meal, original_key: key };
+
+    if (key.includes("desayuno")) {
+      organized[day].desayuno = mealWithKey;
+    } else if (key.includes("almuerzo")) {
+      organized[day].almuerzo = mealWithKey;
+    } else if (key.includes("cena")) {
+      organized[day].cena = mealWithKey;
+    } else {
+      const comidaNombre = key.split("_")[0];
+      if (!organized[day].otras_comidas[comidaNombre]) {
+        organized[day].otras_comidas[comidaNombre] = mealWithKey;
+      }
+    }
+  });
+
+  return organized;
+};
+
+/**
+ * Extracts the diet data JSON block from the AI response (surrounded by &&&).
+ * Returns the parsed object if found, otherwise null.
+ */
+const extractDietData = (inputText) => {
+  const regex = /&&&(.*?)&&&/s;
+  const match = inputText.match(regex);
+  if (match && match[1]) {
+    try {
+      return JSON.parse(match[1]);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
 const Diet = () => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const [dietData, setdietData] = useState({});
-  const [dietLoading, setdietLoading] = useState(true);
-  const [userData, setUserData] = useState();
-  const [currentDay, setCurrentDay] = useState(
-    moment().locale("es").format("dddd")
-  );
+
+  const [isDietLoading, setIsDietLoading] = useState(true);
   const [organizedMeals, setOrganizedMeals] = useState({});
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [newDiet, setNewDiet] = useState(null);
 
-  const organizeMealsByDay = (foods) => {
-    const daysOrder = [
-      "Lunes",
-      "Martes",
-      "Miércoles",
-      "Jueves",
-      "Viernes",
-      "Sábado",
-      "Domingo",
-    ];
-    const organized = {};
+  // Zustand store states/actions
+  const dietData = useStore((state) => state.dietData);
+  const setDietData = useStore((state) => state.setDietData);
 
-    // Inicializar los días
-    daysOrder.forEach((day) => {
-      organized[day] = {
-        desayuno: null,
-        almuerzo: null,
-        cena: null,
-        otras_comidas: {},
-      };
-    });
+  const userData = useStore((state) => state.userData);
+  const setUserData = useStore((state) => state.setUserData);
 
-    // Organizar las comidas por día
-    Object.entries(foods).forEach(([key, meal]) => {
-      // console.log("meal", meal);
-      const day = meal.day_of_week;
-      // Agregar la key original al objeto meal
-      const mealWithKey = {
-        ...meal,
-        original_key: key,
-      };
+  const chatVisible = useStore((state) => state.chatVisible);
+  const setChatVisible = useStore((state) => state.setChatVisible);
 
-      if (key.includes("desayuno")) {
-        organized[day].desayuno = mealWithKey;
-      } else if (key.includes("almuerzo")) {
-        organized[day].almuerzo = mealWithKey;
-      } else if (key.includes("cena")) {
-        organized[day].cena = mealWithKey;
-      } else {
-        const comidaNombre = key.split("_")[0];
-        if (!organized[day].otras_comidas[comidaNombre]) {
-          organized[day].otras_comidas[comidaNombre] = mealWithKey;
-        }
-      }
-    });
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setHeaderColor = useStore((state) => state.setHeaderColor);
+  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
 
-    return organized;
-  };
+  const currentDay = moment().format("dddd");
 
-  useEffect(() => {
-    if (dietData?.foods) {
-      const organized = organizeMealsByDay(dietData.foods);
-      setOrganizedMeals(organized);
-    }
-  }, [dietData]);
+  /**
+   * Adds a new diet to the server using the diet data from AI response
+   * or from the argument if provided.
+   */
+  const addDiet = (diet) => {
+    setIsDietLoading(true);
+    const dietToSave = diet || newDiet;
+    if (!dietToSave) return;
 
-  const addDiet = () => {
-    setdietLoading(true);
-    const totals = newDiet.totals;
-    delete newDiet.totals;
+    const { totals } = dietToSave;
+    delete dietToSave.totals;
+
     fetch("https://ainutritioner.click/diets", {
       method: "POST",
       headers: {
@@ -113,59 +150,49 @@ const Diet = () => {
         proteins: totals.proteins,
         fats: totals.fats,
         carbs: totals.carbs,
-        foods: newDiet,
+        foods: dietToSave,
       }),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        // setLoading(true);
-        fetchDiet(setdietData, setdietLoading);
+      .then((res) => res.json())
+      .then(() => {
+        fetchDiet(setDietData, setIsDietLoading);
       })
-      .catch((error) => console.error("Error:", error));
-    // .finally(() => setdietLoading(false));
-  };
-  useEffect(() => {
-    fetchDiet(setdietData, setdietLoading);
-  }, []);
-
-  const [chatOpen, setChatOpen] = useState(false);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const removeSelectedImage = () => {
-    setSelectedImage(null);
+      .catch((error) => console.error("Error adding new diet:", error));
   };
 
-  const [newMessage, setNewMessage] = useState("");
-  const extractDietData = (inputText) => {
-    const regex = /&&&(.*?)&&&/s;
-    const match = inputText.match(regex);
+  /**
+   * Sends a message to the AI service and handles the response.
+   */
+  const sendMessage = async (message, callback = () => {}) => {
+    if (!message && !newMessage.trim()) return;
 
-    if (match && match[1]) {
-      try {
-        const extractedObject = JSON.parse(match[1]);
-        // Modificar los keywords a cadena vacía para cada comida
-        // const { calories, proteins, fats, carbs } = extractedObject.totals;
-        // delete extractedObject.totals;
-        return extractedObject;
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-      }
-    } else {
-      console.error("No valid JSON found between &&&");
-    }
-  };
+    const userText = message || newMessage;
 
-  const [newDiet, setnewDiet] = useState({});
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: Date.now().toString(),
+        text: userText,
+        image: null,
+        isBot: false,
+      },
+    ]);
 
-  const sendMessage = async () => {
-    setnewDiet(null);
-    if (newMessage.trim()) {
-      const contextMessage = "";
-      const messageBody = {
-        context_chat: `Contexto:
+    setIsChatLoading(true);
+    setNewMessage("");
 
-Datos del usuario (edad, peso, altura, objetivos, etc.): ${JSON.stringify(userData)}
+    try {
+      const response = await fetch("https://ainutritioner.click/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          context_chat: `
+Datos del usuario (edad, peso, altura, objetivos, etc.): ${JSON.stringify(
+            userData
+          )}
 Dieta actual (si la hay): ${JSON.stringify(dietData)}
 Día actual de la semana (si está disponible): ${currentDay}
 Instrucciones generales:
@@ -189,143 +216,136 @@ estimated_time: Tiempo estimado de preparación (en minutos).
 proteins: Cantidad de proteínas en gramos.
 fats: Cantidad de grasas en gramos.
 carbohydrates: Cantidad de carbohidratos en gramos.
-keywords: Palabras descriptivas separadas por guion bajo (p. ej. "avena_frutas_saludable_rapido").
+keywords: Palabras descriptivas separadas por guion bajo.
+
 Incluir una sección "totals" con los valores totales de esa dieta de 1 día:
 calories: Calorías totales.
 proteins: Proteínas totales en gramos.
 fats: Grasas totales en gramos.
 carbs: Carbohidratos totales en gramos.
+
 Tras el bloque &&&, generar un texto en lenguaje natural y amigable describiendo la dieta, invitando al usuario a opinar y preguntar si desea algún cambio.
-Si el usuario pide explícitamente que la dieta sea para más días (2 o 3 días), antes de generarla adviértele que puede tardar un poco más por temas de rendimiento y pídele confirmación. Solo si confirma, crea la dieta extendida.
-En ese caso, el mismo formato anterior aplica, pero para cada día extra: "desayuno_dia_2", "almuerzo_dia_2", "cena_dia_2", etc., hasta un máximo de 3 días.
-Ajusta la sección "totals" para incluir el total de los valores para todos los días planificados.
-Asegúrate de que el valor total de calorías, proteínas, grasas y carbohidratos coincida estrictamente con lo que el usuario solicita o con las indicaciones de su plan (por ejemplo, si menciona 1600 kcal diarias, y piden 2 días, la suma debe ser 3200, etc.).
-No menciones explícitamente la estructura del JSON ni uses frases como "aquí tienes el JSON".
 
-Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes.
+Si el usuario pide explícitamente que la dieta sea para más días (2 o 3 días), antes de generarla adviértele que puede tardar un poco más por temas de rendimiento y pídele confirmación. Solo si confirma, crea la dieta extendida. En ese caso, el mismo formato anterior aplica, pero para cada día extra: "desayuno_dia_2", "almuerzo_dia_2", "cena_dia_2", etc., hasta un máximo de 3 días. Ajusta la sección "totals" para incluir el total de los valores para todos los días planificados. Asegúrate de que el valor total de calorías, proteínas, grasas y carbohidratos coincida estrictamente con lo que el usuario solicita o con las indicaciones de su plan. No menciones explícitamente la estructura del JSON ni uses frases como "aquí tienes el JSON".
 
-Mantén un tono cercano y positivo en el texto final.
+Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. Mantén un tono cercano y positivo en el texto final.
+            `,
+          message: userText,
+          images: [],
+        }),
+      });
 
-Ejemplo de salida (simplificado para 1 día):
+      if (response.ok) {
+        const data = await response.json();
+        const extractedDiet = extractDietData(data.response);
 
-csharp
-Copiar
-Editar
-&&&
-{
-  "desayuno_dia_1": {
-    "day_of_week": "Miércoles",
-    "title": "Avena con frutas frescas",
-    "description": "Un desayuno balanceado con avena y frutas de temporada.",
-    "total_calories": 320,
-    "ingredients": [
-      "1/2 taza de avena",
-      "1 taza de leche descremada",
-      "1/2 plátano",
-      "5 fresas"
-    ],
-    "instructions": "Cocina la avena con la leche durante 5 minutos...",
-    "estimated_time": 10,
-    "proteins": 8,
-    "fats": 4,
-    "carbohydrates": 45,
-    "keywords": "avena_frutas_frescas_saludable"
-  },
-  "almuerzo_dia_1": {
-    ...
-  },
-  "cena_dia_1": {
-    ...
-  },
-  "totals": {
-    "calories": 1600,
-    "proteins": 90,
-    "fats": 50,
-    "carbs": 160
-  }
-}
-&&&
+        setNewDiet(extractedDiet);
+        callback(extractedDiet);
 
-¡Hola! Te presento esta dieta para un solo día. He elegido recetas sencillas...
-
-¿Qué opinas? Si deseas otro tipo de platillos o más días, ¡házmelo saber!`,
-        message: `${newMessage}`,
-        images: [],
-      };
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: Date.now().toString(),
-          text: newMessage,
-          image: null,
-          isBot: false,
-        },
-      ]);
-
-      // setSelectedImage(null);
-
-      setIsChatLoading(true);
-      setNewMessage("");
-      try {
-        const response = await fetch("https://ainutritioner.click/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+        // The plain text from the bot is the AI response minus the JSON block
+        const botText = data.response.replace(/&&&[\s\S]*?&&&/g, "").trim();
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: `${Date.now()}-res`,
+            text: botText,
+            isBot: true,
           },
-          body: JSON.stringify(messageBody),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setnewDiet(extractDietData(data.response));
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              id: `${Date.now().toString()}-res`,
-              text: data.response?.replace(/&&&[\s\S]*?&&&/g, "")?.trim(),
-              isBot: true,
-            },
-          ]);
-        } else {
-          console.error("Error al enviar el mensaje:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error en la solicitud:", error);
+        ]);
+      } else {
+        console.error("Error sending message:", response.statusText);
       }
-
-      setIsChatLoading(false);
+    } catch (error) {
+      console.error("Error in sendMessage request:", error);
     }
+
+    setIsChatLoading(false);
   };
 
-  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
-  const setHeaderColor = useStore((state) => state.setHeaderColor);
-  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
+  /**
+   * Removes the selected image from state (not currently used to send images).
+   */
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
+  };
 
-  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
-
+  /**
+   * Fetch diet data once on mount and fetch user data. Also set up header.
+   */
   useEffect(() => {
     setHeaderVisible(true);
     setNavigationVisible(true);
     setHeaderTitle("Diet");
     setHeaderColor(Colors.Color2);
-    fetchUserData(setUserData, setdietLoading);
+
+    fetchDiet(setDietData, setIsDietLoading);
+    fetchUserData(setUserData, setIsDietLoading);
+
     return () => {
-      setHeaderTitle("Login");
+      setHeaderVisible(false);
       setHeaderColor(Colors.Color1);
     };
-  }, []);
+  }, [
+    setHeaderVisible,
+    setNavigationVisible,
+    setHeaderTitle,
+    setHeaderColor,
+    setDietData,
+    setUserData,
+  ]);
+
+  /**
+   * Organize meals once diet data is available.
+   */
+  useEffect(() => {
+    if (dietData?.foods) {
+      const organized = organizeMealsByDay(dietData.foods);
+      setOrganizedMeals(organized);
+    }
+  }, [dietData]);
+
   return (
     <>
       <ScrollView
         contentContainerStyle={{
-          justifyContent: "flex-start",
           ...styles.container,
           paddingTop: 60,
-          paddingBottom: insets.bottom,
-          overflow: "scroll",
+          paddingBottom: insets.bottom || 60,
+          justifyContent: "flex-start",
         }}
       >
-        <View style={{ alignItems: "center", marginBottom: 20 }}>
+        {/* Add meal / Create menu buttons */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 20,
+            justifyContent: "space-between",
+            gap: 10,
+            // paddingHorizontal: 20,
+          }}
+        >
+          <CopilotStep
+            text={t("tutorial.diet.createMenu")}
+            order={2}
+            name="createMenu"
+          >
+            <CustomComponents>
+              <Button
+                text="Crear menú para hoy"
+                width={250}
+                type="secondary"
+                onClick={() => {
+                  setMessages([]);
+                  sendMessage(
+                    "Crea un menú saludable para hoy respetando los formatos e indicaciones actuales, y teniendo obligatoriamente el mismo formato de comidas que el ejemplo anterior",
+                    addDiet
+                  );
+                }}
+              />
+            </CustomComponents>
+          </CopilotStep>
+
           <CopilotStep
             text={t("tutorial.diet.addMeal")}
             order={1}
@@ -333,12 +353,16 @@ Editar
           >
             <CustomComponents>
               <Button
-                text="Open Chat"
-                width={250}
-                type={"secondary"}
+                text="💬"
+                width={50}
+                type="secondary"
+                style={{
+                  backgroundColor: Colors.Color2,
+                  borderColor: Colors.Color2,
+                }}
                 onClick={() => {
                   setMessages([]);
-                  setChatOpen(true);
+                  setChatVisible(true);
                   deleteContextChat();
                 }}
               />
@@ -346,20 +370,13 @@ Editar
           </CopilotStep>
         </View>
 
-        {!dietData?.foods && !dietLoading && (
+        {/* If no dietData and not loading, show a placeholder */}
+        {!dietData?.foods && !isDietLoading && (
           <View style={{ height: "100%", justifyContent: "center" }}>
-            <CopilotStep
-              text={t("tutorial.diet.mealPlan")}
-              order={2}
-              name="mealPlan"
-            >
-              <CustomComponents>
-                <View style={styles.headerContainer}>
-                  <Image source={MealPlans} />
-                  <Text style={styles.header}>Meal Plans</Text>
-                </View>
-              </CustomComponents>
-            </CopilotStep>
+            <View style={styles.headerContainer}>
+              <Image source={MealPlans} />
+              <Text style={styles.header}>Meal Plans</Text>
+            </View>
 
             <View
               style={{
@@ -373,7 +390,7 @@ Editar
                   textAlign: "center",
                   color: Colors.Font2,
                   fontSize: 20,
-                  fontWeight: "medium",
+                  fontWeight: "500",
                 }}
               >
                 Access your personalized meal plans and get healthy
@@ -381,14 +398,15 @@ Editar
                 or explore options that fit your lifestyle.
               </Text>
             </View>
+
             <View style={{ alignItems: "center", marginBottom: 20 }}>
               <Button
                 text="Open Chat"
                 width={250}
-                type={"secondary"}
+                type="secondary"
                 onClick={() => {
                   setMessages([]);
-                  setChatOpen(true);
+                  setChatVisible(true);
                   deleteContextChat();
                 }}
               />
@@ -396,7 +414,8 @@ Editar
           </View>
         )}
 
-        {dietLoading && (
+        {/* Loading spinner */}
+        {isDietLoading && (
           <View
             style={{
               flex: 1,
@@ -409,118 +428,125 @@ Editar
           </View>
         )}
 
-        {dietData?.foods && !dietLoading && (
+        {/* Render meals by day if we have data */}
+        {dietData?.foods && !isDietLoading && (
           <CopilotStep text={t("tutorial.diet.meals")} order={3} name="meals">
             <CustomComponents>
-              <View
-                style={{
-                  height: "fit-content",
-                }}
-              >
+              <View style={{ height: "fit-content" }}>
                 {Object.entries(organizedMeals).map(([day, meals]) => {
-                  if (
+                  const hasMeals =
                     meals.desayuno ||
                     meals.almuerzo ||
                     meals.cena ||
-                    Object.keys(meals.otras_comidas).length > 0
-                  ) {
-                    return (
-                      <View key={day}>
-                        <Text style={{ ...styles.dayTitle, paddingLeft: 0 }}>
-                          {day}
-                        </Text>
-                        {meals.desayuno && (
-                          <View>
+                    Object.keys(meals.otras_comidas).length > 0;
+
+                  if (!hasMeals) return null;
+
+                  return (
+                    <View key={day}>
+                      <Text style={{ ...styles.dayTitle, paddingLeft: 0 }}>
+                        {day}
+                      </Text>
+
+                      {/* Desayuno */}
+                      {meals.desayuno && (
+                        <View>
+                          <Text style={styles.mealTypeTitle}>desayuno</Text>
+                          <Food
+                            dietId={dietData?.diet_id}
+                            meal={meals.desayuno.original_key}
+                            stimatedTime={meals.desayuno.estimated_time}
+                            title={meals.desayuno.title}
+                            ingredients={meals.desayuno.ingredients}
+                            description={meals.desayuno.description}
+                            calories={meals.desayuno.total_calories}
+                            instructions={meals.desayuno.instructions}
+                            s3Img={meals.desayuno.s3_url}
+                          />
+                        </View>
+                      )}
+
+                      {/* Almuerzo */}
+                      {meals.almuerzo && (
+                        <View>
+                          <Text style={styles.mealTypeTitle}>almuerzo</Text>
+                          <Food
+                            dietId={dietData?.diet_id}
+                            meal={meals.almuerzo.original_key}
+                            stimatedTime={meals.almuerzo.estimated_time}
+                            title={meals.almuerzo.title}
+                            ingredients={meals.almuerzo.ingredients}
+                            description={meals.almuerzo.description}
+                            calories={meals.almuerzo.total_calories}
+                            instructions={meals.almuerzo.instructions}
+                            s3Img={meals.almuerzo.s3_url}
+                          />
+                        </View>
+                      )}
+
+                      {/* Cena */}
+                      {meals.cena && (
+                        <View>
+                          <Text style={styles.mealTypeTitle}>cena</Text>
+                          <Food
+                            dietId={dietData?.diet_id}
+                            meal={meals.cena.original_key}
+                            stimatedTime={meals.cena.estimated_time}
+                            title={meals.cena.title}
+                            ingredients={meals.cena.ingredients}
+                            description={meals.cena.description}
+                            calories={meals.cena.total_calories}
+                            instructions={meals.cena.instructions}
+                            s3Img={meals.cena.s3_url}
+                          />
+                        </View>
+                      )}
+
+                      {/* Otras comidas */}
+                      {Object.entries(meals.otras_comidas).map(
+                        ([nombreComida, comida]) => (
+                          <View key={nombreComida}>
                             <Text style={styles.mealTypeTitle}>
-                              {"desayuno"}
+                              {nombreComida.charAt(0).toUpperCase() +
+                                nombreComida.slice(1)}
                             </Text>
                             <Food
                               dietId={dietData?.diet_id}
-                              meal={meals.desayuno.original_key}
-                              stimatedTime={meals.desayuno?.estimated_time}
-                              title={meals.desayuno?.title}
-                              ingredients={meals.desayuno?.ingredients}
-                              description={meals.desayuno?.description}
-                              calories={meals.desayuno?.total_calories}
-                              instructions={meals.desayuno?.instructions}
-                              s3Img={meals.desayuno?.s3_url}
+                              meal={comida.original_key}
+                              stimatedTime={comida.estimated_time}
+                              title={comida.title}
+                              ingredients={comida.ingredients}
+                              description={comida.description}
+                              calories={comida.total_calories}
+                              instructions={comida.instructions}
+                              s3Img={comida.s3_url}
                             />
                           </View>
-                        )}
-                        {meals.almuerzo && (
-                          <View>
-                            <Text style={styles.mealTypeTitle}>
-                              {"almuerzo"}
-                            </Text>
-                            <Food
-                              dietId={dietData?.diet_id}
-                              meal={meals.almuerzo.original_key}
-                              stimatedTime={meals.almuerzo?.estimated_time}
-                              title={meals.almuerzo?.title}
-                              ingredients={meals.almuerzo?.ingredients}
-                              description={meals.almuerzo?.description}
-                              calories={meals.almuerzo?.total_calories}
-                              instructions={meals.almuerzo?.instructions}
-                              s3Img={meals.almuerzo?.s3_url}
-                            />
-                          </View>
-                        )}
-                        {meals.cena && (
-                          <View>
-                            <Text style={styles.mealTypeTitle}>{"cena"}</Text>
-                            <Food
-                              dietId={dietData?.diet_id}
-                              meal={meals.cena.original_key}
-                              stimatedTime={meals.cena?.estimated_time}
-                              title={meals.cena?.title}
-                              ingredients={meals.cena?.ingredients}
-                              description={meals.cena?.description}
-                              calories={meals.cena?.total_calories}
-                              instructions={meals.cena?.instructions}
-                              s3Img={meals.cena?.s3_url}
-                            />
-                          </View>
-                        )}
-                        {Object.entries(meals.otras_comidas).map(
-                          ([nombreComida, comida]) => (
-                            <View key={nombreComida}>
-                              <Text style={styles.mealTypeTitle}>
-                                {nombreComida.charAt(0).toUpperCase() +
-                                  nombreComida.slice(1)}
-                              </Text>
-                              <Food
-                                dietId={dietData?.diet_id}
-                                meal={comida.original_key}
-                                stimatedTime={comida?.estimated_time}
-                                title={comida?.title}
-                                ingredients={comida?.ingredients}
-                                description={comida?.description}
-                                calories={comida?.total_calories}
-                                instructions={comida?.instructions}
-                                s3Img={comida?.s3_url}
-                              />
-                            </View>
-                          )
-                        )}
-                      </View>
-                    );
-                  }
-                  return null;
+                        )
+                      )}
+                    </View>
+                  );
                 })}
               </View>
             </CustomComponents>
           </CopilotStep>
         )}
 
+        {/* Chat Modal */}
         <Chat
-          chatModalVisible={chatOpen}
-          setChatModalVisible={setChatOpen}
+          chatModalVisible={chatVisible}
+          setChatModalVisible={setChatVisible}
           isLoading={isChatLoading}
           messages={messages}
           nutritionData={newDiet}
           setModalVisible={() => {
             addDiet();
           }}
+          suggestedMessages={[
+            "¿Cuántas calorías tiene una manzana?",
+            "¿Qué comida me recomiendas?",
+            "¿Cómo va mi progreso?",
+          ]}
           disabledImgPicker
           selectedImage={selectedImage}
           removeSelectedImage={removeSelectedImage}
@@ -528,8 +554,10 @@ Editar
           sendMessage={sendMessage}
           newMessage={newMessage}
           setNewMessage={setNewMessage}
+          initialMessage="¡Hola! Soy tu nutricionista IA personal y estoy aquí para ayudarte a crear una dieta personalizada que se ajuste perfectamente a tus objetivos y necesidades. ¿En qué puedo ayudarte hoy? 😊"
         />
       </ScrollView>
+
       <TutorialButton />
     </>
   );

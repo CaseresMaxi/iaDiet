@@ -27,6 +27,7 @@ import {
   walkthroughable,
 } from "react-native-copilot";
 import Colors from "../styles/Colors";
+import Button from "../Components/Button/Button";
 
 const CopilotText = walkthroughable(Text);
 const CopilotView = walkthroughable(View);
@@ -54,7 +55,9 @@ const Tracker = () => {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  const [chatModalVisible, setChatModalVisible] = useState(false);
+  // const [chatModalVisible, setChatModalVisible] = useState(false);
+  const chatVisible = useStore((state) => state.chatVisible);
+  const setChatVisible = useStore((state) => state.setChatVisible);
   const [isLoading, setisLoading] = useState(false);
   const [nutritionData, setNutritionData] = useState(null);
   const [groupedData, setGroupedData] = useState({});
@@ -69,6 +72,8 @@ const Tracker = () => {
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setHeaderVisible = useStore((state) => state.setHeaderVisible);
+  const triggerCamera = useStore((state) => state.triggerCamera);
+  const setTriggerCamera = useStore((state) => state.setTriggerCamera);
 
   useEffect(() => {
     setNavigationVisible(true);
@@ -89,7 +94,17 @@ const Tracker = () => {
       null,
       setloadingIngest
     );
+    return () => {
+      setHeaderVisible(false);
+    };
   }, []);
+
+  useEffect(() => {
+    if (triggerCamera) {
+      handleCameraAndChat();
+      setTriggerCamera(false);
+    }
+  }, [triggerCamera]);
 
   const {
     control,
@@ -149,11 +164,31 @@ const Tracker = () => {
   //   );
   // };
 
-  const openChatModal = (date) => {
-    setCurrentDate(date);
-    setMessages([]);
-    setLastSelectedImg(null);
-    setChatModalVisible(true);
+  const handleCameraAndChat = async () => {
+    try {
+      const imageResult = await pickImageForChat(setSelectedImage);
+      if (imageResult) {
+        setSelectedImage(imageResult);
+        setMessages([]);
+        setLastSelectedImg(null);
+        setisLoading(true);
+        await sendMessage(
+          setNutritionData,
+          "",
+          imageResult,
+          setMessages,
+          setNewMessage,
+          setLastSelectedImg,
+          setSelectedImage,
+          setisLoading
+        );
+        setModalVisible(true);
+      }
+    } catch (error) {
+      console.error("Error en el proceso de cámara y chat:", error);
+    } finally {
+      setisLoading(false);
+    }
   };
 
   const removeSelectedImage = () => {
@@ -204,6 +239,27 @@ const Tracker = () => {
     <>
       <TutorialButton />
 
+      {isLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <ActivityIndicator size="large" color={Colors.Color1} />
+          <Text style={{ color: Colors.Font2, marginTop: 10, fontSize: 16 }}>
+            Analizando imagen...
+          </Text>
+        </View>
+      )}
+
       <ScrollView style={{ ...styles.container }}>
         <>
           <Stack.Screen />
@@ -213,7 +269,15 @@ const Tracker = () => {
             name="addButton"
           >
             <CustomComponents>
-              <View style={{ display: "fixed", right: 0 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center !important",
+                  marginBottom: 20,
+                  justifyContent: "center !important",
+                  gap: 10,
+                }}
+              >
                 <Pressable
                   style={{
                     ...styles.addButton,
@@ -222,9 +286,7 @@ const Tracker = () => {
                     borderRadius: 100,
                     fontWeight: "bold",
                   }}
-                  onPress={() => {
-                    openChatModal(null);
-                  }}
+                  onPress={handleCameraAndChat}
                 >
                   <Text
                     style={{ color: "white", fontSize: 30, fontWeight: "bold" }}
@@ -232,6 +294,22 @@ const Tracker = () => {
                     +
                   </Text>
                 </Pressable>
+                <Button
+                  text="💬"
+                  width={50}
+                  type="secondary"
+                  style={{
+                    // ...styles.addButton,
+                    // width: "50px !important",
+                    backgroundColor: Colors.Color2,
+                    borderColor: Colors.Color2,
+                  }}
+                  onClick={() => {
+                    setMessages([]);
+                    setChatVisible(true);
+                    deleteContextChat();
+                  }}
+                />
               </View>
             </CustomComponents>
           </CopilotStep>
@@ -256,8 +334,8 @@ const Tracker = () => {
             setNutritionData={setNutritionData}
           />
           <Chat
-            chatModalVisible={chatModalVisible}
-            setChatModalVisible={setChatModalVisible}
+            chatModalVisible={chatVisible}
+            setChatModalVisible={setChatVisible}
             isLoading={isLoading}
             messages={messages}
             nutritionData={nutritionData}

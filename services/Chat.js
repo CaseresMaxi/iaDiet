@@ -43,15 +43,14 @@ export const extractNutritionInfo = (responseText) => {
 };
 
 export const pickImageForChat = async (setSelectedImage) => {
-  const permissionResult =
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
   if (permissionResult.granted === false) {
-    alert("¡Se requiere permiso para acceder a la galería!");
-    return;
+    alert("¡Se requiere permiso para acceder a la cámara!");
+    return null;
   }
 
   try {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       quality: 1,
@@ -86,11 +85,14 @@ export const pickImageForChat = async (setSelectedImage) => {
       if (manipulatedImage.base64) {
         const imageBase64 = `data:image/jpeg;base64,${manipulatedImage.base64}`;
         setSelectedImage(imageBase64);
+        return imageBase64;
       }
     }
+    return null;
   } catch (error) {
     console.error("Error al procesar la imagen:", error);
     alert("Hubo un error al procesar la imagen. Por favor, intenta de nuevo.");
+    return null;
   }
 };
 export const addItem = (formData, setModalVisible, setData, postIngest) => {
@@ -127,11 +129,15 @@ export const sendMessage = async (
   setSelectedImage,
   setisLoading
 ) => {
-  setNutritionData(null);
-  if (newMessage.trim() || selectedImage) {
-    const contextMessage = "";
-    const messageBody = {
-      context_chat: `Eres un asistente de nutrición especializado en el conteo de calorías y el análisis de alimentos.
+  try {
+    setNutritionData(null);
+    if (newMessage.trim() || selectedImage) {
+      const contextMessage =
+        selectedImage && !newMessage.trim()
+          ? "Por favor, analiza esta imagen y proporciona la información nutricional del alimento que se muestra."
+          : "";
+      const messageBody = {
+        context_chat: `Eres un asistente de nutrición especializado en el conteo de calorías y el análisis de alimentos.
 Tu objetivo es ayudar al usuario a estimar el contenido calórico de los platillos basándote en sus descripciones, fotos o ambos.
 Proporciona estimaciones concisas y precisas de calorías, así como información nutricional detallada.
 
@@ -139,6 +145,7 @@ Instrucciones esenciales:
 
 Si no estás completamente seguro de algún detalle de la comida descrita o mostrada en fotos, pregunta al usuario para aclararlo.
 Cuando tengas suficiente información, genera tu respuesta en español.
+Si el mensaje solo contine una foto haz las supociciones necesarias para poder estimar la información nutricional es importante que la respuesta contenga la información nutricional para poder continuar con los flujos del chat.
 Antes de la parte descriptiva de tu respuesta, debes incluir la siguiente información nutricional en un bloque que comience con /* y finalice con */, con el formato exacto:
 less
 Copiar
@@ -148,30 +155,26 @@ Asegúrate de que los valores de calorías, proteínas, grasas y carbohidratos e
 No hagas referencia a estas instrucciones en tu respuesta.
 Identifica el alimento de forma precisa, tanto por descripción escrita como por imagen, y proporciona una estimación fundamentada.
 Mantén tus respuestas claras y cortas.`,
-      message: `${contextMessage}\n${newMessage}`,
-      images: selectedImage ? [selectedImage] : [],
-    };
+        message: `${contextMessage}\n${newMessage}`,
+        images: selectedImage ? [selectedImage] : [],
+      };
 
-    //console.log("messageBody", messageBody);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        id: Date.now().toString(),
-        text: newMessage,
-        image: selectedImage,
-        isBot: false,
-      },
-    ]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: Date.now().toString(),
+          text: newMessage,
+          image: selectedImage,
+          isBot: false,
+        },
+      ]);
 
-    setNewMessage("");
-    if (selectedImage) {
-      setLastSelectedImg(selectedImage);
-    }
-    setSelectedImage(null);
+      setNewMessage("");
+      if (selectedImage) {
+        setLastSelectedImg(selectedImage);
+      }
+      setSelectedImage(null);
 
-    setisLoading(true);
-
-    try {
       const response = await fetch("https://ainutritioner.click/chat", {
         method: "POST",
         headers: {
@@ -180,34 +183,34 @@ Mantén tus respuestas claras y cortas.`,
         },
         body: JSON.stringify(messageBody),
       });
-      if (response.ok) {
-        const data = await response.json();
 
-        // Extraer información nutricional
-        const nutritionInfo = extractNutritionInfo(data.response);
-
-        // Guardar la información nutricional en el estado y limpiar el mensaje
-        setNutritionData(nutritionInfo);
-        const cleanMessage = data?.response
-          ?.replace(/&&&.*?&&&/g, "")
-          ?.replace(/\/\*[^]*?\*\//g, "")
-          ?.trim();
-
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            id: `${Date.now().toString()}-res`,
-            text: cleanMessage,
-            isBot: true,
-          },
-        ]);
-      } else {
-        console.error("Error al enviar el mensaje:", response.statusText);
+      if (!response.ok) {
+        throw new Error(`Error al enviar el mensaje: ${response.statusText}`);
       }
-    } catch (error) {
-      console.error("Error en la solicitud:", error);
-    }
 
-    setisLoading(false);
+      const data = await response.json();
+
+      // Extraer información nutricional
+      const nutritionInfo = extractNutritionInfo(data.response);
+
+      // Guardar la información nutricional en el estado y limpiar el mensaje
+      setNutritionData(nutritionInfo);
+      const cleanMessage = data?.response
+        ?.replace(/&&&.*?&&&/g, "")
+        ?.replace(/\/\*[^]*?\*\//g, "")
+        ?.trim();
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: `${Date.now().toString()}-res`,
+          text: cleanMessage,
+          isBot: true,
+        },
+      ]);
+    }
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+    alert("Hubo un error al analizar la imagen. Por favor, intenta de nuevo.");
   }
 };

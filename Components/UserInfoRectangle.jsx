@@ -1,7 +1,20 @@
-import { View, Text } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Image,
+} from "react-native";
 import Colors from "../styles/Colors";
+import { useState } from "react";
+import { modifyUserData } from "../services/UserData";
+import balanza from "../assets/balanza.png";
 
-const UserInfoRectangle = ({ weight, age, height }) => {
+const UserInfoRectangle = ({ weight, age, height, userData, setUserData }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newWeight, setNewWeight] = useState("");
+
   const styles = {
     rectangleInfoContainer: {
       flexDirection: "row",
@@ -33,41 +46,176 @@ const UserInfoRectangle = ({ weight, age, height }) => {
     label: {
       fontWeight: "400",
     },
+    weightContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    weightButton: {
+      marginVertical: 4,
+      padding: 4,
+      borderRadius: 20,
+      backgroundColor: Colors.Color6,
+      opacity: 0.9,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      backgroundColor: Colors.Color6,
+      padding: 20,
+      borderRadius: 12,
+      width: "80%",
+      maxWidth: 300,
+      alignItems: "center",
+    },
+    input: {
+      backgroundColor: Colors.Color4,
+      width: "100%",
+      padding: 10,
+      borderRadius: 8,
+      marginVertical: 10,
+      color: Colors.Font2,
+      textAlign: "center",
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      width: "100%",
+      marginTop: 10,
+    },
+    modalButton: {
+      padding: 10,
+      borderRadius: 8,
+      minWidth: 100,
+      alignItems: "center",
+    },
+  };
+
+  const handleUpdateWeight = () => {
+    if (!newWeight || isNaN(newWeight)) return;
+
+    const updatedWeights = userData.weight ? [...userData.weight] : [];
+    updatedWeights.push(parseFloat(newWeight));
+
+    const updatedUserData = {
+      ...userData,
+      weight: updatedWeights,
+    };
+
+    modifyUserData(
+      updatedUserData,
+      () => {},
+      () => {
+        setUserData(updatedUserData);
+        setModalVisible(false);
+        setNewWeight("");
+      }
+    );
   };
 
   return (
-    <View style={styles.rectangleInfoContainer}>
-      <View style={{ ...styles.rectangeItem, width: "25%" }}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ ...styles.text, ...styles.value }}>
-            {`${weight || 0} kg`}
-          </Text>
-          <Text style={{ ...styles.text, ...styles.label }}>Weight</Text>
+    <>
+      <View style={styles.rectangleInfoContainer}>
+        <View style={{ ...styles.rectangeItem, width: "25%" }}>
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ ...styles.text, ...styles.value }}>
+              {`${height || 0} cm`}
+            </Text>
+            <Text style={{ ...styles.text, ...styles.label }}>Height</Text>
+          </View>
+        </View>
+        <View
+          style={{
+            ...styles.rectangeItem,
+            width: "50%",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={styles.separator}></View>
+          <View style={styles.weightContainer}>
+            <Text style={{ ...styles.text, ...styles.value }}>
+              {`${weight || 0} kg`}
+            </Text>
+
+            <Text style={{ ...styles.text, ...styles.label }}>Weight</Text>
+            <TouchableOpacity
+              style={styles.weightButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Image
+                source={balanza}
+                style={{ width: 24, height: 24 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.separator}></View>
+        </View>
+        <View style={{ ...styles.rectangeItem, width: "25%" }}>
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ ...styles.text, ...styles.value }}>{age || 0}</Text>
+            <Text style={{ ...styles.text, ...styles.label }}>Years Old</Text>
+          </View>
         </View>
       </View>
-      <View
-        style={{
-          ...styles.rectangeItem,
-          width: "50%",
-          justifyContent: "space-between",
-        }}
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.separator}></View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ ...styles.text, ...styles.value }}>{age || 0}</Text>
-          <Text style={{ ...styles.text, ...styles.label }}>Years Old</Text>
-        </View>
-        <View style={styles.separator}></View>
-      </View>
-      <View style={{ ...styles.rectangeItem, width: "25%" }}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ ...styles.text, ...styles.value }}>
-            {`${height || 0} cm`}
-          </Text>
-          <Text style={{ ...styles.text, ...styles.label }}>Height</Text>
-        </View>
-      </View>
-    </View>
+        <TouchableOpacity
+          style={styles.modalContainer}
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalContent}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={{ ...styles.text, fontSize: 18, marginBottom: 10 }}>
+              Actualizar Peso
+            </Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={newWeight}
+              onChangeText={setNewWeight}
+              placeholder="Ingrese nuevo peso"
+              placeholderTextColor={Colors.Font2}
+            />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={{
+                  ...styles.modalButton,
+                  backgroundColor: Colors.Color1,
+                }}
+                onPress={handleUpdateWeight}
+              >
+                <Text style={{ color: Colors.Color4 }}>Guardar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.modalButton,
+                  backgroundColor: Colors.Color4,
+                }}
+                onPress={() => {
+                  setModalVisible(false);
+                  setNewWeight("");
+                }}
+              >
+                <Text style={{ color: Colors.Color1 }}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+    </>
   );
 };
 

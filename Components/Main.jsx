@@ -149,6 +149,14 @@ export default function Main() {
           }}
         >
           <Button text="Login" onClick={handleSubmit(onSubmit)} width="180px" />
+          <Pressable
+            onPress={() => router.push("/forgot-password")}
+            style={{ marginTop: 10 }}
+          >
+            <Text style={{ color: Colors.Font2, fontSize: 14 }}>
+              ¿Olvidaste tu contraseña?
+            </Text>
+          </Pressable>
         </View>
 
         <Pressable onPress={() => router.push("/signup")}>

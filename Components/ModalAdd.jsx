@@ -35,7 +35,12 @@ export const ModalAdd = ({
   useEffect(() => {
     if (lastSelectedImg) {
       updateNutritionData("image", lastSelectedImg);
-    } else if (!isLoadingImg && !generateImg && nutritionData?.nombre) {
+    } else if (
+      !isLoadingImg &&
+      !generateImg &&
+      nutritionData?.nombre &&
+      !nutritionData?.image
+    ) {
       createImage(
         setgenerateImg,
         nutritionData.nombre,
@@ -48,6 +53,7 @@ export const ModalAdd = ({
     isLoadingImg,
     generateImg,
     nutritionData?.nombre,
+    nutritionData?.image,
     updateNutritionData,
   ]);
 
@@ -124,8 +130,14 @@ export const ModalAdd = ({
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+      <Pressable
+        style={styles.modalContainer}
+        onPress={() => setModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalContent}
+          onPress={(e) => e.stopPropagation()}
+        >
           <Text style={styles.title}>{t("modal.add.title")}</Text>
           <Controller
             control={control}
@@ -255,8 +267,8 @@ export const ModalAdd = ({
               <Text style={styles.buttonText}>Cancelar</Text>
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 };

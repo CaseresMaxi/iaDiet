@@ -591,12 +591,18 @@ export default function CompleteSignUp() {
         <View style={styles.stepButtonContainer}>
           <Button
             onClick={() => {
-              delete userValues.email;
               if (val === 7) {
-                modifyUserData(userValues, setisLoading, () =>
-                  router.push("/diet")
+                delete userValues.email;
+                const dataToSend = {
+                  ...userValues,
+                  weight: [userValues.weight], // Convertir el peso a un array
+                };
+                modifyUserData(dataToSend, setisLoading, () =>
+                  router.push("/home")
                 );
-              } else setval((prev) => prev + 1);
+              } else {
+                setval((prev) => prev + 1);
+              }
             }}
             type={val === 7 ? "secondary" : "primary"}
             text={

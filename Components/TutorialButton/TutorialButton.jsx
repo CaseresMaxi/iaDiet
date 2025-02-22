@@ -21,7 +21,7 @@ const TutorialButton = ({
         onPress={() => setModalVisible(true)}
         activeOpacity={0.7}
       >
-        <Text style={{ color: "#fff", fontSize: 32, fontWeight: "bold" }}>
+        <Text style={{ color: "#fff", fontSize: 24, fontWeight: "bold" }}>
           ?
         </Text>
       </TouchableOpacity>
@@ -43,9 +43,10 @@ const styles = StyleSheet.create({
     bottom: 70,
     right: 20,
     zIndex: 1000,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 32,
+    height: 32,
+    opacity: 0.8,
+    borderRadius: 32,
     backgroundColor: "#2196F3",
     justifyContent: "center",
     alignItems: "center",

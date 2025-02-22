@@ -93,8 +93,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
-    width: "100%",
-    height: 40,
+    width: "fit-content",
+    flex: 1,
+    height: 45,
   },
   buttonText: {
     color: "#FFFFFF", // Texto en blanco
@@ -222,7 +223,7 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
   },
   chatInput: {
-    flex: 1,
+    width: "100%",
     borderWidth: 1,
     borderColor: "#4E4C67", // Borde gris oscuro
     borderRadius: 25,
@@ -315,5 +316,21 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro translúcido para el modal
+  },
+  suggestionsContainer: {
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  suggestionBubble: {
+    backgroundColor: Colors.Color5,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    marginVertical: 4,
+  },
+  suggestionText: {
+    color: Colors.Font2,
+    fontSize: 14,
   },
 });
