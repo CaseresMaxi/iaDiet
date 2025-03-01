@@ -87,8 +87,9 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   addButton: {
-    backgroundColor: "#7F56DA", // Botón morado
+    backgroundColor: Colors.Color1, // Botón morado
     padding: 15,
+    color: Colors.Color4,
     borderRadius: "100%",
     alignItems: "center",
     justifyContent: "center",

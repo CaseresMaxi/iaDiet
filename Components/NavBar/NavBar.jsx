@@ -7,7 +7,7 @@ import { useStore } from "../../utils/zustan";
 import Home from "../../assets/icons/Home.svg";
 import Ingest from "../../assets/icons/Ingest.svg";
 import Diets from "../../assets/icons/Diets.svg";
-import HeaderUserW from "../../assets/icons/HeaderUserW.svg";
+import Menu from "../../assets/icons/menu.svg";
 import { Image } from "react-native-web";
 
 const NavBar = ({ butons }) => {
@@ -90,7 +90,7 @@ const NavBar = ({ butons }) => {
           <Image source={Ingest} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.push("/profile")} style={{}}>
-          <Image source={HeaderUserW} />
+          <Image source={Menu} />
         </TouchableOpacity>
       </View>
 
@@ -135,9 +135,10 @@ const NavBar = ({ butons }) => {
             <Button
               text="Crear una dieta"
               onClick={handleCreateDiet}
+              type="secondary"
               width="100%"
             />
-            <Button text="Abrir chat" onClick={handleOpenChat} width="100%" />
+            {/* <Button text="Abrir chat" onClick={handleOpenChat} width="100%" /> */}
             <Button
               text="Agregar ingesta"
               type="secondary"

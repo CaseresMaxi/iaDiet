@@ -281,18 +281,14 @@ const Tracker = () => {
                 <Pressable
                   style={{
                     ...styles.addButton,
-                    color: "white",
+
                     fontSize: 30,
                     borderRadius: 100,
                     fontWeight: "bold",
                   }}
                   onPress={handleCameraAndChat}
                 >
-                  <Text
-                    style={{ color: "white", fontSize: 30, fontWeight: "bold" }}
-                  >
-                    +
-                  </Text>
+                  <Text style={{ fontSize: 30, fontWeight: "bold" }}>+</Text>
                 </Pressable>
                 <Button
                   text="💬"

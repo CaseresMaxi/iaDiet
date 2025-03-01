@@ -1,21 +1,145 @@
-import { StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import UserCard from "../Components/UserCard";
-import { useStore } from "../utils/zustan";
-import { useEffect, useState } from "react";
-import styles from "../styles/ProfileStyles";
-import { Controller, useForm } from "react-hook-form";
-import Colors from "../styles/Colors";
-import Female from "../assets/female_user.png";
-import Male from "../assets/male_user.png";
-import User from "../assets/icons/user.svg";
-import { Image, Text } from "react-native";
-import FormInput from "../Components/Input/Input";
-import Button from "../Components/Button/Button";
-import { fetchUserData, modifyUserData } from "../services/UserData";
-import { ScrollView } from "react-native-web";
 import { router } from "expo-router";
-import UserInfoRectangle from "../Components/UserInfoRectangle";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ScrollView } from "react-native-web";
+import Button from "../Components/Button/Button";
+import FormInput from "../Components/Input/Input";
+import Female from "../assets/female_user.png";
+import ChevronForward from "../assets/icons/ChevronForward.svg";
+import User from "../assets/icons/user.svg";
+import Male from "../assets/male_user.png";
+import { fetchUserData, modifyUserData } from "../services/UserData";
+import Colors from "../styles/Colors";
+import styles from "../styles/ProfileStyles";
+import { useStore } from "../utils/zustan";
+
+// Componente para selector desplegable reutilizable
+const DropdownSelector = ({
+  title,
+  options,
+  value,
+  onChange,
+  displayValue,
+  descriptionField,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(rotateAnim, {
+      toValue: isOpen ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [isOpen]);
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "90deg"],
+  });
+
+  return (
+    <View style={{ width: "100%", alignItems: "center" }}>
+      <TouchableOpacity
+        style={{
+          width: "100%",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingVertical: 15,
+          paddingHorizontal: 10,
+          borderBottomWidth: 1,
+          borderBottomColor: Colors.Color5,
+          marginTop: 10,
+        }}
+        onPress={() => setIsOpen(!isOpen)}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={{
+            color: Colors.Font2,
+            fontSize: 16,
+            fontWeight: "600",
+          }}
+        >
+          {title}
+        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={{
+              color: Colors.Color1,
+              fontSize: 14,
+              marginRight: 10,
+            }}
+          >
+            {displayValue || "Seleccionar"}
+          </Text>
+          <Animated.View style={{ transform: [{ rotate }] }}>
+            <Image source={ChevronForward} resizeMode="cover" />
+          </Animated.View>
+        </View>
+      </TouchableOpacity>
+
+      {isOpen && (
+        <View
+          style={{
+            width: "80%",
+
+            flexDirection: "column",
+            gap: 8,
+            marginVertical: 10,
+            //  backgroundColor: "#f9f9f9",
+            borderRadius: 8,
+            padding: 8,
+            borderWidth: 1,
+            borderColor: Colors.Color5,
+          }}
+        >
+          {options.map((option) => (
+            <TouchableOpacity
+              key={typeof option === "string" ? option : option.value}
+              onPress={() => {
+                onChange(typeof option === "string" ? option : option.value);
+                setIsOpen(false);
+              }}
+              style={{
+                backgroundColor:
+                  value === (typeof option === "string" ? option : option.value)
+                    ? Colors.Color1
+                    : Colors.Font2,
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                borderRadius: 10,
+                width: "100%",
+                marginBottom: 5,
+              }}
+            >
+              <Text
+                style={{
+                  // color: "#fff",
+                  fontWeight: "600",
+                  textAlign: "center",
+                }}
+              >
+                {typeof option === "string" ? option : option.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          {value && descriptionField && (
+            <View style={{ paddingHorizontal: 5, marginTop: 5 }}>
+              <Text style={{ color: Colors.Font2 }}>
+                {descriptionField[value]}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+};
 
 export default function Profile() {
   const insets = useSafeAreaInsets();
@@ -44,28 +168,62 @@ export default function Profile() {
       age: 0,
       weight: 0,
       height: 0,
+      goal: "",
+      daily_activity: "",
     },
   });
 
   const [userData, setuserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState("");
+  const [selectedActivity, setSelectedActivity] = useState("");
+
+  const activityLevels = {
+    Sedentario: "Poca o nula actividad física.",
+    Ligero: "Ejercicio ligero 1-3 días por semana.",
+    Moderado: "Ejercicio moderado 3-5 días por semana.",
+    Activo: "Ejercicio intenso 6-7 días por semana.",
+    "Muy Activo": "Ejercicio intenso diario o entrenamiento físico doble.",
+  };
+
+  // Opciones para el objetivo formateadas para el componente
+  const goalOptions = [
+    { value: "Lose Weight", label: "Perder peso" },
+    { value: "Gain weight", label: "Ganar peso" },
+    { value: "Muscle Mass Gain", label: "Ganar masa muscular" },
+    { value: "shape body", label: "Modelar el cuerpo" },
+    { value: "Others", label: "Otros" },
+  ];
+
+  // Función para obtener la etiqueta del objetivo según su valor
+  const getGoalLabel = (value) => {
+    const option = goalOptions.find((opt) => opt.value === value);
+    return option ? option.label : null;
+  };
 
   useEffect(() => {
     reset({
       username: userData?.username || "",
       email: userData?.email || "",
       age: userData?.age || 0,
-      weight: userData?.weight, //`${userData?.weight} kg` || "",
+      weight: userData?.weight,
       height: userData?.height,
-      // userData?.height !== undefined || userData?.height !== null
-      //   ? `${userData?.height} cm`
-      //   : "",
+      goal: userData?.goal || "",
+      daily_activity: userData?.daily_activity || "",
     });
+    setSelectedGoal(userData?.goal || "");
+    setSelectedActivity(userData?.daily_activity || "");
   }, [userData]);
   // Nueva función onSubmit
   const onSubmit = (data) => {
-    // Aquí puedes enviar los datos al servidor o manejarlos como necesites
-    modifyUserData(data, setLoading, () =>
+    // Incluir el objetivo seleccionado en los datos
+    const updatedData = {
+      ...data,
+      goal: selectedGoal,
+      daily_activity: selectedActivity,
+    };
+    // Enviar los datos actualizados al servidor
+    modifyUserData(updatedData, setLoading, () =>
       fetchUserData(setuserData, setLoading)
     );
   };
@@ -74,7 +232,7 @@ export default function Profile() {
       style={{
         ...styles.container,
         paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        paddingBottom: insets.bottom || 80,
       }}
     >
       <View style={styles.innerFormContainer}>
@@ -148,11 +306,9 @@ export default function Profile() {
             control={control}
             rules={{
               required: true,
-              // pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
-                // style={styles.customInput}
                 placeholder="Cool nickname"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
@@ -160,53 +316,13 @@ export default function Profile() {
                 onChangeText={onChange}
                 label="User Name"
               />
-              // <TextInput
-              //   style={styles.customInput}
-              //   placeholder="Email"
-              //   placeholderTextColor="#888"
-              //   onBlur={onBlur}
-              //   onChangeText={onChange}
-              //   value={value}
-              // />
             )}
             name="username"
           />
           <Controller
             control={control}
-            // rules={{
-            //   required: true,
-            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
-                // style={styles.customInput}
-                placeholder="example@email.com"
-                placeholderTextColor="#888"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                label="Email"
-              />
-              // <TextInput
-              //   style={styles.customInput}
-              //   placeholder="Email"
-              //   placeholderTextColor="#888"
-              //   onBlur={onBlur}
-              //   onChangeText={onChange}
-              //   value={value}
-              // />
-            )}
-            name="email"
-          />
-          <Controller
-            control={control}
-            // rules={{
-            //   required: true,
-            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            // }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <FormInput
-                // style={styles.customInput}
                 placeholder="25"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
@@ -220,13 +336,8 @@ export default function Profile() {
           />
           <Controller
             control={control}
-            // rules={{
-            //   required: true,
-            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
-                // style={styles.customInput}
                 placeholder="70Kg"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
@@ -235,26 +346,13 @@ export default function Profile() {
                 value={value || ""}
                 label="Weight (kg)"
               />
-              // <TextInput
-              //   style={styles.customInput}
-              //   placeholder="Email"
-              //   placeholderTextColor="#888"
-              //   onBlur={onBlur}
-              //   onChangeText={onChange}
-              //   value={value}
-              // />
             )}
             name="weight"
           />
           <Controller
             control={control}
-            // rules={{
-            //   required: true,
-            //   pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-            // }}
             render={({ field: { onChange, onBlur, value } }) => (
               <FormInput
-                // style={styles.customInput}
                 placeholder="180cm"
                 placeholderTextColor="#888"
                 onBlur={onBlur}
@@ -263,16 +361,27 @@ export default function Profile() {
                 label="Height (cm)"
                 type="number"
               />
-              // <TextInput
-              //   style={styles.customInput}
-              //   placeholder="Email"
-              //   placeholderTextColor="#888"
-              //   onBlur={onBlur}
-              //   onChangeText={onChange}
-              //   value={value}
-              // />
             )}
             name="height"
+          />
+
+          {/* Selector de objetivo */}
+          <DropdownSelector
+            title="Objetivo"
+            options={goalOptions}
+            value={selectedGoal}
+            onChange={setSelectedGoal}
+            displayValue={getGoalLabel(selectedGoal)}
+          />
+
+          {/* Selector de nivel de actividad */}
+          <DropdownSelector
+            title="Nivel de Actividad"
+            options={Object.keys(activityLevels)}
+            value={selectedActivity}
+            onChange={setSelectedActivity}
+            displayValue={selectedActivity}
+            descriptionField={activityLevels}
           />
         </View>
         <View
@@ -284,7 +393,6 @@ export default function Profile() {
             alignItems: "center",
           }}
         >
-          {/* <UserCard /> */}
           <Button
             text="Save"
             style={{ marginTop: 20 }}

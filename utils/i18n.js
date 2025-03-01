@@ -13,6 +13,9 @@ const resources = {
         carbs: "carbohidratos",
         calories: "calorías",
       },
+      weight: {
+        history: "Historial de peso",
+      },
       ingests: {
         title: "Tus últimas comidas",
         add: "+",
@@ -147,6 +150,9 @@ const resources = {
         fats: "fats",
         carbs: "carbs",
         calories: "calories",
+      },
+      weight: {
+        history: "Weight History",
       },
       ingests: {
         title: "Your last ingests",

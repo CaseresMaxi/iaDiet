@@ -10,6 +10,8 @@ import Colors from "../styles/Colors";
 import { useState } from "react";
 import { modifyUserData } from "../services/UserData";
 import balanza from "../assets/balanza.png";
+import scale from "../assets/icons/scale.svg";
+import FormInput from "./Input/Input";
 
 const UserInfoRectangle = ({ weight, age, height, userData, setUserData }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -146,7 +148,7 @@ const UserInfoRectangle = ({ weight, age, height, userData, setUserData }) => {
               onPress={() => setModalVisible(true)}
             >
               <Image
-                source={balanza}
+                source={scale}
                 style={{ width: 24, height: 24 }}
                 resizeMode="contain"
               />
@@ -181,9 +183,9 @@ const UserInfoRectangle = ({ weight, age, height, userData, setUserData }) => {
             <Text style={{ ...styles.text, fontSize: 18, marginBottom: 10 }}>
               Actualizar Peso
             </Text>
-            <TextInput
+            <FormInput
               style={styles.input}
-              keyboardType="numeric"
+              type="numeric"
               value={newWeight}
               onChangeText={setNewWeight}
               placeholder="Ingrese nuevo peso"

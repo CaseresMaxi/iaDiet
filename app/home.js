@@ -329,9 +329,9 @@ export default function Home() {
             </CopilotStep>
             <View style={{ flexDirection: "row", gap: 20 }}>
               <Image style={{ width: 14, height: 18 }} source={Notification} />
-              <TouchableOpacity onPress={() => router.push("/profile")}>
+              {/* <TouchableOpacity onPress={() => router.push("/profile")}>
                 <Image style={{ width: 14, height: 18 }} source={HeaderUser} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
           <View
