@@ -99,12 +99,18 @@ const UserInfoRectangle = ({ weight, age, height, userData, setUserData }) => {
   const handleUpdateWeight = () => {
     if (!newWeight || isNaN(newWeight)) return;
 
+    const weightValue = parseFloat(newWeight);
+
     const updatedWeights = userData.weight ? [...userData.weight] : [];
-    updatedWeights.push(parseFloat(newWeight));
+    updatedWeights.push({
+      weight: weightValue,
+      date: new Date().toISOString(),
+    });
 
     const updatedUserData = {
       ...userData,
       weight: updatedWeights,
+      current_weight: weightValue,
     };
 
     modifyUserData(

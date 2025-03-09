@@ -37,6 +37,7 @@ import UserInfoRectangle from "../Components/UserInfoRectangle";
 import MacronutrientsProgress from "../Components/MacronutrientsProgress/MacronutrientsProgress";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import { Color } from "antd/es/color-picker";
 
 const CopilotText = walkthroughable(Text);
 
@@ -281,7 +282,7 @@ export default function Home() {
     backgroundGradientFrom: Colors.Color6,
     backgroundGradientTo: Colors.Color6,
     decimalPlaces: 1,
-    color: (opacity = 1) => Colors.Font2,
+    color: (opacity = 1) => Colors.Color1,
     labelColor: (opacity = 1) => Colors.Font2,
     style: {
       borderRadius: 16,
@@ -343,12 +344,9 @@ export default function Home() {
             }}
           >
             <View style={{ marginBottom: 12 }}>
+              {console.log(userData?.current_weight)}
               <UserInfoRectangle
-                weight={
-                  userData?.weight
-                    ? userData.weight[userData.weight.length - 1]
-                    : 0
-                }
+                weight={userData?.current_weight || 0}
                 age={userData?.age}
                 height={userData?.height}
                 userData={userData}
@@ -403,57 +401,92 @@ export default function Home() {
                   <View style={styles.chartContainer}>
                     <LineChart
                       data={{
-                        labels: userData.weight.map(
-                          (value, index) => `${index + 1}°`
-                        ),
+                        labels: userData.weight
+                          .filter((item) => {
+                            // Mantener tanto objetos con fecha como números (formato antiguo)
+                            return (
+                              (typeof item === "object" && item.date) ||
+                              typeof item === "number"
+                            );
+                          })
+                          .map((item, index) => {
+                            if (typeof item === "object" && item.date) {
+                              // Para nuevas entradas con formato objeto
+                              const date = new Date(item.date);
+                              return `${date.getDate()}/${date.getMonth() + 1}`;
+                            } else {
+                              // Para entradas antiguas (números), usar índice
+                              return `${index + 1}`;
+                            }
+                          }),
                         datasets: [
                           {
-                            data: userData.weight,
+                            data: userData.weight
+                              .filter((item) => {
+                                // Mantener tanto objetos con fecha como números (formato antiguo)
+                                return (
+                                  (typeof item === "object" && item.date) ||
+                                  typeof item === "number"
+                                );
+                              })
+                              .map((item) => {
+                                // Extraer el peso dependiendo del formato
+                                return typeof item === "object"
+                                  ? item.weight
+                                  : item;
+                              }),
 
-                            color: (opacity = 1) =>
-                              `${Colors.Color1}${Math.floor(opacity * 255)
+                            color: (opacity = 1) => {
+                              // Color principal de la aplicación con opacidad
+                              return `${Colors.Color1}${Math.floor(
+                                opacity * 255
+                              )
                                 .toString(16)
-                                .padStart(2, "0")}`,
-                            strokeWidth: 2,
-                            text: (value) => `${value}kg`,
+                                .padStart(2, "0")}`;
+                            },
+                            strokeWidth: 3,
                           },
                         ],
                       }}
-                      width={Dimensions.get("window").width - 72}
-                      height={160}
+                      width={Dimensions.get("window").width - 80}
+                      height={220}
                       chartConfig={{
                         backgroundColor: "transparent",
-                        backgroundGradientFrom: Colors.Color6,
-                        backgroundGradientTo: Colors.Color6,
-                        decimalPlaces: 0,
-                        color: (opacity = 1) =>
-                          `${Colors.Font2}${Math.floor(opacity * 255)
-                            .toString(16)
-                            .padStart(2, "0")}`,
-                        labelColor: (opacity = 1) =>
-                          `${Colors.Font2}${Math.floor(opacity * 255)
-                            .toString(16)
-                            .padStart(2, "0")}`,
-
+                        backgroundGradientFrom: "transparent",
+                        backgroundGradientTo: "transparent",
+                        decimalPlaces: 1,
+                        color: (opacity = 1) => Colors.Font2,
+                        labelColor: (opacity = 1) => Colors.Font2,
+                        style: {
+                          borderRadius: 16,
+                        },
                         propsForLabels: {
-                          fontSize: 10,
+                          fontSize: 12,
+                          fontWeight: "600",
+                          fill: Colors.Font2,
                         },
                         propsForDots: {
-                          r: "3",
-                          strokeWidth: "1",
+                          r: "4",
+                          strokeWidth: "0",
                           stroke: Colors.Color1,
+                          fill: Colors.Color1,
                         },
-                        strokeWidth: 1,
+                        strokeWidth: 2,
+                        useShadowColorFromDataset: false,
+                        yAxisWidth: 45,
                       }}
                       style={{
-                        marginHorizontal: -16,
-                        marginVertical: 4,
+                        marginVertical: 16,
+                        borderRadius: 16,
                       }}
                       bezier
                       withInnerLines={false}
-                      withOuterLines={false}
+                      withOuterLines={true}
+                      withVerticalLines={false}
+                      withHorizontalLines={true}
                       withDots={true}
-                      withShadow={false}
+                      withShadow
+                      yAxisSuffix=" kg"
                     />
                   </View>
                 )}
@@ -527,7 +560,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     marginTop: 16,
-    padding: 16,
+    padding: "16 16 16 0",
     backgroundColor: Colors.Color6,
     borderRadius: 12,
     overflow: "hidden",

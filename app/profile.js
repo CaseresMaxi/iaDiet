@@ -206,7 +206,7 @@ export default function Profile() {
       username: userData?.username || "",
       email: userData?.email || "",
       age: userData?.age || 0,
-      weight: userData?.weight,
+      weight: userData?.current_weight || 0,
       height: userData?.height,
       goal: userData?.goal || "",
       daily_activity: userData?.daily_activity || "",
