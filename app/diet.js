@@ -337,9 +337,12 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
                 type="secondary"
                 onClick={() => {
                   setMessages([]);
+                  setIsDietLoading(true);
                   sendMessage(
-                    "Crea un menú saludable para hoy respetando los formatos e indicaciones actuales, y teniendo obligatoriamente el mismo formato de comidas que el ejemplo anterior",
-                    addDiet
+                    "Crea un menú saludable para hoy respetando los formatos e indicaciones actuales, y teniendo obligatoriamente el mismo formato de comidas que el ejemplo anterior, pero con ligeros cambios en los platos para que no sean exactamente iguales.",
+                    (data) => {
+                      addDiet(data);
+                    }
                   );
                 }}
               />

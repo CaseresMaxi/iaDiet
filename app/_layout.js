@@ -64,6 +64,7 @@ const Layout = () => {
   const headerColor = useStore((state) => state.headerColor);
   const navigationVisible = useStore((state) => state.navigationVisible);
   const headerVisible = useStore((state) => state.headerVisible);
+  const goBackVisible = useStore((state) => state.goBackVisible);
   return (
     <>
       <RenewTokenProvider>
@@ -76,12 +77,19 @@ const Layout = () => {
 
                   <TouchableOpacity
                     style={headerStyles.backButtonContainer}
-                    onPress={() => router.back()}
+                    onPress={() => {
+                      goBackVisible && router.back();
+                    }}
                   >
-                    <Text style={headerStyles.backButton}>
-                      <Image source={ChevronBack} style={{ marginRight: 8 }} />
-                      {leftTitle}
-                    </Text>
+                    {goBackVisible && (
+                      <Text style={headerStyles.backButton}>
+                        <Image
+                          source={ChevronBack}
+                          style={{ marginRight: 8 }}
+                        />
+                        {leftTitle}
+                      </Text>
+                    )}
                   </TouchableOpacity>
 
                   {/* Título centrado */}

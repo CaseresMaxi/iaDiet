@@ -152,7 +152,7 @@ export default function ForgotPassword() {
               <Button
                 text={t("forgotPassword.sendCodeButton")}
                 onClick={handleSubmit(requestCode)}
-                width="90%"
+                width="100%"
                 type="secondary"
               />
             </View>
@@ -240,7 +240,7 @@ export default function ForgotPassword() {
               <Button
                 text={t("forgotPassword.resetPasswordButton")}
                 onClick={handleSubmit(resetPassword)}
-                width="90%"
+                width="100%"
                 type="secondary"
               />
             </View>
@@ -285,6 +285,8 @@ const localStyles = StyleSheet.create({
   buttonContainer: {
     marginTop: 20,
     width: "100%",
+    paddingHorizontal: 24,
+
     alignItems: "center",
   },
   backToLogin: {

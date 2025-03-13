@@ -366,14 +366,14 @@ export default function Home() {
               <CopilotStep text={t("tutorial.macros")} order={2} name="macros">
                 <CustomComponents>
                   <MacronutrientsProgress
-                    totalProteins={totalProteins}
-                    totalFats={totalFats}
-                    totalCarbs={totalCarbs}
-                    totalCalories={totalCalories}
-                    targetProteins={dietData.proteins}
-                    targetFats={dietData.fats}
-                    targetCarbs={dietData.carbs}
-                    targetCalories={dietData.calories}
+                    totalProteins={totalProteins || 0}
+                    totalFats={totalFats || 0}
+                    totalCarbs={totalCarbs || 0}
+                    totalCalories={totalCalories || 0}
+                    targetProteins={dietData.proteins || 0}
+                    targetFats={dietData.fats || 0}
+                    targetCarbs={dietData.carbs || 0}
+                    targetCalories={dietData.calories || 0}
                   />
                 </CustomComponents>
               </CopilotStep>
@@ -460,9 +460,10 @@ export default function Home() {
                           borderRadius: 16,
                         },
                         propsForLabels: {
-                          fontSize: 12,
-                          fontWeight: "600",
+                          fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`,
+                          fontWeight: "400",
                           fill: Colors.Font2,
+                          // fontFamily: "inherit",
                         },
                         propsForDots: {
                           r: "4",

@@ -10,6 +10,7 @@ import FormInput from "./Input/Input";
 import Button from "./Button/Button";
 import Colors from "../styles/Colors";
 import GlobalStyles from "../styles/Global";
+import { useStore } from "../utils/zustan";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -32,6 +33,15 @@ export default function Main() {
   //     placement,
   //   });
   // };
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
+  const setNavigationVisible = useStore((state) => state.setNavigationVisible);
+  useEffect(() => {
+    setGoBackVisible(false);
+    setNavigationVisible(false);
+    return () => {
+      setGoBackVisible(true);
+    };
+  }, []);
 
   const onSubmit = (data) => {
     login(
