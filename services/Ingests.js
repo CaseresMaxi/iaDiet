@@ -20,7 +20,6 @@ export const getIngests = (
     })
     .catch((error) => console.error(error))
     .finally(() => {
-      console.log("finally");
       setloadingIngest(false);
     });
 };

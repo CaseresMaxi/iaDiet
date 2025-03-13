@@ -344,7 +344,6 @@ export default function Home() {
             }}
           >
             <View style={{ marginBottom: 12 }}>
-              {console.log(userData?.current_weight)}
               <UserInfoRectangle
                 weight={userData?.current_weight || 0}
                 age={userData?.age}

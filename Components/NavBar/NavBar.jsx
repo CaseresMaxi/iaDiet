@@ -78,7 +78,7 @@ const NavBar = ({ butons }) => {
               fontWeight: "bold",
               // textAlign: "justify",
               lineHeight: 32,
-              top: -2,
+              top: -5,
               justifyContent: "center",
               alignItems: "center",
             }}
