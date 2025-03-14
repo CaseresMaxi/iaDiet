@@ -11,6 +11,7 @@ import Button from "./Button/Button";
 import Colors from "../styles/Colors";
 import GlobalStyles from "../styles/Global";
 import { useStore } from "../utils/zustan";
+import { AdSenseDisplay } from "./Ads/AdSense";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -188,6 +189,13 @@ export default function Main() {
         </Pressable>
       </View>
       {/* </View> */}
+
+      <AdSenseDisplay
+        client="ca-pub-9027784644042368"
+        slot="tu-id-de-anuncio"
+        format="auto"
+        responsive={true}
+      />
     </View>
   );
 }
