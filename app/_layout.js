@@ -65,6 +65,7 @@ const Layout = () => {
   const navigationVisible = useStore((state) => state.navigationVisible);
   const headerVisible = useStore((state) => state.headerVisible);
   const goBackVisible = useStore((state) => state.goBackVisible);
+  console.log(goBackVisible);
   return (
     <>
       <RenewTokenProvider>

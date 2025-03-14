@@ -36,13 +36,12 @@ export default function Main() {
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
 
   useEffect(() => {
     setHeaderTitle("Sign Up");
     setNavigationVisible(false);
-    return () => {
-      setNavigationVisible(true);
-    };
+    setGoBackVisible(true);
   }, []);
 
   // Watch para observar los valores de los campos

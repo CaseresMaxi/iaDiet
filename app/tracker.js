@@ -74,6 +74,7 @@ const Tracker = () => {
   const setHeaderVisible = useStore((state) => state.setHeaderVisible);
   const triggerCamera = useStore((state) => state.triggerCamera);
   const setTriggerCamera = useStore((state) => state.setTriggerCamera);
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
 
   useEffect(() => {
     setNavigationVisible(true);
@@ -94,6 +95,7 @@ const Tracker = () => {
       null,
       setloadingIngest
     );
+    setGoBackVisible(true);
     return () => {
       setHeaderVisible(false);
     };

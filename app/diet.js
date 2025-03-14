@@ -123,7 +123,7 @@ const Diet = () => {
   const setHeaderColor = useStore((state) => state.setHeaderColor);
   const setHeaderVisible = useStore((state) => state.setHeaderVisible);
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
-
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
   const currentDay = moment().format("dddd");
 
   /**
@@ -280,6 +280,7 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
 
     fetchDiet(setDietData, setIsDietLoading);
     fetchUserData(setUserData, setIsDietLoading);
+    setGoBackVisible(true);
 
     return () => {
       setHeaderVisible(false);

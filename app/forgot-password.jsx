@@ -20,12 +20,14 @@ export default function ForgotPassword() {
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
-  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
-
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
   useEffect(() => {
     setHeaderTitle("");
     setNavigationVisible(false);
-    return () => {};
+    setGoBackVisible(true);
+
+    return () => {
+    };
   }, []);
 
   const {

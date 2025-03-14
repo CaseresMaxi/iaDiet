@@ -1,11 +1,11 @@
 import { notification } from "antd";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { login } from "../services/Users";
 import { styles } from "../styles/MainStyles";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import FormInput from "./Input/Input";
 import Button from "./Button/Button";
 import Colors from "../styles/Colors";
@@ -34,14 +34,23 @@ export default function Main() {
   //   });
   // };
   const setGoBackVisible = useStore((state) => state.setGoBackVisible);
+  const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
-  useEffect(() => {
-    setGoBackVisible(false);
-    setNavigationVisible(false);
-    return () => {
-      setGoBackVisible(true);
-    };
-  }, []);
+  const setHeaderVisible = useStore((state) => state.setHeaderVisible);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("useFocusEffect triggered");
+      setGoBackVisible(false);
+      setHeaderTitle("Login");
+      setHeaderVisible(true);
+      setNavigationVisible(false);
+
+      return () => {
+        // setNavigationVisible(true);
+      };
+    }, [])
+  );
 
   const onSubmit = (data) => {
     login(

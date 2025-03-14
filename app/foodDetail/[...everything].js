@@ -20,6 +20,7 @@ export default function Detail() {
   const insets = useSafeAreaInsets();
   const { everything } = useLocalSearchParams(); // Captura id y dietId
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
   // const setLeftTitle = useStore((state) => state.setLeftTitle);
   const [s3ImgB64, sets3ImgB64] = useState("");
   const [dietData, setDietData] = useState();
@@ -52,6 +53,7 @@ export default function Detail() {
     );
     fetchDiet(setDietData, setloading);
     // setLeftTitle(everything[0]);
+    setGoBackVisible(true);
     return () => {
       setHeaderTitle("Diet");
       // setLeftTitle(null);

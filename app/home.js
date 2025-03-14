@@ -77,6 +77,7 @@ export default function Home() {
   // const [chatModalVisible, setChatModalVisible] = useState(false); // Estado para el modal de chat
   const chatVisible = useStore((state) => state.chatVisible);
   const setChatVisible = useStore((state) => state.setChatVisible);
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
   const [nutritionData, setNutritionData] = useState(null); // Nuevo estado para guardar datos nutricionales
 
   const [loadingIngest, setloadingIngest] = useState(true);
@@ -126,8 +127,11 @@ export default function Home() {
 
     setNavigationVisible(true);
     getIngests(setIngestData, null, setloadingIngest);
+    setGoBackVisible(true);
+
     return () => {
       setHeaderVisible(true);
+      setGoBackVisible(true);
     };
   }, []);
 

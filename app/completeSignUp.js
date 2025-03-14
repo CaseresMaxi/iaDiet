@@ -36,6 +36,7 @@ export default function CompleteSignUp() {
   const setHeaderVisible = useStore((state) => state.setHeaderVisible);
   // const setHEaderTitle = useStore((state) => state.setHEaderTitle);
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
+  const setGoBackVisible = useStore((state) => state.setGoBackVisible);
 
   const setNavigationVisible = useStore((state) => state.setNavigationVisible);
   const [confirmStepUserData, setconfirmStepUserData] = useState({});
@@ -45,6 +46,7 @@ export default function CompleteSignUp() {
     setHeaderVisible(false);
     setHeaderTitle("");
     setNavigationVisible(false);
+    setGoBackVisible(true);
 
     return () => {
       setHeaderVisible(true);
