@@ -1,11 +1,11 @@
 export const fetchDiet = (setDietData, setdietLoading = () => {}) =>
   fetch(
-    `https://ainutritioner.click/diets/last/${window.sessionStorage?.getItem(
+    `https://ainutritioner.click/diets/last/${window.localStorage?.getItem(
       "user_id"
     )}`,
     {
       headers: {
-        Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+        Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
       },
     }
   )

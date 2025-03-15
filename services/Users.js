@@ -19,8 +19,8 @@ export const login = async (
     const result = await response.json();
 
     if (result?.user?.user_id && result?.token) {
-      window.sessionStorage.setItem("user_id", result.user.user_id);
-      window.sessionStorage.setItem("token", result.token);
+      window.localStorage.setItem("user_id", result.user.user_id);
+      window.localStorage.setItem("token", result.token);
     }
 
     callback();
@@ -46,7 +46,7 @@ export const createUser = async (data, callback = () => {}) => {
     //console.log(response);
 
     if (result?.user_id) {
-      window.sessionStorage?.setItem("user_id", data.user_id);
+      window.localStorage?.setItem("user_id", data.user_id);
     }
     login({ email: data.email, password: data.password });
     callback();

@@ -2,7 +2,7 @@ export const deleteContextChat = (setingestData) => {
   fetch(`https://ainutritioner.click/chat/clear`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
     },
   })
     .then((response) => {
@@ -19,15 +19,14 @@ export const renewToken = () => {
   fetch(`https://ainutritioner.click/users/renew-token`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
     },
   })
     .then((response) => {
       return response.json();
     })
     .then((data) => {
-     
-      window.sessionStorage.setItem("token", data.token);
+      window.localStorage.setItem("token", data.token);
     })
 
     .catch((error) => console.error(error));

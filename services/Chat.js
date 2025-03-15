@@ -10,7 +10,7 @@ export const createImage = (
   setisLoading(true);
   fetch(`https://ainutritioner.click/chat/create-image`, {
     headers: {
-      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
       "Content-Type": "application/json",
     },
     method: "POST",
@@ -179,7 +179,7 @@ Mantén tus respuestas claras y cortas.`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
         body: JSON.stringify(messageBody),
       });

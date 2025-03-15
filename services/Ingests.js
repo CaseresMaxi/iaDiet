@@ -4,10 +4,10 @@ export const getIngests = (
   setloadingIngest = () => {}
 ) => {
   fetch(
-    `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}${period?.start ? `/by_date?start_date=${period.start}&end_date=${period.end}` : ""}`, // implementar el filtro por fecha
+    `https://ainutritioner.click/ingests/user/${window.localStorage?.getItem("user_id")}${period?.start ? `/by_date?start_date=${period.start}&end_date=${period.end}` : ""}`, // implementar el filtro por fecha
     {
       headers: {
-        Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+        Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
       },
     }
   )
@@ -33,10 +33,10 @@ export const postIngest = (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
     },
     body: JSON.stringify({
-      user_id: window.sessionStorage?.getItem("user_id"),
+      user_id: window.localStorage?.getItem("user_id"),
       ingest: formData.nombre,
       calories: formData.calorias,
       description: formData.nombre,
@@ -49,10 +49,10 @@ export const postIngest = (
     .then((response) => response.json())
     .then(() => {
       fetch(
-        `https://ainutritioner.click/ingests/user/${window.sessionStorage?.getItem("user_id")}`,
+        `https://ainutritioner.click/ingests/user/${window.localStorage?.getItem("user_id")}`,
         {
           headers: {
-            Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+            Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
           },
         }
       )
@@ -69,7 +69,7 @@ export const getIngest = (ingestId, sets3Img) => {
   fetch(`https://ainutritioner.click/ingests/${ingestId}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
     },
   })
     .then((response) => response.json())

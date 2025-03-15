@@ -65,10 +65,10 @@ export default function Main() {
   };
 
   useEffect(() => {
-    if (window.sessionStorage?.getItem("token")) {
+    if (window.localStorage?.getItem("token")) {
       // router.push("/tracker");
-      window.sessionStorage.removeItem("token");
-      window.sessionStorage.removeItem("user_id");
+      window.localStorage.removeItem("token");
+      window.localStorage.removeItem("user_id");
     }
   }, [router.isReady]);
 

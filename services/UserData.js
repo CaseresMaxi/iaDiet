@@ -3,10 +3,10 @@ export const fetchUserData = async (setuserData, setLoading) => {
   //console.log(window.sessionStorage?.user_id, "asdasdasd");
   try {
     const response = await fetch(
-      `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
+      `https://ainutritioner.click/users/${window.localStorage?.user_id}`,
       {
         headers: {
-          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
       }
     );
@@ -33,12 +33,12 @@ export const modifyUserData = async (
 ) => {
   try {
     const response = await fetch(
-      `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
+      `https://ainutritioner.click/users/${window.localStorage?.user_id}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
         body: JSON.stringify(payload),
       }
