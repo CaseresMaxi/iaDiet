@@ -11,7 +11,7 @@ import Button from "./Button/Button";
 import Colors from "../styles/Colors";
 import GlobalStyles from "../styles/Global";
 import { useStore } from "../utils/zustan";
-import { AdSenseDisplay } from "./Ads/AdSense";
+import AdsterraAd from "./Ads/AdsterraAd";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -78,6 +78,7 @@ export default function Main() {
         ...styles.container,
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
+
         alaignItems: "center",
         justifyContent: "center",
         // paddingHorizontal: 35,
@@ -88,113 +89,120 @@ export default function Main() {
 
       {/* <View style={styles.formContainer}> */}
       {/* <Text style={styles.title}>Login</Text> */}
-
-      <Controller
-        control={control}
-        rules={{
-          required: true,
-          pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormInput
-            // style={styles.customInput}
-            placeholder="Email"
-            placeholderTextColor="#888"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            paddingHorizontal={24}
-            value={value}
-            label="Username or email"
-          />
-          // <TextInput
-          //   style={styles.customInput}
-          //   placeholder="Email"
-          //   placeholderTextColor="#888"
-          //   onBlur={onBlur}
-          //   onChangeText={onChange}
-          //   value={value}
-          // />
+      <View style={{ flex: 1, justifyContent: "center", gap: 24 }}>
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+            pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              // style={styles.customInput}
+              placeholder="Email"
+              placeholderTextColor="#888"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              paddingHorizontal={24}
+              value={value}
+              label="Username or email"
+            />
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="Email"
+            //   placeholderTextColor="#888"
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            // />
+          )}
+          name="email"
+        />
+        {errors.email && (
+          <View style={GlobalStyles.errorWrapper}>
+            <Text style={styles.errorText}>Valid email is required.</Text>
+          </View>
         )}
-        name="email"
-      />
-      {errors.email && (
-        <View style={GlobalStyles.errorWrapper}>
-          <Text style={styles.errorText}>Valid email is required.</Text>
-        </View>
-      )}
 
-      <Controller
-        control={control}
-        rules={{ required: true }}
-        render={({ field: { onChange, onBlur, value } }) => (
-          <FormInput
-            // style={styles.customInput}
-            placeholder="Password"
-            placeholderTextColor="#888"
-            secureTextEntry
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            label={"Password"}
-            password
-          />
-          // <TextInput
-          //   style={styles.customInput}
-          //   placeholder="Password"
-          //   placeholderTextColor="#888"
-          //   secureTextEntry
-          //   onBlur={onBlur}
-          //   onChangeText={onChange}
-          //   value={value}
-          // />
+        <Controller
+          control={control}
+          rules={{ required: true }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormInput
+              // style={styles.customInput}
+              placeholder="Password"
+              placeholderTextColor="#888"
+              secureTextEntry
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              label={"Password"}
+              password
+            />
+            // <TextInput
+            //   style={styles.customInput}
+            //   placeholder="Password"
+            //   placeholderTextColor="#888"
+            //   secureTextEntry
+            //   onBlur={onBlur}
+            //   onChangeText={onChange}
+            //   value={value}
+            // />
+          )}
+          name="password"
+        />
+        {errors.password && (
+          <View style={GlobalStyles.errorWrapper}>
+            <Text style={styles.errorText}>Password is required.</Text>
+          </View>
         )}
-        name="password"
-      />
-      {errors.password && (
-        <View style={GlobalStyles.errorWrapper}>
-          <Text style={styles.errorText}>Password is required.</Text>
-        </View>
-      )}
 
-      {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
+        {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable> */}
-      <View>
-        <View
-          style={{
-            width: "100%",
-            height: "fit-content",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button text="Login" onClick={handleSubmit(onSubmit)} width="180px" />
-          <Pressable
-            onPress={() => router.push("/forgot-password")}
-            style={{ marginTop: 10 }}
+        <View>
+          <View
+            style={{
+              width: "100%",
+              height: "fit-content",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            <Text style={{ color: Colors.Font2, fontSize: 14 }}>
-              ¿Olvidaste tu contraseña?
+            <Button
+              text="Login"
+              onClick={handleSubmit(onSubmit)}
+              width="180px"
+            />
+            <Pressable
+              onPress={() => router.push("/forgot-password")}
+              style={{ marginTop: 10 }}
+            >
+              <Text style={{ color: Colors.Font2, fontSize: 14 }}>
+                ¿Olvidaste tu contraseña?
+              </Text>
+            </Pressable>
+          </View>
+
+          <Pressable onPress={() => router.push("/signup")}>
+            <Text style={styles.footerText}>
+              Don't have any account?{" "}
+              <Text style={{ color: Colors.Color1, fontWeight: "medium" }}>
+                Sign Up
+              </Text>
             </Text>
           </Pressable>
         </View>
-
-        <Pressable onPress={() => router.push("/signup")}>
-          <Text style={styles.footerText}>
-            Don't have any account?{" "}
-            <Text style={{ color: Colors.Color1, fontWeight: "medium" }}>
-              Sign Up
-            </Text>
-          </Text>
-        </Pressable>
+        {/* </View> */}
       </View>
-      {/* </View> */}
-
-      <AdSenseDisplay
-        client="ca-pub-9027784644042368"
-        slot="tu-id-de-anuncio"
-        format="auto"
-        responsive={true}
+      <AdsterraAd
+        options={`{
+		'key' : 'ffe342de43ba35b7e331c1a15e408e19',
+		'format' : 'iframe',
+		'height' : 50,
+		'width' : 320,
+		'params' : {}
+	}`}
       />
     </View>
   );
