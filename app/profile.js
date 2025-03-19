@@ -14,6 +14,7 @@ import { fetchUserData, modifyUserData } from "../services/UserData";
 import Colors from "../styles/Colors";
 import styles from "../styles/ProfileStyles";
 import { useStore } from "../utils/zustan";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
 
 // Componente para selector desplegable reutilizable
 const DropdownSelector = ({
@@ -412,6 +413,18 @@ export default function Profile() {
           />
         </View>
       </View>
+
+      {/* <View>
+        <AdsterraAd
+          options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+        />
+      </View> */}
     </ScrollView>
   );
 }

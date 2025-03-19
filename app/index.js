@@ -7,6 +7,7 @@ import { StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { useStore } from "../utils/zustan";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
 
 export default function Index() {
   const insets = useSafeAreaInsets();
@@ -32,6 +33,17 @@ export default function Index() {
           }
         />
         <Main />
+        <View style={{ position: "absolute", bottom: 10, width: "100%" }}>
+          <AdsterraAd
+            options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+          />
+        </View>
       </View>
       {/* </CopilotProvider> */}
     </SafeAreaProvider>

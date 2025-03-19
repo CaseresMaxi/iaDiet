@@ -19,6 +19,7 @@ import Button from "../Components/Button/Button";
 import Food from "../Components/Food";
 import Chat from "../Components/Chat";
 import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
 
 import { useStore } from "../utils/zustan";
 import { fetchDiet } from "../services/Diet";
@@ -320,7 +321,7 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 20,
+            //marginBottom: 20,
             justifyContent: "space-between",
             gap: 10,
             // paddingHorizontal: 20,
@@ -373,7 +374,17 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
             </CustomComponents>
           </CopilotStep>
         </View>
-
+        <View>
+          <AdsterraAd
+            options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+          />
+        </View>
         {/* If no dietData and not loading, show a placeholder */}
         {!dietData?.foods && !isDietLoading && (
           <View style={{ height: "100%", justifyContent: "center" }}>

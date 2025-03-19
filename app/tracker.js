@@ -28,6 +28,7 @@ import {
 } from "react-native-copilot";
 import Colors from "../styles/Colors";
 import Button from "../Components/Button/Button";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
 
 const CopilotText = walkthroughable(Text);
 const CopilotView = walkthroughable(View);
@@ -92,7 +93,10 @@ const Tracker = () => {
         }, {});
         setGroupedData(grouped);
       },
-      null,
+      {
+        start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+        end: dayjs().format("YYYY-MM-DD"),
+      },
       setloadingIngest
     );
     setGoBackVisible(true);
@@ -275,7 +279,7 @@ const Tracker = () => {
                 style={{
                   flexDirection: "row",
                   alignItems: "center !important",
-                  marginBottom: 20,
+                  //  marginBottom: 20,
                   justifyContent: "center !important",
                   gap: 10,
                 }}
@@ -311,7 +315,17 @@ const Tracker = () => {
               </View>
             </CustomComponents>
           </CopilotStep>
-
+          <View>
+            <AdsterraAd
+              options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+            />
+          </View>
           <CopilotStep
             text={t("tutorial.historyList")}
             order={2}
@@ -359,6 +373,35 @@ const Tracker = () => {
           />
         </>
       </ScrollView>
+
+      {chatVisible && (
+        <Chat
+          chatModalVisible={chatVisible}
+          setChatModalVisible={setChatVisible}
+          isLoading={isLoading}
+          messages={messages}
+          nutritionData={nutritionData}
+          setModalVisible={setModalVisible}
+          selectedImage={selectedImage}
+          removeSelectedImage={removeSelectedImage}
+          pickImageForChat={() => pickImageForChat(setSelectedImage)}
+          sendMessage={() =>
+            sendMessage(
+              setNutritionData,
+              newMessage,
+              selectedImage,
+              setMessages,
+              setNewMessage,
+              setLastSelectedImg,
+              setSelectedImage,
+              setisLoading,
+              extractNutritionInfo
+            )
+          }
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+        />
+      )}
     </>
   );
 };

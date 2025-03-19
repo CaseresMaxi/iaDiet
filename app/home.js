@@ -38,6 +38,7 @@ import MacronutrientsProgress from "../Components/MacronutrientsProgress/Macronu
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { Color } from "antd/es/color-picker";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
 
 const CopilotText = walkthroughable(Text);
 
@@ -356,6 +357,17 @@ export default function Home() {
                 setUserData={setUserData}
               />
             </View>
+            <View style={{ marginVertical: 0 }}>
+              <AdsterraAd
+                options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+              />
+            </View>
             <View>
               <Text
                 style={{
@@ -536,21 +548,6 @@ export default function Home() {
             </View>
           </View>
         </View>
-        {modalVisible && (
-          <ModalAdd
-            modalVisible={modalVisible}
-            setModalVisible={setModalVisible}
-            control={control}
-            handleSubmit={handleSubmit}
-            errors={errors}
-            addItem={addItem}
-            lastSelectedImg={lastSelectedImg}
-            nutritionData={nutritionData}
-            enableGenerateImg={true}
-            setNutritionData={setNutritionData}
-          />
-        )}
-        {MemoizedChat}
       </ScrollView>
       <TutorialButton />
     </>

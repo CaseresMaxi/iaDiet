@@ -15,6 +15,7 @@ import Clock from "../../assets/icons/ClockColor.svg";
 import { fetchDiet } from "../../services/Diet";
 import Colors from "../../styles/Colors";
 import { useStore } from "../../utils/zustan";
+import AdsterraAd from "../../Components/Ads/AdsterraAd";
 
 export default function Detail() {
   const insets = useSafeAreaInsets();
@@ -119,7 +120,18 @@ export default function Detail() {
                 <ActivityIndicator size="large" color={Colors.Color1} />
               </View>
             )}
-            <View style={{ marginTop: 48 }}>
+            <View>
+              <AdsterraAd
+                options={`{
+  "key": "ffe342de43ba35b7e331c1a15e408e19",
+  "format": "iframe",
+  "height": 50,
+  "width": 320,
+  "params": {}
+}`}
+              />
+            </View>
+            <View>
               <Text
                 style={{
                   fontSize: 24,
