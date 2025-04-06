@@ -27,6 +27,7 @@ import femaleUser from "../assets/female_user.png";
 import { fetchUserData, modifyUserData } from "../services/UserData";
 import { styles } from "../styles/CompleteSingUp";
 import { useTranslation } from "react-i18next";
+import "../utils/i18n";
 
 export default function CompleteSignUp() {
   const { t } = useTranslation();
