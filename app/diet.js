@@ -143,10 +143,10 @@ const Diet = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+        Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
       },
       body: JSON.stringify({
-        user_id: window.sessionStorage?.getItem("user_id"),
+        user_id: window.localStorage?.getItem("user_id"),
         calories: totals.calories,
         proteins: totals.proteins,
         fats: totals.fats,
@@ -187,7 +187,7 @@ const Diet = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
         body: JSON.stringify({
           context_chat: `
@@ -374,15 +374,15 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
             </CustomComponents>
           </CopilotStep>
         </View>
-        <View>
+        <View style={{ marginTop: 24 }}>
           <AdsterraAd
             options={`{
-  "key": "ffe342de43ba35b7e331c1a15e408e19",
-  "format": "iframe",
-  "height": 50,
-  "width": 320,
-  "params": {}
-}`}
+		'key' : 'f255d145b8b2ade65ac202c2eca1dd34',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	}`}
           />
         </View>
         {/* If no dietData and not loading, show a placeholder */}

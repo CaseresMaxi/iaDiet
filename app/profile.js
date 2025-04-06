@@ -417,12 +417,12 @@ export default function Profile() {
       {/* <View>
         <AdsterraAd
           options={`{
-  "key": "ffe342de43ba35b7e331c1a15e408e19",
-  "format": "iframe",
-  "height": 50,
-  "width": 320,
-  "params": {}
-}`}
+		'key' : 'f255d145b8b2ade65ac202c2eca1dd34',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	}`}
         />
       </View> */}
     </ScrollView>

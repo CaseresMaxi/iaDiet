@@ -12,7 +12,7 @@ export default function UserCard() {
       `https://ainutritioner.click/users/${window.sessionStorage?.user_id}`,
       {
         headers: {
-          Authorization: `Bearer ${window.sessionStorage?.getItem("token")}`,
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
       }
     )

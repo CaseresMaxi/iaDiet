@@ -69,6 +69,7 @@ export default function Detail() {
         // paddingTop: insets.top,
         paddingBottom: insets.bottom || 64,
         paddingHorizontal: 32,
+        overflowX: "hidden",
       }}
     >
       <ScrollView>
@@ -120,15 +121,16 @@ export default function Detail() {
                 <ActivityIndicator size="large" color={Colors.Color1} />
               </View>
             )}
-            <View>
+
+            <View style={{ marginTop: 24, width: "100%", maxWidth: 320 }}>
               <AdsterraAd
                 options={`{
-  "key": "ffe342de43ba35b7e331c1a15e408e19",
-  "format": "iframe",
+		'key' : 'f255d145b8b2ade65ac202c2eca1dd34',
+		'format' : 'iframe',
   "height": 50,
   "width": 320,
-  "params": {}
-}`}
+		'params' : {}
+	}`}
               />
             </View>
             <View>

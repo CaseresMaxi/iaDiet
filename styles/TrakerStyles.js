@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 100,
     backgroundColor: Colors.Color4, // Fondo oscuro
   },
   newDateInput: {

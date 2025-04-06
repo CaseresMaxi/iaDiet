@@ -1,46 +1,57 @@
-import { router, Stack } from "expo-router";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Image, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { Stack } from "expo-router";
+import moment from "moment";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { LineChart } from "react-native-chart-kit";
+import { CopilotStep, walkthroughable } from "react-native-copilot";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useStore } from "../utils/zustan";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import HeaderUser from "../assets/icons/HeaderUser.svg";
-import Notification from "../assets/icons/Notification.svg";
-import Food from "../Components/Food";
+import { ScrollView } from "react-native-web";
 import * as yup from "yup";
-import Colors from "../styles/Colors";
-import { ProgressBar } from "react-native-paper";
-import { Button, ScrollView, TouchableOpacity } from "react-native-web";
-import { getIngests, postIngest } from "../services/Ingests";
-import { fetchUserData } from "../services/UserData";
+import Notification from "../assets/icons/Notification.svg";
+import AdPopup from "../Components/Ads/AdPopup";
+import AdPopupService from "../Components/Ads/AdPopupService";
+import AdsterraAd from "../Components/Ads/AdsterraAd";
+import Chat from "../Components/Chat";
+import Food from "../Components/Food";
+import MacronutrientsProgress from "../Components/MacronutrientsProgress/MacronutrientsProgress";
+import TutorialButton from "../Components/TutorialButton/TutorialButton";
+import UserInfoRectangle from "../Components/UserInfoRectangle";
 import {
   extractNutritionInfo,
   pickImageForChat,
   sendMessage,
 } from "../services/Chat";
-import { useForm } from "react-hook-form";
-import { ModalAdd } from "../Components/ModalAdd";
-import Chat from "../Components/Chat";
-import { renewToken } from "../services/Utils";
-import {
-  CopilotProvider,
-  CopilotStep,
-  useCopilot,
-  walkthroughable,
-} from "react-native-copilot";
-import moment from "moment";
-import { useTranslation } from "react-i18next";
-import "../utils/i18n";
-import TutorialButton from "../Components/TutorialButton/TutorialButton";
 import { fetchDiet } from "../services/Diet";
-import UserInfoRectangle from "../Components/UserInfoRectangle";
-import MacronutrientsProgress from "../Components/MacronutrientsProgress/MacronutrientsProgress";
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
-import { Color } from "antd/es/color-picker";
-import AdsterraAd from "../Components/Ads/AdsterraAd";
+import { getIngests, postIngest } from "../services/Ingests";
+import { fetchUserData } from "../services/UserData";
+import Colors from "../styles/Colors";
+import "../utils/i18n";
+import { useStore } from "../utils/zustan";
 
 const CopilotText = walkthroughable(Text);
+
+// Opciones para el anuncio en el popup
+// const popupAdOptions = `{
+// 'key' : '042516d131fbac62d6201e74af0f4f8f',
+// 		'format' : 'iframe',
+// 		'height' : 90,
+// 		'width' : 728,
+// 		'params' : {}
+// 	}`;
+const shouldShowPopup = () => {
+  return Math.floor(Math.random() * 5) === 0; // 20% de probabilidad (1 de 5)
+};
 
 export default function Home() {
   const { t } = useTranslation();
@@ -84,6 +95,8 @@ export default function Home() {
   const [loadingIngest, setloadingIngest] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [showAdPopup, setShowAdPopup] = useState(true);
+
   const addItem = (formData) => {
     setloadingIngest(true);
     postIngest(
@@ -299,6 +312,36 @@ export default function Home() {
     },
   };
 
+  // Inicializar el servicio de anuncios
+  useEffect(() => {
+    // Configuración personalizada para los popups
+    const adConfig = {
+      minTimeBetweenPopups: 3, // 3 minutos entre popups
+      showOnFirstVisit: true, // Mostrar en primera visita
+      maxPopupsPerSession: 5, // Máximo 5 popups por sesión
+      initialDelay: 15, // 15 segundos antes del primer popup
+    };
+
+    // Inicializar el servicio con callback para mostrar/ocultar el popup
+    AdPopupService.init(adConfig, (shouldShow) => {
+      setShowAdPopup(shouldShow);
+    });
+
+    return () => {
+      // No es necesario limpiar nada aquí, el servicio es un singleton
+    };
+  }, []);
+
+  // Manejar el cierre del popup
+  const handleCloseAdPopup = () => {
+    setShowAdPopup(false);
+  };
+  useFocusEffect(
+    useCallback(() => {
+      // Determinar si mostrar el popup cuando la pantalla obtiene el foco
+      setShowAdPopup(shouldShowPopup());
+    }, [])
+  );
   return (
     <>
       <ScrollView style={{ backgroundColor: Colors.Color4 }}>
@@ -360,12 +403,12 @@ export default function Home() {
             <View style={{ marginVertical: 0 }}>
               <AdsterraAd
                 options={`{
-  "key": "ffe342de43ba35b7e331c1a15e408e19",
-  "format": "iframe",
-  "height": 50,
-  "width": 320,
-  "params": {}
-}`}
+		'key' : 'f255d145b8b2ade65ac202c2eca1dd34',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	}`}
               />
             </View>
             <View>
@@ -550,6 +593,12 @@ export default function Home() {
         </View>
       </ScrollView>
       <TutorialButton />
+
+      {/* <AdPopup
+        isVisible={showAdPopup}
+        onClose={handleCloseAdPopup}
+        adOptions={popupAdOptions}
+      /> */}
     </>
   );
 }
