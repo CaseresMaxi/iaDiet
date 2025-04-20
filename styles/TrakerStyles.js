@@ -171,11 +171,11 @@ export const styles = StyleSheet.create({
   },
 
   chatModalFixedContent: {
-    width: "90%",
-    height: "80%",
     backgroundColor: "#1E2028", // Fondo oscuro para el chat modal
     borderRadius: 20,
+    width: "100%",
     padding: 15,
+    height: "600px",
     justifyContent: "space-between",
   },
   chatMessageContainer: {

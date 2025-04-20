@@ -56,9 +56,9 @@ const Tracker = () => {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  // const [chatModalVisible, setChatModalVisible] = useState(false);
-  const chatVisible = useStore((state) => state.chatVisible);
-  const setChatVisible = useStore((state) => state.setChatVisible);
+  const [chatModalVisible, setChatModalVisible] = useState(false);
+  // const chatVisible = useStore((state) => state.chatVisible);
+  // const setChatVisible = useStore((state) => state.setChatVisible);
   const [isLoading, setisLoading] = useState(false);
   const [nutritionData, setNutritionData] = useState(null);
   const [groupedData, setGroupedData] = useState({});
@@ -204,28 +204,59 @@ const Tracker = () => {
     return (
       <View style={{ height: "100%", flexDirection: "column-reverse" }}>
         {!loadingIngest ? (
-          Object.keys(groupedData).map((date, index) => (
-            <View key={`${date}-${index}`} style={styles.dayContainer}>
-              <View style={styles.dateContainer}>
-                <View style={styles.dateHeader}>
-                  <Text style={styles.dateText}>{date}</Text>
+          Object.keys(groupedData).length > 0 ? (
+            Object.keys(groupedData).map((date, index) => (
+              <View key={`${date}-${index}`} style={styles.dayContainer}>
+                <View style={styles.dateContainer}>
+                  <View style={styles.dateHeader}>
+                    <Text style={styles.dateText}>{date}</Text>
+                  </View>
                 </View>
+                <FlatList
+                  data={groupedData[date]}
+                  keyExtractor={(item) => `${item.id}+${Math.random()}`}
+                  renderItem={({ item, index }) => (
+                    <Food
+                      key={`${item.id}+ ${index}`}
+                      title={item.ingest}
+                      linkeable={false}
+                      s3Img={item.signed_url}
+                      {...item}
+                    />
+                  )}
+                />
               </View>
-              <FlatList
-                data={groupedData[date]}
-                keyExtractor={(item) => `${item.id}+${Math.random()}`}
-                renderItem={({ item, index }) => (
-                  <Food
-                    key={`${item.id}+ ${index}`}
-                    title={item.ingest}
-                    linkeable={false}
-                    s3Img={item.signed_url}
-                    {...item}
-                  />
-                )}
-              />
+            ))
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 20,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.Font2,
+                  fontSize: 18,
+                  textAlign: "center",
+                  marginBottom: 20,
+                }}
+              >
+                No hay comidas registradas recientemente 📅
+              </Text>
+              <Text
+                style={{
+                  color: Colors.Font2,
+                  fontSize: 16,
+                  textAlign: "center",
+                }}
+              >
+                Usa el botón + para registrar tus comidas del día
+              </Text>
             </View>
-          ))
+          )
         ) : (
           <View
             style={{
@@ -308,7 +339,7 @@ const Tracker = () => {
                   }}
                   onClick={() => {
                     setMessages([]);
-                    setChatVisible(true);
+                    setChatModalVisible(true);
                     deleteContextChat();
                   }}
                 />
@@ -345,39 +376,41 @@ const Tracker = () => {
             nutritionData={nutritionData}
             setNutritionData={setNutritionData}
           />
-          <Chat
-            chatModalVisible={chatVisible}
-            setChatModalVisible={setChatVisible}
-            isLoading={isLoading}
-            messages={messages}
-            nutritionData={nutritionData}
-            setModalVisible={setModalVisible}
-            selectedImage={selectedImage}
-            removeSelectedImage={removeSelectedImage}
-            pickImageForChat={() => pickImageForChat(setSelectedImage)}
-            sendMessage={() =>
-              sendMessage(
-                setNutritionData,
-                newMessage,
-                selectedImage,
-                setMessages,
-                setNewMessage,
-                setLastSelectedImg,
-                setSelectedImage,
-                setisLoading,
-                extractNutritionInfo
-              )
-            }
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-          />
+          {/* {chatModalVisible && (
+            <Chat
+              chatModalVisible={chatModalVisible}
+              setChatModalVisible={setChatModalVisible}
+              isLoading={isLoading}
+              messages={messages}
+              nutritionData={nutritionData}
+              setModalVisible={setModalVisible}
+              selectedImage={selectedImage}
+              removeSelectedImage={removeSelectedImage}
+              pickImageForChat={() => pickImageForChat(setSelectedImage)}
+              sendMessage={() =>
+                sendMessage(
+                  setNutritionData,
+                  newMessage,
+                  selectedImage,
+                  setMessages,
+                  setNewMessage,
+                  setLastSelectedImg,
+                  setSelectedImage,
+                  setisLoading,
+                  extractNutritionInfo
+                )
+              }
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+            />
+          )} */}
         </>
       </ScrollView>
 
-      {chatVisible && (
+      {chatModalVisible && (
         <Chat
-          chatModalVisible={chatVisible}
-          setChatModalVisible={setChatVisible}
+          chatModalVisible={chatModalVisible}
+          setChatModalVisible={setChatModalVisible}
           isLoading={isLoading}
           messages={messages}
           nutritionData={nutritionData}

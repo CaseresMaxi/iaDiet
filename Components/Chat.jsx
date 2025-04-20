@@ -2,7 +2,6 @@ import React, { useState, useCallback, memo } from "react";
 import { Image, Pressable, TouchableOpacity } from "react-native";
 import {
   FlatList,
-  Modal,
   Text,
   TextInput,
   View,
@@ -14,6 +13,7 @@ import { styles } from "../styles/TrakerStyles";
 import DotTypingAnimation from "./DotTyping";
 import Markdown from "react-native-markdown-display";
 import Colors from "../styles/Colors";
+import SimpleModal from "./SimpleModal/SimpleModal";
 
 const MessageItem = memo(
   ({ item, nutritionData, onOpenModal, index, messagesLength }) => {
@@ -168,93 +168,86 @@ const Chat = memo(
     const keyExtractor = useCallback((item) => item.id, []);
 
     return (
-      <Modal
-        transparent={true}
-        animationType="slide"
+      <SimpleModal
         visible={chatModalVisible}
-        onRequestClose={() => setChatModalVisible(false)}
+        onClose={() => setChatModalVisible(false)}
       >
         <Pressable
-          style={styles.modalCenteredContainer}
-          onPress={() => setChatModalVisible(false)}
+          style={styles.chatModalFixedContent}
+          onPress={(e) => e.stopPropagation()}
         >
-          <Pressable
-            style={styles.chatModalFixedContent}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <FlatList
-              data={
-                isLoading
-                  ? [...messages, { id: "loading", isBot: true }]
-                  : messages
-              }
-              keyExtractor={keyExtractor}
-              renderItem={renderItem}
-            />
+          <FlatList
+            data={
+              isLoading
+                ? [...messages, { id: "loading", isBot: true }]
+                : messages
+            }
+            keyExtractor={keyExtractor}
+            renderItem={renderItem}
+          />
 
-            {showSuggestions && suggestedMessages.length > 0 && (
-              <ScrollView
-                vertical
-                style={styles.suggestionsContainer}
-                showsHorizontalScrollIndicator={false}
-              >
-                {suggestedMessages.map((suggestion, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.suggestionBubble}
-                    onPress={() => handleSuggestedMessage(suggestion)}
-                  >
-                    <Text style={styles.suggestionText}>{suggestion}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            )}
-
-            {selectedImage && (
-              <View style={styles.selectedImageContainer}>
-                <Image
-                  source={{ uri: selectedImage }}
-                  style={styles.selectedImage}
-                />
-                <Pressable
-                  style={styles.removeImageButton}
-                  onPress={removeSelectedImage}
+          {showSuggestions && suggestedMessages.length > 0 && (
+            <ScrollView
+              vertical
+              style={styles.suggestionsContainer}
+              showsHorizontalScrollIndicator={false}
+            >
+              {suggestedMessages.map((suggestion, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestionBubble}
+                  onPress={() => handleSuggestedMessage(suggestion)}
                 >
-                  <Text style={styles.removeImageButtonText}>✖</Text>
-                </Pressable>
-              </View>
-            )}
+                  <Text style={styles.suggestionText}>{suggestion}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
 
-            <View style={styles.chatInputContainer}>
-              {!disabledImgPicker && (
-                <Pressable
-                  style={styles.imagePickerButton}
-                  onPress={pickImageForChat}
-                >
-                  <Text style={styles.imagePickerButtonText}>📷</Text>
-                </Pressable>
-              )}
-              <TextInput
-                style={styles.chatInput}
-                placeholder="Escribe tu mensaje..."
-                value={newMessage}
-                onChangeText={(text) => {
-                  setNewMessage(text);
-                  if (text) setShowSuggestions(false);
-                  else setShowSuggestions(true);
-                }}
+          {selectedImage && (
+            <View style={styles.selectedImageContainer}>
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.selectedImage}
               />
               <Pressable
-                style={styles.chatSendButton}
-                onPress={handleSendMessage}
-                disabled={localLoading || isLoading}
+                style={styles.removeImageButton}
+                onPress={removeSelectedImage}
               >
-                <Text style={styles.sendButtonText}>➡️</Text>
+                <Text style={styles.removeImageButtonText}>✖</Text>
               </Pressable>
             </View>
-          </Pressable>
+          )}
+
+          <View style={styles.chatInputContainer}>
+            {!disabledImgPicker && (
+              <Pressable
+                style={styles.imagePickerButton}
+                onPress={pickImageForChat}
+              >
+                <Text style={styles.imagePickerButtonText}>📷</Text>
+              </Pressable>
+            )}
+            <TextInput
+              style={styles.chatInput}
+              placeholder="Escribe tu mensaje..."
+              value={newMessage}
+              onChangeText={(text) => {
+                setNewMessage(text);
+                if (text) setShowSuggestions(false);
+                else setShowSuggestions(true);
+              }}
+            />
+            <Pressable
+              style={styles.chatSendButton}
+              onPress={handleSendMessage}
+              disabled={localLoading || isLoading}
+            >
+              <Text style={styles.sendButtonText}>➡️</Text>
+            </Pressable>
+          </View>
         </Pressable>
-      </Modal>
+      </SimpleModal>
     );
   }
 );

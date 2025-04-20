@@ -117,8 +117,9 @@ const Diet = () => {
   const userData = useStore((state) => state.userData);
   const setUserData = useStore((state) => state.setUserData);
 
-  const chatVisible = useStore((state) => state.chatVisible);
-  const setChatVisible = useStore((state) => state.setChatVisible);
+  // const chatVisible = useStore((state) => state.chatVisible);
+  // const setChatVisible = useStore((state) => state.setChatVisible);
+  const [chatVisible, setChatVisible] = useState(false);
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
   const setHeaderColor = useStore((state) => state.setHeaderColor);
@@ -548,29 +549,31 @@ Sé claro y preciso en las instrucciones culinarias y al enumerar ingredientes. 
         )}
 
         {/* Chat Modal */}
-        <Chat
-          chatModalVisible={chatVisible}
-          setChatModalVisible={setChatVisible}
-          isLoading={isChatLoading}
-          messages={messages}
-          nutritionData={newDiet}
-          setModalVisible={() => {
-            addDiet();
-          }}
-          suggestedMessages={[
-            "¿Cuántas calorías tiene una manzana?",
-            "¿Qué comida me recomiendas?",
-            "¿Cómo va mi progreso?",
-          ]}
-          disabledImgPicker
-          selectedImage={selectedImage}
-          removeSelectedImage={removeSelectedImage}
-          pickImageForChat={() => {}}
-          sendMessage={sendMessage}
-          newMessage={newMessage}
-          setNewMessage={setNewMessage}
-          initialMessage="¡Hola! Soy tu nutricionista IA personal y estoy aquí para ayudarte a crear una dieta personalizada que se ajuste perfectamente a tus objetivos y necesidades. ¿En qué puedo ayudarte hoy? 😊"
-        />
+        {chatVisible && (
+          <Chat
+            chatModalVisible={chatVisible}
+            setChatModalVisible={setChatVisible}
+            isLoading={isChatLoading}
+            messages={messages}
+            nutritionData={newDiet}
+            setModalVisible={() => {
+              addDiet();
+            }}
+            suggestedMessages={[
+              "¿Cuántas calorías tiene una manzana?",
+              "¿Qué comida me recomiendas?",
+              "¿Cómo va mi progreso?",
+            ]}
+            disabledImgPicker
+            selectedImage={selectedImage}
+            removeSelectedImage={removeSelectedImage}
+            pickImageForChat={() => {}}
+            sendMessage={sendMessage}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            initialMessage="¡Hola! Soy tu nutricionista IA personal y estoy aquí para ayudarte a crear una dieta personalizada que se ajuste perfectamente a tus objetivos y necesidades. ¿En qué puedo ayudarte hoy? 😊"
+          />
+        )}
       </ScrollView>
 
       <TutorialButton />
