@@ -1,8 +1,10 @@
+import AuthService from "./Auth";
+
 export const deleteContextChat = (setingestData) => {
   fetch(`https://ainutritioner.click/chat/clear`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
+      Authorization: `Bearer ${AuthService.getToken()}`,
     },
   })
     .then((response) => {
@@ -36,13 +38,19 @@ export const createAbortableFetch = (url, options = {}) => {
   const controller = new AbortController();
   const signal = controller.signal;
 
-  const fetchPromise = fetch(url, {
+  const fetchOptions = {
     ...options,
     signal,
-  });
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${AuthService.getToken()}`,
+    },
+  };
+
+  const promise = fetch(url, fetchOptions);
 
   return {
-    promise: fetchPromise,
+    promise,
     abort: () => controller.abort(),
   };
 };

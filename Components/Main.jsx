@@ -18,6 +18,7 @@ import Colors from "../styles/Colors";
 import GlobalStyles from "../styles/Global";
 import { useStore } from "../utils/zustan";
 import AdsterraAd from "./Ads/AdsterraAd";
+import AuthService from "../services/Auth";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -62,34 +63,29 @@ export default function Main() {
     }, [])
   );
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsLoading(true);
-    login(
-      data,
-      () => {
-        setIsLoading(false);
-        router.push("/home");
-      },
-      () => {
-        setIsLoading(false);
-        setLoginError(true);
-        setError("email", {
-          type: "manual",
-          message: "Usuario o contraseña incorrectos",
-        });
-        setError("password", {
-          type: "manual",
-          message: "Usuario o contraseña incorrectos",
-        });
-      }
-    );
+    try {
+      await AuthService.login(data.email, data.password);
+      setIsLoading(false);
+      router.push("/home");
+    } catch (error) {
+      setIsLoading(false);
+      setLoginError(true);
+      setError("email", {
+        type: "manual",
+        message: "Usuario o contraseña incorrectos",
+      });
+      setError("password", {
+        type: "manual",
+        message: "Usuario o contraseña incorrectos",
+      });
+    }
   };
 
   useEffect(() => {
-    if (window.localStorage?.getItem("token")) {
-      // router.push("/tracker");
-      window.localStorage.removeItem("token");
-      window.localStorage.removeItem("user_id");
+    if (AuthService.isAuthenticated()) {
+      AuthService.clearAuth();
     }
   }, [router.isReady]);
 

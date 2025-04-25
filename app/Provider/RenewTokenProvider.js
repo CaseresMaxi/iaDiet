@@ -1,14 +1,17 @@
 import React, { createContext, useEffect, useRef } from "react";
-import { renewToken } from "../../services/Utils";
+import AuthService from "../../services/Auth";
 
 export const PollingContext = createContext({});
 
 export const RenewTokenProvider = ({ children }) => {
   const intervalRef = useRef(null);
+
   useEffect(() => {
     const renewTokenFetch = async () => {
       try {
-        await renewToken();
+        if (AuthService.isAuthenticated()) {
+          await AuthService.renewToken();
+        }
       } catch (error) {
         console.error("Error al renovar el token:", error);
       }
@@ -17,15 +20,19 @@ export const RenewTokenProvider = ({ children }) => {
     // Llamada inicial
     renewTokenFetch();
 
-    // Configuración del intervalo
-    if (!intervalRef.current)
-      intervalRef.current = setInterval(renewTokenFetch, 60000 * 2);
+    // Configuración del intervalo (cada 5 minutos)
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(renewTokenFetch, 5 * 60 * 1000);
+    }
 
     // Limpieza del intervalo cuando el componente se desmonta
     return () => {
-      //if (interval) clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, []); // [] asegura que solo se configure al montar el componente
+  }, []);
+
   return (
     <PollingContext.Provider value={{}}>{children}</PollingContext.Provider>
   );
