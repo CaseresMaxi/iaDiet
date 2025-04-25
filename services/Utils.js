@@ -31,3 +31,18 @@ export const renewToken = () => {
 
     .catch((error) => console.error(error));
 };
+
+export const createAbortableFetch = (url, options = {}) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const fetchPromise = fetch(url, {
+    ...options,
+    signal,
+  });
+
+  return {
+    promise: fetchPromise,
+    abort: () => controller.abort(),
+  };
+};

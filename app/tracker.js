@@ -77,6 +77,34 @@ const Tracker = () => {
   const setTriggerCamera = useStore((state) => state.setTriggerCamera);
   const setGoBackVisible = useStore((state) => state.setGoBackVisible);
 
+  const [hasTriggeredCamera, setHasTriggeredCamera] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const handleTrigger = async () => {
+      if (triggerCamera && isMounted && !hasTriggeredCamera) {
+        setHasTriggeredCamera(true);
+        try {
+          await handleCameraAndChat();
+        } finally {
+          if (isMounted) {
+            setTriggerCamera(false);
+            setHasTriggeredCamera(false);
+          }
+        }
+      }
+    };
+
+    handleTrigger();
+
+    return () => {
+      isMounted = false;
+      setTriggerCamera(false);
+      setHasTriggeredCamera(false);
+    };
+  }, [triggerCamera]);
+
   useEffect(() => {
     setNavigationVisible(true);
     setHeaderTitle("Tracker");
@@ -102,15 +130,10 @@ const Tracker = () => {
     setGoBackVisible(true);
     return () => {
       setHeaderVisible(false);
+      setTriggerCamera(false);
+      setHasTriggeredCamera(false);
     };
   }, []);
-
-  useEffect(() => {
-    if (triggerCamera) {
-      handleCameraAndChat();
-      setTriggerCamera(false);
-    }
-  }, [triggerCamera]);
 
   const {
     control,
@@ -144,12 +167,18 @@ const Tracker = () => {
     postIngest(
       (data) => {
         setIngestData(data);
-        const grouped = data.reduce((acc, item) => {
-          const date = dayjs(item.date).format("YYYY-MM-DD");
-          if (!acc[date]) acc[date] = [];
-          acc[date].push(item);
-          return acc;
-        }, {});
+        const grouped = data.reduce(
+          (acc, item) => {
+            const date = dayjs(item.date).format("YYYY-MM-DD");
+            if (!acc[date]) acc[date] = [];
+            acc[date].push(item);
+            return acc;
+          },
+          {
+            start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+            end: dayjs().format("YYYY-MM-DD"),
+          }
+        );
         setGroupedData(grouped);
         setloadingIngest(false);
       },

@@ -1,31 +1,48 @@
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
+import { createAbortableFetch } from "./Utils";
 
 export const createImage = (
   setGeneratedImage = () => {},
   prompt = "",
   keywords = "",
-  setisLoading = () => {}
+  setisLoading = () => {},
+  signal = null
 ) => {
   setisLoading(true);
-  fetch(`https://ainutritioner.click/chat/create-image`, {
-    headers: {
-      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify({
-      keywords: keywords,
-      prompt: prompt,
-    }),
-  })
+  const { promise, abort } = createAbortableFetch(
+    `https://ainutritioner.click/chat/create-image`,
+    {
+      headers: {
+        Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        keywords: keywords,
+        prompt: prompt,
+      }),
+      signal,
+    }
+  );
+
+  promise
     .then((response) => response.json())
     .then((data) => {
       setGeneratedImage(data.response);
       setisLoading(false);
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      if (error.name === "AbortError") {
+        console.log("Creación de imagen cancelada");
+        return;
+      }
+      console.error(error);
+    });
+
+  return abort;
 };
+
 export const extractNutritionInfo = (responseText) => {
   const nutritionPattern =
     /&&&nombre:(.*?)&&&calorias:(.*?)&&&proteinas:(.*?)&&&grasas:(.*?)&&&carbohidratos:(.*?)&&&/;
@@ -42,10 +59,18 @@ export const extractNutritionInfo = (responseText) => {
   return null;
 };
 
+let isPickerActive = false;
+
 export const pickImageForChat = async (setSelectedImage) => {
+  if (isPickerActive) {
+    return null;
+  }
+
+  isPickerActive = true;
   const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
   if (permissionResult.granted === false) {
     alert("¡Se requiere permiso para acceder a la cámara!");
+    isPickerActive = false;
     return null;
   }
 
@@ -85,16 +110,20 @@ export const pickImageForChat = async (setSelectedImage) => {
       if (manipulatedImage.base64) {
         const imageBase64 = `data:image/jpeg;base64,${manipulatedImage.base64}`;
         setSelectedImage(imageBase64);
+        isPickerActive = false;
         return imageBase64;
       }
     }
+    isPickerActive = false;
     return null;
   } catch (error) {
     console.error("Error al procesar la imagen:", error);
     alert("Hubo un error al procesar la imagen. Por favor, intenta de nuevo.");
+    isPickerActive = false;
     return null;
   }
 };
+
 export const addItem = (formData, setModalVisible, setData, postIngest) => {
   postIngest(setingestData, formData, lastSelectedImg);
   setData((prevData) =>
@@ -127,7 +156,8 @@ export const sendMessage = async (
   setNewMessage,
   setLastSelectedImg,
   setSelectedImage,
-  setisLoading
+  setisLoading,
+  signal = null
 ) => {
   try {
     setNutritionData(null);
@@ -175,14 +205,20 @@ Mantén tus respuestas claras y cortas.`,
       }
       setSelectedImage(null);
 
-      const response = await fetch("https://ainutritioner.click/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
-        },
-        body: JSON.stringify(messageBody),
-      });
+      const { promise } = createAbortableFetch(
+        "https://ainutritioner.click/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
+          },
+          body: JSON.stringify(messageBody),
+          signal,
+        }
+      );
+
+      const response = await promise;
 
       if (!response.ok) {
         throw new Error(`Error al enviar el mensaje: ${response.statusText}`);
@@ -210,6 +246,10 @@ Mantén tus respuestas claras y cortas.`,
       ]);
     }
   } catch (error) {
+    if (error.name === "AbortError") {
+      console.log("Envío de mensaje cancelado");
+      return;
+    }
     console.error("Error en la solicitud:", error);
     alert("Hubo un error al analizar la imagen. Por favor, intenta de nuevo.");
   }

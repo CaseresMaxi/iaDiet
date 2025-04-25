@@ -1,15 +1,20 @@
-export const fetchUserData = async (setuserData, setLoading) => {
+import { createAbortableFetch } from "./Utils";
+
+export const fetchUserData = async (setuserData, setLoading, signal = null) => {
   setLoading(true); // Indica que la carga ha comenzado
   //console.log(window.sessionStorage?.user_id, "asdasdasd");
   try {
-    const response = await fetch(
+    const { promise } = createAbortableFetch(
       `https://ainutritioner.click/users/${window.localStorage?.user_id}`,
       {
         headers: {
           Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
+        signal,
       }
     );
+
+    const response = await promise;
     const data = await response.json();
     setuserData(data);
     // reset({
@@ -20,6 +25,10 @@ export const fetchUserData = async (setuserData, setLoading) => {
     //   height: data.height || "",
     // });
   } catch (error) {
+    if (error.name === "AbortError") {
+      console.log("Fetch de datos de usuario cancelado");
+      return;
+    }
     console.error(error);
   } finally {
     setLoading(false); // Indica que la carga ha terminado
@@ -29,10 +38,11 @@ export const fetchUserData = async (setuserData, setLoading) => {
 export const modifyUserData = async (
   payload,
   setLoading = () => {},
-  callback = () => {}
+  callback = () => {},
+  signal = null
 ) => {
   try {
-    const response = await fetch(
+    const { promise } = createAbortableFetch(
       `https://ainutritioner.click/users/${window.localStorage?.user_id}`,
       {
         method: "PUT",
@@ -41,16 +51,21 @@ export const modifyUserData = async (
           Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
         },
         body: JSON.stringify(payload),
+        signal,
       }
     );
+
+    const response = await promise;
     if (!response.ok) throw new Error("Network response was not ok.");
     setLoading(true);
     setTimeout(() => {
       callback();
     }, 1000);
   } catch (error) {
+    if (error.name === "AbortError") {
+      console.log("Modificación de datos de usuario cancelada");
+      return;
+    }
     console.error(error);
-  } finally {
-    // setLoading(false); // Indica que la carga ha terminado
   }
 };

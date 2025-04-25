@@ -13,6 +13,7 @@ const FormInput = ({
   paddingHorizontal = 24,
   type = "default",
   password = false,
+  email = false,
 }) => {
   const handleChange = (text) => {
     if (type === "number") {
@@ -32,7 +33,10 @@ const FormInput = ({
 
       <TextInput
         secureTextEntry={password}
-        keyboardType={type === "number" ? "numeric" : "default"}
+        keyboardType={
+          email ? "email-address" : type === "number" ? "numeric" : "default"
+        }
+        autoCapitalize={email ? "none" : "sentences"}
         placeholder={placeholder}
         value={value}
         onChangeText={handleChange}

@@ -1,11 +1,17 @@
 import { notification } from "antd";
 import { useRouter, useFocusEffect } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { login } from "../services/Users";
 import { styles } from "../styles/MainStyles";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import FormInput from "./Input/Input";
 import Button from "./Button/Button";
 import Colors from "../styles/Colors";
@@ -16,10 +22,13 @@ import AdsterraAd from "./Ads/AdsterraAd";
 export default function Main() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [loginError, setLoginError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm({
     defaultValues: {
       email: "",
@@ -54,12 +63,24 @@ export default function Main() {
   );
 
   const onSubmit = (data) => {
+    setIsLoading(true);
     login(
       data,
-      () => router.push("/home"),
       () => {
-        //console.log("error");
-        // openNotification("topRight");
+        setIsLoading(false);
+        router.push("/home");
+      },
+      () => {
+        setIsLoading(false);
+        setLoginError(true);
+        setError("email", {
+          type: "manual",
+          message: "Usuario o contraseña incorrectos",
+        });
+        setError("password", {
+          type: "manual",
+          message: "Usuario o contraseña incorrectos",
+        });
       }
     );
   };
@@ -84,6 +105,23 @@ export default function Main() {
         // paddingHorizontal: 35,
       }}
     >
+      {isLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <ActivityIndicator size="large" color={Colors.Color1} />
+        </View>
+      )}
       {/* {contextHolder} */}
       {/* <View style={styles.header}></View> */}
 
@@ -98,29 +136,27 @@ export default function Main() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <FormInput
-              // style={styles.customInput}
               placeholder="Email"
               placeholderTextColor="#888"
               onBlur={onBlur}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(text);
+                setLoginError(false);
+              }}
               paddingHorizontal={24}
               value={value}
+              email
               label="Username or email"
+              error={errors.email?.message}
             />
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="Email"
-            //   placeholderTextColor="#888"
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            // />
           )}
           name="email"
         />
         {errors.email && (
           <View style={GlobalStyles.errorWrapper}>
-            <Text style={styles.errorText}>Valid email is required.</Text>
+            <Text style={styles.errorText}>
+              {errors.email.message || "Valid email is required."}
+            </Text>
           </View>
         )}
 
@@ -129,31 +165,27 @@ export default function Main() {
           rules={{ required: true }}
           render={({ field: { onChange, onBlur, value } }) => (
             <FormInput
-              // style={styles.customInput}
               placeholder="Password"
               placeholderTextColor="#888"
               secureTextEntry
               onBlur={onBlur}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(text);
+                setLoginError(false);
+              }}
               value={value}
               label={"Password"}
               password
+              error={errors.password?.message}
             />
-            // <TextInput
-            //   style={styles.customInput}
-            //   placeholder="Password"
-            //   placeholderTextColor="#888"
-            //   secureTextEntry
-            //   onBlur={onBlur}
-            //   onChangeText={onChange}
-            //   value={value}
-            // />
           )}
           name="password"
         />
         {errors.password && (
           <View style={GlobalStyles.errorWrapper}>
-            <Text style={styles.errorText}>Password is required.</Text>
+            <Text style={styles.errorText}>
+              {errors.password.message || "Password is required."}
+            </Text>
           </View>
         )}
 

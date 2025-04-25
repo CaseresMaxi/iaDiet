@@ -446,108 +446,110 @@ export default function Home() {
               }}
             >
               <View style={{ marginBottom: 12 }}>
-                <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: Colors.Color1,
-                    fontSize: 20,
-                  }}
-                >
-                  {t("weight.history")}
-                </Text>
                 {userData?.weight && userData.weight.length > 0 && (
-                  <View style={styles.chartContainer}>
-                    <LineChart
-                      data={{
-                        labels: userData.weight
-                          .filter((item) => {
-                            // Mantener tanto objetos con fecha como números (formato antiguo)
-                            return (
-                              (typeof item === "object" && item.date) ||
-                              typeof item === "number"
-                            );
-                          })
-                          .map((item, index) => {
-                            if (typeof item === "object" && item.date) {
-                              // Para nuevas entradas con formato objeto
-                              const date = new Date(item.date);
-                              return `${date.getDate()}/${date.getMonth() + 1}`;
-                            } else {
-                              // Para entradas antiguas (números), usar índice
-                              return `${index + 1}`;
-                            }
-                          }),
-                        datasets: [
-                          {
-                            data: userData.weight
-                              .filter((item) => {
-                                // Mantener tanto objetos con fecha como números (formato antiguo)
-                                return (
-                                  (typeof item === "object" && item.date) ||
-                                  typeof item === "number"
-                                );
-                              })
-                              .map((item) => {
-                                // Extraer el peso dependiendo del formato
-                                return typeof item === "object"
-                                  ? item.weight
-                                  : item;
-                              }),
-
-                            color: (opacity = 1) => {
-                              // Color principal de la aplicación con opacidad
-                              return `${Colors.Color1}${Math.floor(
-                                opacity * 255
-                              )
-                                .toString(16)
-                                .padStart(2, "0")}`;
-                            },
-                            strokeWidth: 3,
-                          },
-                        ],
-                      }}
-                      width={Dimensions.get("window").width - 80}
-                      height={220}
-                      chartConfig={{
-                        backgroundColor: "transparent",
-                        backgroundGradientFrom: "transparent",
-                        backgroundGradientTo: "transparent",
-                        decimalPlaces: 1,
-                        color: (opacity = 1) => Colors.Font2,
-                        labelColor: (opacity = 1) => Colors.Font2,
-                        style: {
-                          borderRadius: 16,
-                        },
-                        propsForLabels: {
-                          fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`,
-                          fontWeight: "400",
-                          fill: Colors.Font2,
-                          // fontFamily: "inherit",
-                        },
-                        propsForDots: {
-                          r: "4",
-                          strokeWidth: "0",
-                          stroke: Colors.Color1,
-                          fill: Colors.Color1,
-                        },
-                        strokeWidth: 2,
-                        useShadowColorFromDataset: false,
-                        yAxisWidth: 45,
-                      }}
+                  <>
+                    <Text
                       style={{
-                        marginVertical: 16,
-                        borderRadius: 16,
+                        fontWeight: "bold",
+                        color: Colors.Color1,
+                        fontSize: 20,
                       }}
-                      bezier
-                      withInnerLines={false}
-                      withOuterLines={true}
-                      withVerticalLines={false}
-                      withHorizontalLines={true}
-                      withDots={true}
-                      withShadow
-                      yAxisSuffix=" kg"
-                    />
-                  </View>
+                    >
+                      {t("weight.history")}
+                    </Text>
+                    <View style={styles.chartContainer}>
+                      <LineChart
+                        data={{
+                          labels: userData.weight
+                            .filter((item) => {
+                              // Mantener tanto objetos con fecha como números (formato antiguo)
+                              return (
+                                (typeof item === "object" && item.date) ||
+                                typeof item === "number"
+                              );
+                            })
+                            .map((item, index) => {
+                              if (typeof item === "object" && item.date) {
+                                // Para nuevas entradas con formato objeto
+                                const date = new Date(item.date);
+                                return `${date.getDate()}/${date.getMonth() + 1}`;
+                              } else {
+                                // Para entradas antiguas (números), usar índice
+                                return `${index + 1}`;
+                              }
+                            }),
+                          datasets: [
+                            {
+                              data: userData.weight
+                                .filter((item) => {
+                                  // Mantener tanto objetos con fecha como números (formato antiguo)
+                                  return (
+                                    (typeof item === "object" && item.date) ||
+                                    typeof item === "number"
+                                  );
+                                })
+                                .map((item) => {
+                                  // Extraer el peso dependiendo del formato
+                                  return typeof item === "object"
+                                    ? item.weight
+                                    : item;
+                                }),
+
+                              color: (opacity = 1) => {
+                                // Color principal de la aplicación con opacidad
+                                return `${Colors.Color1}${Math.floor(
+                                  opacity * 255
+                                )
+                                  .toString(16)
+                                  .padStart(2, "0")}`;
+                              },
+                              strokeWidth: 3,
+                            },
+                          ],
+                        }}
+                        width={Dimensions.get("window").width - 80}
+                        height={220}
+                        chartConfig={{
+                          backgroundColor: "transparent",
+                          backgroundGradientFrom: "transparent",
+                          backgroundGradientTo: "transparent",
+                          decimalPlaces: 1,
+                          color: (opacity = 1) => Colors.Font2,
+                          labelColor: (opacity = 1) => Colors.Font2,
+                          style: {
+                            borderRadius: 16,
+                          },
+                          propsForLabels: {
+                            fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`,
+                            fontWeight: "400",
+                            fill: Colors.Font2,
+                            // fontFamily: "inherit",
+                          },
+                          propsForDots: {
+                            r: "4",
+                            strokeWidth: "0",
+                            stroke: Colors.Color1,
+                            fill: Colors.Color1,
+                          },
+                          strokeWidth: 2,
+                          useShadowColorFromDataset: false,
+                          yAxisWidth: 45,
+                        }}
+                        style={{
+                          marginVertical: 16,
+                          borderRadius: 16,
+                        }}
+                        bezier
+                        withInnerLines={false}
+                        withOuterLines={true}
+                        withVerticalLines={false}
+                        withHorizontalLines={true}
+                        withDots={true}
+                        withShadow
+                        yAxisSuffix=" kg"
+                      />
+                    </View>
+                  </>
                 )}
               </View>
               <View
