@@ -33,6 +33,19 @@ export default function TapeMeasureSlider({
     setValue(defaultValue);
   }, [defaultValue, unit]);
 
+  const triggerVibration = () => {
+    // Verificar si el navegador soporta la API de vibración
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        // Vibración corta de 50ms
+        navigator.vibrate(50);
+      } catch (error) {
+        // Silenciosamente ignorar errores de vibración
+        console.debug("Vibración no disponible:", error);
+      }
+    }
+  };
+
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
@@ -46,10 +59,16 @@ export default function TapeMeasureSlider({
 
         // Cuando el acumulador supera la sensibilidad, se cambia el valor
         if (newAccumulatedDx >= SENSITIVITY) {
-          setValue((prevValue) => prevValue + 1); // Incrementa el valor
+          setValue((prevValue) => {
+            triggerVibration();
+            return prevValue + 1;
+          });
           return 0; // Reinicia el acumulador
         } else if (newAccumulatedDx <= -SENSITIVITY) {
-          setValue((prevValue) => Math.max(prevValue - 1, 0)); // Decrementa el valor
+          setValue((prevValue) => {
+            triggerVibration();
+            return Math.max(prevValue - 1, 0);
+          });
           return 0; // Reinicia el acumulador
         }
 
