@@ -70,6 +70,13 @@ npx expo export --platform web
 
 Este comando generará una versión optimizada de la aplicación web que podrás desplegar en cualquier servicio de hosting.
 
+> **Nota importante para deploy en Netlify**: 
+> Después de generar el build, debes crear un archivo sin extensión llamado `_redirects` en la carpeta `dist` con el siguiente contenido:
+> ```
+> /*    /index.html   200
+> ```
+> Este archivo es necesario para el correcto funcionamiento del enrutamiento en Netlify.
+
 ### Comandos adicionales
 
 ```bash
