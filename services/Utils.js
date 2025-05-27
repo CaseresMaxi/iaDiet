@@ -47,7 +47,14 @@ export const createAbortableFetch = (url, options = {}) => {
     },
   };
 
-  const promise = fetch(url, fetchOptions);
+  const promise = fetch(url, fetchOptions).then(async (response) => {
+    if (response.status === 401) {
+      AuthService.clearAuth();
+      window.location.href = "/";
+      throw new Error("Unauthorized");
+    }
+    return response;
+  });
 
   return {
     promise,

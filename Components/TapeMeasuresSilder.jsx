@@ -37,13 +37,21 @@ export default function TapeMeasureSlider({
     // Verificar si el navegador soporta la API de vibración
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
-        // Vibración corta de 50ms
-        navigator.vibrate(50);
+        if (
+          window.AndroidBridge &&
+          typeof window.AndroidBridge.vibrate === "function"
+        ) {
+          window.AndroidBridge.vibrate(200); // Native Android vibration
+        } else {
+          navigator.vibrate(50);
+        }
       } catch (error) {
         // Silenciosamente ignorar errores de vibración
         console.debug("Vibración no disponible:", error);
       }
     }
+
+ 
   };
 
   const panResponder = PanResponder.create({

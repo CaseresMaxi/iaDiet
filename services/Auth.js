@@ -100,7 +100,7 @@ class AuthService {
       throw new Error("Invalid token renewal response");
     } catch (error) {
       console.error("Token renewal error:", error);
-      this.clearAuth();
+      // this.clearAuth();
       throw error;
     }
   }

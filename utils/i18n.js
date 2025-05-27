@@ -83,6 +83,15 @@ const resources = {
         edit: "Editar",
         back: "Volver",
       },
+      chat: {
+        error: {
+          message: "Ha ocurrido un error al procesar tu mensaje",
+          retry: "¿Deseas intentarlo de nuevo?",
+          imageError: "Ha ocurrido un error al procesar la imagen",
+          networkError:
+            "Error de conexión. Por favor, verifica tu conexión a internet",
+        },
+      },
       completeSignUp: {
         motivation: "La consistencia es la clave del progreso. ¡No te rindas!",
         motivationSubtext:
@@ -252,6 +261,15 @@ const resources = {
         delete: "Delete",
         edit: "Edit",
         back: "Back",
+      },
+      chat: {
+        error: {
+          message: "An error occurred while processing your message",
+          retry: "Would you like to try again?",
+          imageError: "An error occurred while processing the image",
+          networkError:
+            "Connection error. Please check your internet connection",
+        },
       },
       completeSignUp: {
         motivation: "Consistency Is the Key To progress. Don't Give Up!",

@@ -52,6 +52,10 @@ export default function Main() {
   useFocusEffect(
     useCallback(() => {
       console.log("useFocusEffect triggered");
+
+      // Clear session data every time user enters login page
+      AuthService.clearAuth();
+
       setGoBackVisible(false);
       setHeaderTitle("Login");
       setHeaderVisible(true);
@@ -83,11 +87,11 @@ export default function Main() {
     }
   };
 
-  useEffect(() => {
-    if (AuthService.isAuthenticated()) {
-      AuthService.clearAuth();
-    }
-  }, [router.isReady]);
+  // useEffect(() => {
+  //   if (AuthService.isAuthenticated()) {
+  //     AuthService.clearAuth();
+  //   }
+  // }, [router.isReady]);
 
   return (
     <View

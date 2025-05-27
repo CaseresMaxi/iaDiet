@@ -50,8 +50,8 @@ const Layout = () => {
       extra: "🔒",
       onClick: () => {
         try {
-          window.sessionStorage?.removeItem("user_id");
-          window.sessionStorage?.removeItem("token");
+          window.localStorage?.removeItem("user_id");
+          window.localStorage?.removeItem("token");
           router.push("/");
         } catch (error) {
           console.error("Failed to log out:", error);

@@ -1,12 +1,14 @@
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { createAbortableFetch } from "./Utils";
+import i18next from "i18next";
 
 export const createImage = (
   setGeneratedImage = () => {},
   prompt = "",
   keywords = "",
   setisLoading = () => {},
+  setMessages = () => {},
   signal = null
 ) => {
   setisLoading(true);
@@ -38,6 +40,16 @@ export const createImage = (
         return;
       }
       console.error(error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: `${Date.now().toString()}-error`,
+          text: `${i18next.t("chat.error.imageError")}\n${i18next.t("chat.error.retry")}`,
+          isBot: true,
+          isError: true,
+        },
+      ]);
+      setisLoading(false);
     });
 
   return abort;
@@ -221,6 +233,7 @@ Mantén tus respuestas claras y cortas.`,
       const response = await promise;
 
       if (!response.ok) {
+        console.log("error en endpoint");
         throw new Error(`Error al enviar el mensaje: ${response.statusText}`);
       }
 
@@ -251,6 +264,15 @@ Mantén tus respuestas claras y cortas.`,
       return;
     }
     console.error("Error en la solicitud:", error);
-    alert("Hubo un error al analizar la imagen. Por favor, intenta de nuevo.");
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: `${Date.now().toString()}-error`,
+        text: `${i18next.t("chat.error.message")}\n${i18next.t("chat.error.retry")}`,
+        isBot: true,
+        isError: true,
+      },
+    ]);
+    setisLoading(false);
   }
 };
