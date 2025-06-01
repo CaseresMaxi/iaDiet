@@ -222,6 +222,7 @@ export default function Profile() {
       ...data,
       goal: selectedGoal,
       daily_activity: selectedActivity,
+      weight: [parseFloat(data.weight)],
     };
     // Enviar los datos actualizados al servidor
     modifyUserData(updatedData, setLoading, () =>
