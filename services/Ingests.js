@@ -42,7 +42,8 @@ export const postIngest = (
   setingestData = () => {},
   formData,
   lastSelectedImg,
-  signal = null
+  signal = null,
+  period = null
 ) => {
   const { promise, abort } = createAbortableFetch(
     "https://ainutritioner.click/ingests",
@@ -70,7 +71,7 @@ export const postIngest = (
     .then((response) => response.json())
     .then(() => {
       const { promise: refreshPromise } = createAbortableFetch(
-        `https://ainutritioner.click/ingests/user/${window.localStorage?.getItem("user_id")}`,
+        `https://ainutritioner.click/ingests/user/${window.localStorage?.getItem("user_id")}${period?.start ? `/by_date?start_date=${period.start}&end_date=${period.end}` : ""}`,
         {
           headers: {
             Authorization: `Bearer ${window.localStorage?.getItem("token")}`,

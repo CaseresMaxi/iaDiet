@@ -123,7 +123,7 @@ const Tracker = () => {
       },
       {
         start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
-        end: dayjs().format("YYYY-MM-DD"),
+        end: dayjs().add(1, "day").format("YYYY-MM-DD"),
       },
       setloadingIngest
     );
@@ -166,24 +166,29 @@ const Tracker = () => {
     setloadingIngest(true);
     postIngest(
       (data) => {
-        setIngestData(data);
-        const grouped = data.reduce(
-          (acc, item) => {
-            const date = dayjs(item.date).format("YYYY-MM-DD");
-            if (!acc[date]) acc[date] = [];
-            acc[date].push(item);
-            return acc;
-          },
-          {
-            start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
-            end: dayjs().format("YYYY-MM-DD"),
-          }
-        );
-        setGroupedData(grouped);
+        // setIngestData(data);
+        // const grouped = data.reduce(
+        //   (acc, item) => {
+        //     const date = dayjs(item.date).format("YYYY-MM-DD");
+        //     if (!acc[date]) acc[date] = [];
+        //     acc[date].push(item);
+        //     return acc;
+        //   },
+        //   {
+        //     start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+        //     end: dayjs().format("YYYY-MM-DD"),
+        //   }
+        // );
+        // setGroupedData(grouped);
         setloadingIngest(false);
       },
       formData,
-      formData.image
+      formData.image,
+      null,
+      {
+        start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+        end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+      }
     );
     reset();
     setModalVisible(false);
