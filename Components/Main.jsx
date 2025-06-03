@@ -19,17 +19,20 @@ import GlobalStyles from "../styles/Global";
 import { useStore } from "../utils/zustan";
 import AdsterraAd from "./Ads/AdsterraAd";
 import AuthService from "../services/Auth";
+import CheckBox from "./CheckBox/CheckBox";
 
 export default function Main() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [loginError, setLoginError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const {
     control,
     handleSubmit,
     formState: { errors },
     setError,
+    setValue,
   } = useForm({
     defaultValues: {
       email: "",
@@ -56,6 +59,16 @@ export default function Main() {
       // Clear session data every time user enters login page
       AuthService.clearAuth();
 
+      // Load saved credentials if they exist
+      const savedEmail = window.localStorage?.getItem("rememberedEmail");
+      const savedPassword = window.localStorage?.getItem("rememberedPassword");
+
+      if (savedEmail && savedPassword) {
+        setValue("email", savedEmail);
+        setValue("password", savedPassword);
+        setRememberMe(true);
+      }
+
       setGoBackVisible(false);
       setHeaderTitle("Login");
       setHeaderVisible(true);
@@ -64,13 +77,23 @@ export default function Main() {
       return () => {
         // setNavigationVisible(true);
       };
-    }, [])
+    }, [setValue])
   );
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
       await AuthService.login(data.email, data.password);
+
+      // Handle remember me functionality
+      if (rememberMe) {
+        window.localStorage?.setItem("rememberedEmail", data.email);
+        window.localStorage?.setItem("rememberedPassword", data.password);
+      } else {
+        window.localStorage?.removeItem("rememberedEmail");
+        window.localStorage?.removeItem("rememberedPassword");
+      }
+
       setIsLoading(false);
       router.push("/home");
     } catch (error) {
@@ -159,7 +182,7 @@ export default function Main() {
             </Text>
           </View>
         )}
-
+        <View>
         <Controller
           control={control}
           rules={{ required: true }}
@@ -189,6 +212,15 @@ export default function Main() {
           </View>
         )}
 
+        {/* Remember me checkbox */}
+        <View style={{ paddingHorizontal: 24, marginTop: 10 }}>
+          <CheckBox
+            checked={rememberMe}
+            onPress={() => setRememberMe(!rememberMe)}
+            label="Recordarme"
+            />
+          </View>
+        </View>s
         {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable> */}

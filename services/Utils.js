@@ -17,23 +17,6 @@ export const deleteContextChat = (setingestData) => {
     .catch((error) => console.error(error));
 };
 
-export const renewToken = () => {
-  fetch(`https://ainutritioner.click/users/renew-token`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
-    },
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      window.localStorage.setItem("token", data.token);
-    })
-
-    .catch((error) => console.error(error));
-};
-
 export const createAbortableFetch = (url, options = {}) => {
   const controller = new AbortController();
   const signal = controller.signal;
@@ -49,9 +32,32 @@ export const createAbortableFetch = (url, options = {}) => {
 
   const promise = fetch(url, fetchOptions).then(async (response) => {
     if (response.status === 401) {
-      AuthService.clearAuth();
-      window.location.href = "/";
-      throw new Error("Unauthorized");
+      // Try to renew token first
+      try {
+        await AuthService.renewToken();
+
+        // Retry the original request with new token
+        const retryOptions = {
+          ...fetchOptions,
+          headers: {
+            ...fetchOptions.headers,
+            Authorization: `Bearer ${AuthService.getToken()}`,
+          },
+        };
+
+        const retryResponse = await fetch(url, retryOptions);
+        if (retryResponse.ok) {
+          return retryResponse;
+        }
+
+        // If retry also fails, clear auth
+        throw new Error("Token renewal failed");
+      } catch (error) {
+        console.error("Token renewal failed:", error);
+        AuthService.clearAuth();
+        window.location.href = "/";
+        throw new Error("Unauthorized");
+      }
     }
     return response;
   });
