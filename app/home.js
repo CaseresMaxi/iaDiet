@@ -38,6 +38,7 @@ import { fetchUserData } from "../services/UserData";
 import Colors from "../styles/Colors";
 import "../utils/i18n";
 import { useStore } from "../utils/zustan";
+import dayjs from "dayjs";
 
 const CopilotText = walkthroughable(Text);
 
@@ -140,7 +141,14 @@ export default function Home() {
     fetchDiet(setDietData, setisLoading);
 
     setNavigationVisible(true);
-    getIngests(setIngestData, null, setloadingIngest);
+    getIngests(
+      setIngestData,
+      {
+        start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+        end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+      },
+      setloadingIngest
+    );
     setGoBackVisible(true);
 
     return () => {

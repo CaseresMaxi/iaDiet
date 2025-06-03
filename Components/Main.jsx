@@ -183,44 +183,44 @@ export default function Main() {
           </View>
         )}
         <View>
-        <Controller
-          control={control}
-          rules={{ required: true }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <FormInput
-              placeholder="Password"
-              placeholderTextColor="#888"
-              secureTextEntry
-              onBlur={onBlur}
-              onChangeText={(text) => {
-                onChange(text);
-                setLoginError(false);
-              }}
-              value={value}
-              label={"Password"}
-              password
-              error={errors.password?.message}
-            />
+          <Controller
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <FormInput
+                placeholder="Password"
+                placeholderTextColor="#888"
+                secureTextEntry
+                onBlur={onBlur}
+                onChangeText={(text) => {
+                  onChange(text);
+                  setLoginError(false);
+                }}
+                value={value}
+                label={"Password"}
+                password
+                error={errors.password?.message}
+              />
+            )}
+            name="password"
+          />
+          {errors.password && (
+            <View style={GlobalStyles.errorWrapper}>
+              <Text style={styles.errorText}>
+                {errors.password.message || "Password is required."}
+              </Text>
+            </View>
           )}
-          name="password"
-        />
-        {errors.password && (
-          <View style={GlobalStyles.errorWrapper}>
-            <Text style={styles.errorText}>
-              {errors.password.message || "Password is required."}
-            </Text>
-          </View>
-        )}
 
-        {/* Remember me checkbox */}
-        <View style={{ paddingHorizontal: 24, marginTop: 10 }}>
-          <CheckBox
-            checked={rememberMe}
-            onPress={() => setRememberMe(!rememberMe)}
-            label="Recordarme"
+          {/* Remember me checkbox */}
+          <View style={{ paddingHorizontal: 24, marginTop: 10 }}>
+            <CheckBox
+              checked={rememberMe}
+              onPress={() => setRememberMe(!rememberMe)}
+              label="Recordarme"
             />
           </View>
-        </View>s
+        </View>
         {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable> */}

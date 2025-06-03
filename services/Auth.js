@@ -1,4 +1,4 @@
-import { createAbortableFetch } from "./Utils";
+import { createAbortableFetch, resetTokenRenewalAttempts } from "./Utils";
 
 class AuthService {
   static TOKEN_KEY = "token";
@@ -34,6 +34,7 @@ class AuthService {
     window.localStorage?.removeItem(this.TOKEN_KEY);
     window.localStorage?.removeItem(this.REFRESH_TOKEN_KEY);
     window.localStorage?.removeItem(this.USER_ID_KEY);
+    resetTokenRenewalAttempts();
   }
 
   static async login(email, password) {
@@ -59,6 +60,7 @@ class AuthService {
       if (result?.user?.user_id && result?.token) {
         this.setUserId(result.user.user_id);
         this.setTokens(result.token, result.refresh_token);
+        resetTokenRenewalAttempts();
         return result;
       }
 
@@ -72,31 +74,36 @@ class AuthService {
   static async renewToken() {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
+      console.error("No refresh token available for renewal");
       throw new Error("No refresh token available");
     }
 
     try {
-      const { promise } = createAbortableFetch(
+      console.log("Attempting to renew token...");
+      const response = await fetch(
         "https://ainutritioner.click/users/renew-token",
         {
           method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${refreshToken}`,
           },
         }
       );
 
-      const response = await promise;
       if (!response.ok) {
+        console.error(`Token renewal failed with status: ${response.status}`);
         throw new Error("Token renewal failed");
       }
 
       const result = await response.json();
       if (result?.token && result?.refresh_token) {
         this.setTokens(result.token, result.refresh_token);
+        console.log("Token renewed successfully");
         return result;
       }
 
+      console.error("Invalid token renewal response format");
       throw new Error("Invalid token renewal response");
     } catch (error) {
       console.error("Token renewal error:", error);
