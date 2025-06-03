@@ -69,3 +69,43 @@ export const modifyUserData = async (
     console.error(error);
   }
 };
+
+export const deleteAccount = async (
+  setLoading = () => {},
+  onSuccess = () => {},
+  onError = () => {},
+  signal = null
+) => {
+  setLoading(true);
+  try {
+    const { promise } = createAbortableFetch(
+      `https://ainutritioner.click/users/${window.localStorage?.user_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${window.localStorage?.getItem("token")}`,
+        },
+        signal,
+      }
+    );
+
+    const response = await promise;
+    if (!response.ok) throw new Error("Error deleting account");
+
+    // Clear local storage
+    window.localStorage?.removeItem("user_id");
+    window.localStorage?.removeItem("token");
+    window.sessionStorage?.clear();
+
+    onSuccess();
+  } catch (error) {
+    if (error.name === "AbortError") {
+      console.log("Eliminación de cuenta cancelada");
+      return;
+    }
+    console.error("Error deleting account:", error);
+    onError(error);
+  } finally {
+    setLoading(false);
+  }
+};

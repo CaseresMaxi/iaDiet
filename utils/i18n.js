@@ -134,6 +134,7 @@ const resources = {
           username: "Nombre de usuario",
           email: "Correo electrónico",
           phoneNumber: "Número de teléfono",
+          privacyPolicy: "Política de Privacidad",
         },
         buttons: {
           continue: "Continuar",
@@ -146,6 +147,20 @@ const resources = {
           emailInvalid: "Ingresa un correo electrónico válido",
           phoneRequired: "El número de teléfono es requerido",
           phoneInvalid: "Ingresa un número de teléfono válido",
+        },
+      },
+      profile: {
+        privacyPolicy: "Política de Privacidad",
+        deleteAccount: {
+          title: "Eliminar Cuenta",
+          description:
+            "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+          warning:
+            "Se eliminarán permanentemente todos tus datos, incluidos registros de comidas, progreso y configuraciones.",
+          confirm: "Eliminar cuenta",
+          button: "Eliminar Cuenta",
+          success: "Tu cuenta ha sido eliminada exitosamente",
+          error: "Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.",
         },
       },
       forgotPassword: {
@@ -175,6 +190,69 @@ const resources = {
         errorResettingPassword:
           "Error al restablecer la contraseña. Por favor intenta nuevamente.",
         successMessage: "Contraseña actualizada exitosamente",
+      },
+      privacy: {
+        title: "Política de Privacidad",
+        introduction:
+          "En iaDiet, valoramos tu privacidad y nos comprometemos a proteger tu información personal. Esta política describe cómo recopilamos, utilizamos y protegemos tus datos cuando utilizas nuestra aplicación de nutrición y seguimiento dietético.",
+        lastUpdated: "Última actualización:",
+        sections: {
+          dataCollection: {
+            title: "Información que Recopilamos",
+            content:
+              "• Información personal (nombre, edad, peso, altura)\n• Datos de actividad física y objetivos de salud\n• Información nutricional y registros de comidas\n• Fotos de alimentos y análisis nutricional\n• Datos de uso de la aplicación\n• Información del dispositivo y técnica",
+          },
+          dataUsage: {
+            title: "Cómo Utilizamos tu Información",
+            content:
+              "• Personalizar tu experiencia nutricional\n• Calcular y recomendar planes de dieta\n• Analizar fotos de alimentos para determinar información nutricional\n• Generar estadísticas y gráficos de progreso\n• Mejorar nuestros servicios y funcionalidades\n• Enviar notificaciones relevantes sobre tu progreso",
+          },
+          dataSharing: {
+            title: "Compartir Información",
+            content:
+              "• No vendemos tu información personal a terceros\n• Podemos compartir datos agregados y anónimos para investigación\n• Utilizamos servicios de terceros confiables para procesamiento de datos\n• Solo compartimos información cuando sea legalmente requerido\n• Los datos pueden ser compartidos con tu consentimiento explícito",
+          },
+          dataSecurity: {
+            title: "Seguridad de Datos",
+            content:
+              "• Utilizamos encriptación para proteger tus datos\n• Almacenamiento seguro en servidores protegidos\n• Acceso restringido solo a personal autorizado\n• Auditorías regulares de seguridad\n• Copias de seguridad automáticas para prevenir pérdida de datos",
+          },
+          userRights: {
+            title: "Tus Derechos",
+            content:
+              "• Acceder a tu información personal\n• Corregir datos inexactos o incompletos\n• Eliminar tu cuenta y todos los datos asociados\n• Exportar tus datos en formato legible\n• Retirar consentimiento para procesamiento de datos\n• Presentar quejas ante autoridades de protección de datos",
+          },
+          dataRetention: {
+            title: "Retención de Datos",
+            content:
+              "• Mantenemos tus datos mientras tu cuenta esté activa\n• Puedes solicitar eliminación de datos en cualquier momento\n• Algunos datos pueden conservarse por requisitos legales\n• Datos anonimizados pueden usarse para investigación a largo plazo\n• Backup automático se elimina según política de retención",
+          },
+          cookies: {
+            title: "Cookies y Tecnologías de Seguimiento",
+            content:
+              "• Utilizamos cookies para mejorar la experiencia del usuario\n• Tecnologías de análisis para entender el uso de la aplicación\n• Puedes controlar las cookies en la configuración de tu navegador\n• Algunas funciones pueden requerir cookies para funcionar correctamente",
+          },
+          minors: {
+            title: "Menores de Edad",
+            content:
+              "• Nuestra aplicación está dirigida a usuarios mayores de 13 años\n• Requerimos consentimiento parental para menores de 18 años\n• No recopilamos intencionalmente información de menores de 13 años\n• Si detectamos datos de menores, los eliminaremos inmediatamente",
+          },
+          policyChanges: {
+            title: "Cambios en la Política",
+            content:
+              "• Podemos actualizar esta política de privacidad ocasionalmente\n• Te notificaremos sobre cambios significativos\n• La fecha de última actualización se indica al final del documento\n• El uso continuado implica aceptación de los cambios",
+          },
+          contact: {
+            title: "Contacto",
+            content:
+              "• Para preguntas sobre privacidad, contacta: privacy@iadiet.com\n• Para ejercer tus derechos: support@iadiet.com\n• Para reportar problemas de seguridad: security@iadiet.com\n• Para consultas generales: hello@iadiet.com",
+          },
+        },
+        footer: {
+          title: "¿Tienes preguntas?",
+          content:
+            "Si tienes alguna pregunta sobre esta política de privacidad o sobre cómo manejamos tus datos, no dudes en contactarnos.",
+        },
       },
     },
   },
@@ -313,6 +391,7 @@ const resources = {
           username: "Username",
           email: "Email",
           phoneNumber: "Phone Number",
+          privacyPolicy: "Privacy Policy",
         },
         buttons: {
           continue: "Continue",
@@ -325,6 +404,21 @@ const resources = {
           emailInvalid: "Enter a valid email address",
           phoneRequired: "Phone Number is required",
           phoneInvalid: "Enter a valid phone number",
+        },
+      },
+      profile: {
+        privacyPolicy: "Privacy Policy",
+        deleteAccount: {
+          title: "Delete Account",
+          description:
+            "Are you sure you want to delete your account? This action cannot be undone.",
+          warning:
+            "All your data will be permanently deleted, including meal records, progress, and settings.",
+          confirm: "Yes, delete account",
+          button: "Delete Account",
+          success: "Your account has been successfully deleted",
+          error:
+            "An error occurred while deleting the account. Please try again.",
         },
       },
       forgotPassword: {
@@ -352,6 +446,69 @@ const resources = {
         errorSendingCode: "Error sending code. Please try again.",
         errorResettingPassword: "Error resetting password. Please try again.",
         successMessage: "Password successfully updated",
+      },
+      privacy: {
+        title: "Privacy Policy",
+        introduction:
+          "At iaDiet, we value your privacy and are committed to protecting your personal information. This policy describes how we collect, use, and protect your data when you use our nutrition and diet tracking application.",
+        lastUpdated: "Last updated:",
+        sections: {
+          dataCollection: {
+            title: "Information We Collect",
+            content:
+              "• Personal information (name, age, weight, height)\n• Physical activity data and health goals\n• Nutritional information and meal records\n• Food photos and nutritional analysis\n• App usage data\n• Device and technical information",
+          },
+          dataUsage: {
+            title: "How We Use Your Information",
+            content:
+              "• Personalize your nutritional experience\n• Calculate and recommend diet plans\n• Analyze food photos to determine nutritional information\n• Generate progress statistics and charts\n• Improve our services and functionalities\n• Send relevant notifications about your progress",
+          },
+          dataSharing: {
+            title: "Information Sharing",
+            content:
+              "• We do not sell your personal information to third parties\n• We may share aggregated and anonymous data for research\n• We use trusted third-party services for data processing\n• We only share information when legally required\n• Data may be shared with your explicit consent",
+          },
+          dataSecurity: {
+            title: "Data Security",
+            content:
+              "• We use encryption to protect your data\n• Secure storage on protected servers\n• Restricted access only to authorized personnel\n• Regular security audits\n• Automatic backups to prevent data loss",
+          },
+          userRights: {
+            title: "Your Rights",
+            content:
+              "• Access your personal information\n• Correct inaccurate or incomplete data\n• Delete your account and all associated data\n• Export your data in readable format\n• Withdraw consent for data processing\n• File complaints with data protection authorities",
+          },
+          dataRetention: {
+            title: "Data Retention",
+            content:
+              "• We keep your data while your account is active\n• You can request data deletion at any time\n• Some data may be retained for legal requirements\n• Anonymized data may be used for long-term research\n• Automatic backup is deleted according to retention policy",
+          },
+          cookies: {
+            title: "Cookies and Tracking Technologies",
+            content:
+              "• We use cookies to improve user experience\n• Analytics technologies to understand app usage\n• You can control cookies in your browser settings\n• Some features may require cookies to function properly",
+          },
+          minors: {
+            title: "Minors",
+            content:
+              "• Our application is intended for users over 13 years old\n• We require parental consent for minors under 18\n• We do not intentionally collect information from children under 13\n• If we detect data from minors, we will delete it immediately",
+          },
+          policyChanges: {
+            title: "Policy Changes",
+            content:
+              "• We may update this privacy policy occasionally\n• We will notify you about significant changes\n• The last update date is indicated at the end of the document\n• Continued use implies acceptance of changes",
+          },
+          contact: {
+            title: "Contact",
+            content:
+              "• For privacy questions, contact: privacy@iadiet.com\n• To exercise your rights: support@iadiet.com\n• To report security issues: security@iadiet.com\n• For general inquiries: hello@iadiet.com",
+          },
+        },
+        footer: {
+          title: "Have Questions?",
+          content:
+            "If you have any questions about this privacy policy or how we handle your data, please don't hesitate to contact us.",
+        },
       },
     },
   },

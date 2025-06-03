@@ -1,20 +1,34 @@
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-web";
+import { useTranslation } from "react-i18next";
 import Button from "../Components/Button/Button";
 import FormInput from "../Components/Input/Input";
+import DeleteAccountModal from "../Components/DeleteAccountModal";
 import Female from "../assets/female_user.png";
 import ChevronForward from "../assets/icons/ChevronForward.svg";
 import User from "../assets/icons/user.svg";
 import Male from "../assets/male_user.png";
-import { fetchUserData, modifyUserData } from "../services/UserData";
+import {
+  fetchUserData,
+  modifyUserData,
+  deleteAccount,
+} from "../services/UserData";
 import Colors from "../styles/Colors";
 import styles from "../styles/ProfileStyles";
 import { useStore } from "../utils/zustan";
 import AdsterraAd from "../Components/Ads/AdsterraAd";
+import "../utils/i18n";
 
 // Componente para selector desplegable reutilizable
 const DropdownSelector = ({
@@ -143,6 +157,7 @@ const DropdownSelector = ({
 };
 
 export default function Profile() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const setHeaderTitle = useStore((state) => state.setHeaderTitle);
@@ -178,6 +193,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState("");
   const [selectedActivity, setSelectedActivity] = useState("");
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const activityLevels = {
     Sedentario: "Poca o nula actividad física.",
@@ -215,6 +232,7 @@ export default function Profile() {
     setSelectedGoal(userData?.goal || "");
     setSelectedActivity(userData?.daily_activity || "");
   }, [userData]);
+
   // Nueva función onSubmit
   const onSubmit = (data) => {
     // Incluir el objetivo seleccionado en los datos
@@ -229,6 +247,35 @@ export default function Profile() {
       fetchUserData(setuserData, setLoading)
     );
   };
+
+  // Function to handle account deletion
+  const handleDeleteAccount = () => {
+    deleteAccount(
+      setDeleteLoading,
+      () => {
+        // Success callback
+        setDeleteModalVisible(false);
+        Alert.alert(
+          t("profile.deleteAccount.title"),
+          t("profile.deleteAccount.success"),
+          [
+            {
+              text: "OK",
+              onPress: () => router.push("/"),
+            },
+          ]
+        );
+      },
+      (error) => {
+        // Error callback
+        setDeleteModalVisible(false);
+        Alert.alert("Error", t("profile.deleteAccount.error"), [
+          { text: "OK" },
+        ]);
+      }
+    );
+  };
+
   return (
     <ScrollView
       style={{
@@ -386,6 +433,7 @@ export default function Profile() {
             descriptionField={activityLevels}
           />
         </View>
+
         <View
           style={{
             width: "100%",
@@ -413,7 +461,69 @@ export default function Profile() {
             width={142}
           />
         </View>
+
+        {/* Privacy Policy Link */}
+        <TouchableOpacity
+          onPress={() => router.push("/privacy")}
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingVertical: 15,
+            paddingHorizontal: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.Color5,
+            marginTop: 20,
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.Font2,
+              fontSize: 16,
+              fontWeight: "600",
+            }}
+          >
+            {t("profile.privacyPolicy")}
+          </Text>
+          <Image source={ChevronForward} resizeMode="cover" />
+        </TouchableOpacity>
+
+        {/* Delete Account Link */}
+        <TouchableOpacity
+          onPress={() => setDeleteModalVisible(true)}
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingVertical: 15,
+            paddingHorizontal: 10,
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.Color5,
+            marginTop: 5,
+          }}
+        >
+          <Text
+            style={{
+              color: "#FF4444",
+              fontSize: 16,
+              fontWeight: "600",
+            }}
+          >
+            {t("profile.deleteAccount.button")}
+          </Text>
+          <Image source={ChevronForward} resizeMode="cover" />
+        </TouchableOpacity>
       </View>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        visible={deleteModalVisible}
+        onClose={() => setDeleteModalVisible(false)}
+        onConfirm={handleDeleteAccount}
+        loading={deleteLoading}
+      />
 
       {/* <View>
         <AdsterraAd

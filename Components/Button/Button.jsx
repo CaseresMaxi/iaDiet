@@ -2,7 +2,14 @@ import React from "react";
 import { TouchableOpacity, Text, View, StyleSheet } from "react-native";
 import buttonStyles from "../../styles/ButtonStyles";
 
-const Button = ({ text = "", onClick = () => {}, style, type, width }) => {
+const Button = ({
+  text = "",
+  onClick = () => {},
+  style,
+  type,
+  width,
+  disabled = false,
+}) => {
   const ButtonVariant = {
     secondary: buttonStyles.secondaryButton,
     error: buttonStyles.errorButton,
@@ -11,15 +18,20 @@ const Button = ({ text = "", onClick = () => {}, style, type, width }) => {
     secondary: buttonStyles.secondaryButtonText,
     error: buttonStyles.errorButtonText,
   };
+
+  const disabledStyle = disabled ? { opacity: 0.6 } : {};
+
   return (
     <TouchableOpacity
       style={{
         ...buttonStyles.button,
         ...ButtonVariant[type],
+        ...disabledStyle,
         width,
         ...style,
       }}
-      onPress={onClick}
+      onPress={disabled ? undefined : onClick}
+      disabled={disabled}
     >
       <Text style={{ ...buttonStyles.buttonText, ...ButtonTextVariant[type] }}>
         {text}
