@@ -166,21 +166,25 @@ const Tracker = () => {
     setloadingIngest(true);
     postIngest(
       (data) => {
-        // setIngestData(data);
-        // const grouped = data.reduce(
-        //   (acc, item) => {
-        //     const date = dayjs(item.date).format("YYYY-MM-DD");
-        //     if (!acc[date]) acc[date] = [];
-        //     acc[date].push(item);
-        //     return acc;
-        //   },
-        //   {
-        //     start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
-        //     end: dayjs().format("YYYY-MM-DD"),
-        //   }
-        // );
-        // setGroupedData(grouped);
-        setloadingIngest(false);
+        // After successful ingest creation, fetch updated ingests
+        getIngests(
+          (data) => {
+            setIngestData(data);
+            setloadingIngest(false);
+            const grouped = data.reduce((acc, item) => {
+              const date = dayjs(item.date).format("YYYY-MM-DD");
+              if (!acc[date]) acc[date] = [];
+              acc[date].push(item);
+              return acc;
+            }, {});
+            setGroupedData(grouped);
+          },
+          {
+            start: dayjs().subtract(10, "day").format("YYYY-MM-DD"),
+            end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+          },
+          setloadingIngest
+        );
       },
       formData,
       formData.image,

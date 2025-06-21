@@ -60,7 +60,7 @@ const resources = {
       },
       modal: {
         add: {
-          title: "Agregar alimento",
+          title: "",
           food_name: "Nombre del alimento",
           calories: "Calorías",
           proteins: "Proteínas (g)",
