@@ -30,17 +30,25 @@ const MessageItem = memo(
         style={[
           styles.chatMessageContainer,
           item.isBot ? styles.botMessage : styles.userMessage,
+          item.isError && styles.errorMessage,
         ]}
       >
         {item?.image && (
           <Image source={{ uri: item?.image }} style={styles.messageImage} />
         )}
+        {item.isError && (
+          <View style={styles.errorIconContainer}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+          </View>
+        )}
         {item.isBot ? (
-          <Markdown style={markdownStyles}>{item.text}</Markdown>
+          <Markdown style={item.isError ? errorMarkdownStyles : markdownStyles}>
+            {item.text}
+          </Markdown>
         ) : (
           <Text style={styles.messageText}>{item.text}</Text>
         )}
-        {nutritionData && index === messagesLength - 1 && (
+        {nutritionData && index === messagesLength - 1 && !item.isError && (
           <Pressable style={styles.openModalButton} onPress={onOpenModal}>
             <Text style={styles.openModalButtonText}>Me parece bien!</Text>
           </Pressable>
@@ -95,6 +103,55 @@ const markdownStyles = {
   },
   paragraph: {
     color: Colors.Font2,
+    marginVertical: 8,
+  },
+};
+
+const errorMarkdownStyles = {
+  body: {
+    color: "#ff4444",
+  },
+  heading1: {
+    color: "#ff4444",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  heading2: {
+    color: "#ff4444",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  heading3: {
+    color: "#ff4444",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  strong: {
+    color: "#ff4444",
+    fontWeight: "bold",
+  },
+  bullet_list: {
+    color: "#ff4444",
+    marginLeft: 20,
+  },
+  bullet_list_icon: {
+    color: "#ff4444",
+  },
+  ordered_list: {
+    color: "#ff4444",
+    marginLeft: 20,
+  },
+  ordered_list_icon: {
+    color: "#ff4444",
+  },
+  paragraph: {
+    color: "#ff4444",
     marginVertical: 8,
   },
 };

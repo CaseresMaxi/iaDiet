@@ -263,6 +263,9 @@ export default function CompleteSignUp() {
               heightMeasure
               orientation="vertical"
               defaultValue={userValues.gender === "m" ? 170 : 150}
+              setValueCallback={(height) =>
+                setUserValues({ ...userValues, height: height })
+              }
             />
           </View>
         );
@@ -443,14 +446,15 @@ export default function CompleteSignUp() {
                   rules={{
                     required: t("completeSignUp.validation.usernameRequired"),
                   }}
-                  render={({ field: { onBlur, value } }) => (
+                  render={({ field: { onBlur, onChange } }) => (
                     <FormInput
                       placeholder={t("completeSignUp.profile.username")}
                       placeholderTextColor="#888"
                       onBlur={onBlur}
-                      onChangeText={(text) =>
-                        handleInputChange("username", text)
-                      }
+                      onChangeText={(text) => {
+                        handleInputChange("username", text);
+                        onChange(text);
+                      }}
                       value={userValues.username}
                       label={t("completeSignUp.profile.username")}
                     />
@@ -458,36 +462,6 @@ export default function CompleteSignUp() {
                 />
                 {errors.username && (
                   <Text style={styles.error}>{errors.username.message}</Text>
-                )}
-              </View>
-
-              <View>
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: t("completeSignUp.validation.emailRequired"),
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: t("completeSignUp.validation.emailInvalid"),
-                    },
-                  }}
-                  render={({ field: { onBlur, onChange } }) => (
-                    <FormInput
-                      placeholder="example@email.com"
-                      placeholderTextColor="#888"
-                      onBlur={onBlur}
-                      onChangeText={(text) => {
-                        handleInputChange("email", text);
-                        onChange(text);
-                      }}
-                      value={confirmStepUserData.email}
-                      label={t("completeSignUp.profile.email")}
-                    />
-                  )}
-                />
-                {errors.email && (
-                  <Text style={styles.error}>{errors.email.message}</Text>
                 )}
               </View>
 
@@ -502,14 +476,15 @@ export default function CompleteSignUp() {
                       message: t("completeSignUp.validation.phoneInvalid"),
                     },
                   }}
-                  render={({ field: { onBlur, value } }) => (
+                  render={({ field: { onBlur, onChange } }) => (
                     <FormInput
                       placeholder="1234567890"
                       placeholderTextColor="#888"
                       onBlur={onBlur}
-                      onChangeText={(text) =>
-                        handleInputChange("phoneNumber", text)
-                      }
+                      onChangeText={(text) => {
+                        handleInputChange("phoneNumber", text);
+                        onChange(text);
+                      }}
                       value={userValues.phoneNumber}
                       label={t("completeSignUp.profile.phoneNumber")}
                     />
@@ -545,10 +520,8 @@ export default function CompleteSignUp() {
       case 7:
         return (
           userValues.username !== "" &&
-          userValues.email !== "" &&
           userValues.phoneNumber !== "" &&
           !errors.username &&
-          !errors.email &&
           !errors.phoneNumber
         ); // Validar campos del perfil
       default:

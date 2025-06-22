@@ -335,4 +335,19 @@ export const styles = StyleSheet.create({
     color: Colors.Font2,
     fontSize: 14,
   },
+  // Error message styles
+  errorMessage: {
+    backgroundColor: "#4A1B1B", // Dark red background for error messages
+    borderColor: "#FF6B6B", // Red border for error messages
+    borderWidth: 1,
+  },
+  errorIconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  errorIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
 });

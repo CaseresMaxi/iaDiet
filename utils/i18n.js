@@ -90,6 +90,15 @@ const resources = {
           imageError: "Ha ocurrido un error al procesar la imagen",
           networkError:
             "Error de conexión. Por favor, verifica tu conexión a internet",
+          timeoutError: "La solicitud ha tardado demasiado tiempo",
+          serverError: "Error interno del servidor. Intenta más tarde",
+          authError:
+            "Error de autenticación. Por favor, inicia sesión nuevamente",
+          badRequest: "Solicitud inválida. Verifica los datos enviados",
+          forbiddenError: "No tienes permisos para realizar esta acción",
+          notFoundError: "El servicio no está disponible temporalmente",
+          rateLimitError:
+            "Has excedido el límite de mensajes. Espera un momento",
         },
       },
       completeSignUp: {

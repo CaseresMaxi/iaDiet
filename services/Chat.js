@@ -39,12 +39,24 @@ export const createImage = (
         console.log("Creación de imagen cancelada");
         return;
       }
+
       console.error(error);
+
+      // Determine the type of error and show appropriate message
+      let errorMessage = "";
+      if (!navigator.onLine) {
+        errorMessage = `${i18next.t("chat.error.networkError")}\n${i18next.t("chat.error.retry")}`;
+      } else if (error.message && error.message.includes("Failed to fetch")) {
+        errorMessage = `${i18next.t("chat.error.networkError")}\n${i18next.t("chat.error.retry")}`;
+      } else {
+        errorMessage = `${i18next.t("chat.error.imageError")}\n${i18next.t("chat.error.retry")}`;
+      }
+
       setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: `${Date.now().toString()}-error`,
-          text: `${i18next.t("chat.error.imageError")}\n${i18next.t("chat.error.retry")}`,
+          text: errorMessage,
           isBot: true,
           isError: true,
         },
@@ -234,7 +246,46 @@ Mantén tus respuestas claras y cortas.`,
 
       if (!response.ok) {
         console.log("error en endpoint");
-        throw new Error(`Error al enviar el mensaje: ${response.statusText}`);
+
+        // Handle specific HTTP status codes
+        let errorMessage = "";
+        switch (response.status) {
+          case 400:
+            errorMessage = `${i18next.t("chat.error.badRequest")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          case 401:
+            errorMessage = `${i18next.t("chat.error.authError")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          case 403:
+            errorMessage = `${i18next.t("chat.error.forbiddenError")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          case 404:
+            errorMessage = `${i18next.t("chat.error.notFoundError")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          case 429:
+            errorMessage = `${i18next.t("chat.error.rateLimitError")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          case 500:
+          case 502:
+          case 503:
+          case 504:
+            errorMessage = `${i18next.t("chat.error.serverError")}\n${i18next.t("chat.error.retry")}`;
+            break;
+          default:
+            errorMessage = `${i18next.t("chat.error.message")}\n${i18next.t("chat.error.retry")}`;
+        }
+
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: `${Date.now().toString()}-error`,
+            text: errorMessage,
+            isBot: true,
+            isError: true,
+          },
+        ]);
+        setisLoading(false);
+        return;
       }
 
       const data = await response.json();
@@ -263,12 +314,30 @@ Mantén tus respuestas claras y cortas.`,
       console.log("Envío de mensaje cancelado");
       return;
     }
+
     console.error("Error en la solicitud:", error);
+
+    // Determine the type of error and show appropriate message
+    let errorMessage = "";
+    if (!navigator.onLine) {
+      errorMessage = `${i18next.t("chat.error.networkError")}\n${i18next.t("chat.error.retry")}`;
+    } else if (error.message && error.message.includes("Failed to fetch")) {
+      errorMessage = `${i18next.t("chat.error.networkError")}\n${i18next.t("chat.error.retry")}`;
+    } else if (error.message && error.message.includes("timeout")) {
+      errorMessage = `${i18next.t("chat.error.timeoutError")}\n${i18next.t("chat.error.retry")}`;
+    } else if (error.message && error.message.includes("500")) {
+      errorMessage = `${i18next.t("chat.error.serverError")}\n${i18next.t("chat.error.retry")}`;
+    } else if (error.message && error.message.includes("401")) {
+      errorMessage = `${i18next.t("chat.error.authError")}\n${i18next.t("chat.error.retry")}`;
+    } else {
+      errorMessage = `${i18next.t("chat.error.message")}\n${i18next.t("chat.error.retry")}`;
+    }
+
     setMessages((prevMessages) => [
       ...prevMessages,
       {
         id: `${Date.now().toString()}-error`,
-        text: `${i18next.t("chat.error.message")}\n${i18next.t("chat.error.retry")}`,
+        text: errorMessage,
         isBot: true,
         isError: true,
       },
